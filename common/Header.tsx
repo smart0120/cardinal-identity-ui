@@ -110,40 +110,6 @@ export const StyledHeader = styled.div`
   }
 `;
 
-export const StyledTabs = styled.div`
-  margin: 30px auto;
-  top: 20px;
-  padding: 5px;
-  position: relative;
-  max-width: 600px;
-  background-color: ${Colors.navBg};
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-
-  .vline {
-    width: 1px;
-    height: 20px;
-    background: ${Colors.lightGray};
-    opacity: 0;
-  }
-`;
-
-export const StyledTab = styled.div`
-  border-radius: 20px;
-  background: ${(props) => (props.selected ? Colors.lightGrayBg : "none")};
-  color ${(props) => (props.disabled ? Colors.lightGrayBg : Colors.white)};
-  text-align: center;
-  width: 150px;
-  padding: 10px 20px;
-  cursor: pointer;
-  transition: 0.3s all;
-  &:hover {
-    background: ${Colors.darkGrayBg};
-  }
-`;
-
 const WalletButton = styled(WalletMultiButton)`
   color: rgba(255, 255, 255, 0.8);
   font-size: 14px;

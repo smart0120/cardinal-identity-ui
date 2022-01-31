@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 
-export const StyledBackground = styled.div`
+export const StyledBackground = styled.div<{ dark?: boolean }>`
   z-index: -1;
   top: 0;
   width: 100%;
@@ -26,7 +26,7 @@ export const StyledBackground = styled.div`
   }
 `;
 
-export const StyledBackgroundStatic = styled.div`
+export const StyledBackgroundStatic = styled.div<{ dark?: boolean }>`
   z-index: -1;
   top: 0;
   width: 100%;

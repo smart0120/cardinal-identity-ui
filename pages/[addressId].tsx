@@ -24,19 +24,19 @@ const TwitterClaim = () => {
   const { addressId } = router.query;
   let address;
   try {
-    address = new PublicKey(addressId);
+    address = new PublicKey(addressId || "");
   } catch (err) {}
 
   useMemo(() => {
     if (
       wallet.connected &&
-      addressId.toString() !== wallet.publicKey?.toString()
+      addressId?.toString() !== wallet.publicKey?.toString()
     ) {
       router.push(`/${wallet?.publicKey?.toString()}`, undefined, {
         shallow: true,
       });
     }
-  }, [wallet.connected, wallet.publicKey, router]);
+  }, [wallet.connected, wallet.publicKey, addressId, router]);
 
   return (
     <>

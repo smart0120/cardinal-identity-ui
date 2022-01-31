@@ -5,7 +5,6 @@ import * as Sentry from "@sentry/react";
 import { useEffect, useMemo } from "react";
 import { createContainer } from "unstated-next";
 
-import { SOLE_NETWORK } from "../providers/WalletConnectorProvider";
 import type { IEnvironment } from "./environments";
 import { environments } from "./environments";
 
@@ -25,18 +24,12 @@ interface UseEnvironment {
 }
 
 const useEnvironmentInternal = (): UseEnvironment => {
-  const { network, setNetwork } = useConnectionContext();
+  const { network } = useConnectionContext();
   useEffect(() => {
     Sentry.setContext("network", {
       network,
     });
   }, [network]);
-
-  useEffect(() => {
-    if (SOLE_NETWORK && SOLE_NETWORK !== network) {
-      setNetwork(SOLE_NETWORK);
-    }
-  });
 
   const environment: IEnvironment = environments[network];
   const chainId: ChainId = useMemo(() => networkToChainId(network), [network]);

@@ -14,6 +14,7 @@ export function notify({
   type?: string;
   placement?: string;
 }) {
+  // @ts-ignore
   notification[type]({
     message: <span>{message}</span>,
     description: (
