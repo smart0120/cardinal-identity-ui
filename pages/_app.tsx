@@ -1,12 +1,11 @@
-import type { AppProps } from "next/app";
 import "./styles.css";
-import { getWalletAdapters } from "@solana/wallet-adapter-wallets";
+import "tailwindcss/tailwind.css";
+
+import { WalletIdentityProvider } from "@cardinal/namespaces-components";
 import { WalletProvider } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
-import { WalletIdentityProvider } from "@cardinal/namespaces-components";
-
-import "tailwindcss/tailwind.css";
-// import { WalletConnectorProvider } from "../providers/WalletConnectorProvider";
+import { getWalletAdapters } from "@solana/wallet-adapter-wallets";
+import type { AppProps } from "next/app";
 import { EnvironmentContextProvider } from "providers/EnvironmentProvider";
 
 require("@solana/wallet-adapter-react-ui/styles.css");

@@ -1,11 +1,10 @@
-import { useWallet } from "@solana/wallet-adapter-react";
 import styled from "@emotion/styled";
-import { useRouter } from "next/router";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
-
 import { Header } from "common/Header";
 import { PlaceholderProfile, Profile } from "components/Profile";
-import { useEffect, useMemo } from "react";
+import { useRouter } from "next/router";
+import { useMemo } from "react";
 
 export const TwitterBackground = styled.div`
   z-index: -1;
