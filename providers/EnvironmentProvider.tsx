@@ -1,5 +1,5 @@
-import React, { useMemo, useState, useContext } from "react";
 import { Connection } from "@solana/web3.js";
+import React, { useContext, useMemo, useState } from "react";
 
 export interface Environment {
   label: string;
@@ -40,7 +40,7 @@ export function EnvironmentContextProvider({
   children: React.ReactChild;
 }) {
   // could be used by environment selector
-  const [environment, setEnvironment] = useState(ENVIRONMENTS[0]);
+  const [environment, setEnvironment] = useState<Environment>(ENVIRONMENTS[0]!);
 
   // only update connection if environment changes
   const connection = useMemo(
