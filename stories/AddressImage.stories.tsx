@@ -1,5 +1,6 @@
 import { Connection, PublicKey } from "@solana/web3.js";
 import type { ComponentMeta, ComponentStory } from "@storybook/react";
+import { omit } from "lodash";
 import React from "react";
 import { withReactContext } from "storybook-react-context";
 
@@ -33,19 +34,30 @@ export default {
   ],
 } as ComponentMeta<typeof AddressImage>;
 
-const Template: ComponentStory<typeof AddressImage> = ({
-  address,
-  ...args
-}) => {
-  const publicKey = tryPublicKey(address);
+const Template: ComponentStory<typeof AddressImage> = ({ ...args }) => {
+  let publicKey = args.address;
+  // @ts-ignore
+  if (typeof args.address !== PublicKey) {
+    // @ts-ignore
+    publicKey = tryPublicKey(args.address) || undefined;
+  }
   if (publicKey) {
-    return <AddressImage address={publicKey} {...args} />;
+    return (
+      <AddressImage
+        address={publicKey}
+        connection={
+          args.connection ||
+          new Connection("https://api.mainnet-beta.solana.com")
+        }
+        {...omit(args, "address", "connection")}
+      />
+    );
   }
   return <div>Invalid Public Key</div>;
 };
 
 export const Primary = Template.bind({});
 Primary.args = {
-  address: "3c5mtZ9PpGu3hj1W1a13Hie1CAXKnRyj2xruNxwWcWTz",
+  address: new PublicKey("3c5mtZ9PpGu3hj1W1a13Hie1CAXKnRyj2xruNxwWcWTz"),
   connection: new Connection("https://api.mainnet-beta.solana.com"),
 };
