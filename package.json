@@ -1,6 +1,6 @@
 {
   "name": "@cardinal/namespaces-components",
-  "version": "2.5.8",
+  "version": "2.5.9",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "scripts": {
