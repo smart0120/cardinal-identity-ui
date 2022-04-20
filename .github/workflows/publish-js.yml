@@ -37,7 +37,7 @@ jobs:
 
       - name: Install Yarn dependencies
         run: yarn install
-      - run: yarn build
+      - run: yarn build-lib
       - run: |
           echo 'npmAuthToken: "${NPM_AUTH_TOKEN}"' >> .yarnrc.yml
       - name: Publish

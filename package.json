@@ -1,11 +1,14 @@
 {
   "name": "@cardinal/namespaces-components",
   "version": "2.5.7",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "build-lib": "rm -fr dist/ && tsc && tsc -P tsconfig.esm.json",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook -o docs -s ./stories/assets"
   },
