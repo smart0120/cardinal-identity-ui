@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
 import styled from "@emotion/styled";
-import { PostTweet } from "./PostTweet";
+import type { Wallet } from "@saberhq/solana-contrib";
+import type { Connection } from "@solana/web3.js";
+import { useEffect, useState } from "react";
+
+import { Alert } from "../common/Alert";
 import { LoadingSpinner } from "../common/LoadingSpinner";
-import { ButtonWithFooter } from "./ButtonWithFooter";
-import { StepDetail } from "./StepDetail";
-import { Link, Megaphone, Verified } from "./icons";
+import { useClaimRequest } from "../hooks/useClaimRequest";
+import { useNameEntryData } from "../hooks/useNameEntryData";
+import { useReverseEntry } from "../hooks/useReverseEntry";
 import {
   apiBase,
   claimEntry,
@@ -13,16 +16,14 @@ import {
   setReverseEntry,
   tryGetNameEntry,
 } from "../utils/api";
-import { useClaimRequest } from "../hooks/useClaimRequest";
-import { useNameEntryData } from "../hooks/useNameEntryData";
-import { Connection } from "@solana/web3.js";
-import { Wallet } from "@saberhq/solana-contrib";
 import { formatShortAddress, formatTwitterLink } from "../utils/format";
-import { useReverseEntry } from "../hooks/useReverseEntry";
-import { PoweredByFooter } from "./PoweredByFooter";
+import { ButtonWithFooter } from "./ButtonWithFooter";
+import { Link, Megaphone, Verified } from "./icons";
 import { LabeledInput } from "./LabeledInput";
+import { PostTweet } from "./PostTweet";
+import { PoweredByFooter } from "./PoweredByFooter";
+import { StepDetail } from "./StepDetail";
 import { TwitterHandleNFT } from "./TwitterHandleNFT";
-import { Alert } from "../common/Alert";
 
 const handleFromTweetUrl = (raw: string | undefined): string | undefined => {
   if (!raw) return undefined;
@@ -52,7 +53,7 @@ export const NameEntryClaim = ({
   namespaceName?: string;
   appName?: string;
   appTwitter?: string;
-  notify?: Function;
+  notify?: (arg: { message?: string; txid?: string }) => void;
   onComplete?: (arg0: string) => void;
 }) => {
   const [verifyError, setVerifyError] = useState<React.ReactNode | undefined>(

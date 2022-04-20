@@ -1,7 +1,8 @@
-import { ClaimRequestData, getClaimRequest } from "@cardinal/namespaces";
-import { Connection, PublicKey } from "@solana/web3.js";
+import type { AccountData } from "@cardinal/certificates";
+import type { ClaimRequestData} from "@cardinal/namespaces";
+import { getClaimRequest } from "@cardinal/namespaces";
+import type { Connection, PublicKey } from "@solana/web3.js";
 import { useMemo, useState } from "react";
-import { AccountData } from "@cardinal/certificates";
 
 export const useClaimRequest = (
   connection: Connection | null,

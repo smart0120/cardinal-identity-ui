@@ -1,7 +1,8 @@
 import { tryGetName } from "@cardinal/namespaces";
-import { useWalletIdentity } from "../providers/WalletIdentityProvider";
-import type { PublicKey, Connection } from "@solana/web3.js";
+import type { Connection,PublicKey } from "@solana/web3.js";
 import { useMemo, useState } from "react";
+
+import { useWalletIdentity } from "../providers/WalletIdentityProvider";
 
 export const useAddressName = (
   connection: Connection,

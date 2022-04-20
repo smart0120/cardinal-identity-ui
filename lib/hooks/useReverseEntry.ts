@@ -1,7 +1,8 @@
-import { getReverseEntry, ReverseEntryData } from "@cardinal/namespaces";
-import { Connection, PublicKey } from "@solana/web3.js";
+import type { AccountData } from "@cardinal/certificates";
+import type { ReverseEntryData } from "@cardinal/namespaces";
+import { getReverseEntry } from "@cardinal/namespaces";
+import type { Connection, PublicKey } from "@solana/web3.js";
 import { useMemo, useState } from "react";
-import { AccountData } from "@cardinal/certificates";
 
 export const useReverseEntry = (
   connection: Connection | null,

@@ -1,8 +1,8 @@
-import { web3 } from "@project-serum/anchor";
-import { Wallet } from "@saberhq/solana-contrib";
-import { TwitterIcon } from "../common/TwitterIcon";
-import { Button } from "../common/Button";
+import type { web3 } from "@project-serum/anchor";
+import type { Wallet } from "@saberhq/solana-contrib";
 
+import { Button } from "../common/Button";
+import { TwitterIcon } from "../common/TwitterIcon";
 import { useWalletIdentity } from "../providers/WalletIdentityProvider";
 
 interface Props

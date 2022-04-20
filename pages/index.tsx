@@ -1,9 +1,8 @@
-import { useWallet } from "@solana/wallet-adapter-react";
 import styled from "@emotion/styled";
-import { useRouter } from "next/router";
-
+import { useWallet } from "@solana/wallet-adapter-react";
 import { Header } from "common/Header";
 import { PlaceholderProfile } from "components/Profile";
+import { useRouter } from "next/router";
 import { useEffect } from "react";
 
 export const TwitterBackground = styled.div`

@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
+import type { Wallet } from "@saberhq/solana-contrib";
+
 import { Button } from "../common/Button";
-import { Wallet } from "@saberhq/solana-contrib";
 import { TwitterIcon } from "../common/TwitterIcon";
 
 export const PostTweet = ({
@@ -15,7 +16,7 @@ export const PostTweet = ({
   appTwitter?: string | undefined;
   appName?: string | undefined;
   disabled: boolean;
-  callback?: Function;
+  callback?: () => void;
   cluster?: string | undefined;
 }) => {
   const link = useGenerateLink(

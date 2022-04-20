@@ -1,7 +1,8 @@
-import { NameEntryClaim } from "./NameEntryClaim";
 import styled from "@emotion/styled";
-import { Connection } from "@solana/web3.js";
-import { Wallet } from "@saberhq/solana-contrib";
+import type { Wallet } from "@saberhq/solana-contrib";
+import type { Connection } from "@solana/web3.js";
+
+import { NameEntryClaim } from "./NameEntryClaim";
 
 export type ClaimCardProps = {
   dev?: boolean;
@@ -10,8 +11,8 @@ export type ClaimCardProps = {
   wallet: Wallet | null;
   appName?: string;
   appTwitter?: string;
-  notify?: Function;
-  onComplete?: (asrg0: string) => void;
+  notify?: (arg: { message?: string; txid?: string }) => void;
+  onComplete?: (arg: string) => void;
 };
 
 export const ClaimCard = ({

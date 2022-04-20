@@ -1,7 +1,8 @@
-import type { PublicKey, Connection } from "@solana/web3.js";
+import type { Connection,PublicKey } from "@solana/web3.js";
 import ContentLoader from "react-content-loader";
+
 import { useAddressName } from "../hooks/useAddressName";
-import { formatTwitterLink, formatShortAddress } from "../utils/format";
+import { formatShortAddress,formatTwitterLink } from "../utils/format";
 
 export const DisplayAddress = ({
   connection,

@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
 import { breakName } from "@cardinal/namespaces";
-import { tryGetImageUrl } from "../utils/format";
-import type { PublicKey, Connection } from "@solana/web3.js";
+import type { Connection,PublicKey } from "@solana/web3.js";
+import { useMemo, useState } from "react";
 
+import { tryGetImageUrl } from "../utils/format";
 import { useAddressName } from "./useAddressName";
 
 export const useAddressImage = (

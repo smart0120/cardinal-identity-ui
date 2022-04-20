@@ -1,5 +1,5 @@
 import { web3 } from "@project-serum/anchor";
-import { Wallet } from "@saberhq/solana-contrib";
+import type { Wallet } from "@saberhq/solana-contrib";
 
 export const signAndSendTransaction = async (
   connection: web3.Connection,
@@ -20,7 +20,7 @@ export const signAndSendTransaction = async (
   return txid;
 };
 
-export const withSleep = async (fn: Function, sleep = 2000) => {
+export const withSleep = async (fn: () => void, sleep = 2000) => {
   await new Promise((r) => setTimeout(r, sleep));
   await fn();
 };

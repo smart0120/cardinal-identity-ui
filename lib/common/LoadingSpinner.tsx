@@ -1,4 +1,4 @@
-export const LoadingSpinner = ({ fill = "#FFF" }) => {
+export const LoadingSpinner = ({ fill = "#FFF" }: { fill?: string }) => {
   return (
     <div style={{ height: "40px" }}>
       <svg

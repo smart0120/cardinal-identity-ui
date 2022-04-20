@@ -1,21 +1,20 @@
-import type { PublicKey } from "@solana/web3.js";
-import ContentLoader from "react-content-loader";
-import { Alert } from "./Alert";
-import styled from "@emotion/styled";
-import { useRouter } from "next/router";
-import { FaUserAlt } from "react-icons/fa";
-
-import { useAddressImage } from "./useAddressImage";
-import { formatTwitterLink, useAddressName } from "./useAddressName";
-import { AddressLink } from "./AddressLink";
 import {
   ConnectTwitterButton,
   formatShortAddress,
 } from "@cardinal/namespaces-components";
-import { useEnvironmentCtx } from "providers/EnvironmentProvider";
+import styled from "@emotion/styled";
 import { useWallet } from "@solana/wallet-adapter-react";
+import type { PublicKey } from "@solana/web3.js";
 import { notify } from "common/Notification";
-import { FaShare } from "react-icons/fa";
+import { useRouter } from "next/router";
+import { useEnvironmentCtx } from "providers/EnvironmentProvider";
+import ContentLoader from "react-content-loader";
+import { FaShare,FaUserAlt  } from "react-icons/fa";
+
+import { AddressLink } from "./AddressLink";
+import { Alert } from "./Alert";
+import { useAddressImage } from "./useAddressImage";
+import { formatTwitterLink, useAddressName } from "./useAddressName";
 
 interface Props {
   address: PublicKey;

@@ -1,21 +1,24 @@
-import {
+import type {
   AccountData,
-  CertificateData,
+  CertificateData} from "@cardinal/certificates";
+import {
   certificateIdForMint,
   getCertificate,
 } from "@cardinal/certificates";
+import type {
+  EntryData} from "@cardinal/namespaces";
 import {
-  EntryData,
   getNameEntry,
   NAMESPACES_PROGRAM_ID,
 } from "@cardinal/namespaces";
-import * as anchor from "@project-serum/anchor";
 import * as metaplex from "@metaplex/js";
+import * as anchor from "@project-serum/anchor";
 import * as splToken from "@solana/spl-token";
-import {
+import type {
   Connection,
-  PublicKey,
-  TokenAccountBalancePair,
+  TokenAccountBalancePair} from "@solana/web3.js";
+import {
+  PublicKey
 } from "@solana/web3.js";
 import { useMemo, useState } from "react";
 

@@ -1,11 +1,11 @@
-import * as web3 from "@solana/web3.js";
-import * as namespaces from "@cardinal/namespaces";
-import * as certificates from "@cardinal/certificates";
-import * as splToken from "@solana/spl-token";
-import * as BufferLayout from "@solana/buffer-layout";
-import { Wallet } from "@saberhq/solana-contrib";
 import { withFindOrInitAssociatedTokenAccount } from "@cardinal/certificates";
-import { AccountData, EntryData } from "@cardinal/namespaces";
+import type { AccountData, EntryData } from "@cardinal/namespaces";
+import * as namespaces from "@cardinal/namespaces";
+import type { Wallet } from "@saberhq/solana-contrib";
+import * as BufferLayout from "@solana/buffer-layout";
+import * as splToken from "@solana/spl-token";
+import * as web3 from "@solana/web3.js";
+
 import { signAndSendTransaction } from "./transactions";
 
 export function apiBase(dev?: boolean): string {
@@ -339,83 +339,10 @@ export function createSyncNativeInstruction(
     data
   );
 
-  let keys = [{ pubkey: nativeAccount, isSigner: false, isWritable: true }];
+  const keys = [{ pubkey: nativeAccount, isSigner: false, isWritable: true }];
   return new web3.TransactionInstruction({
     keys,
     programId: splToken.TOKEN_PROGRAM_ID,
     data,
   });
-}
-
-const GOOGLE_API_KEYS = [
-  "AIzaSyDkw2sqop26epnX1uH474xqNJPQZR0wjcU",
-  "AIzaSyD8TYEdz-8g8-4baaIwvuMUXlI8C_d3UOM",
-  "AIzaSyAMQw50YDTi0nFst-WVx4m5ynK0HOe--Gc",
-  "AIzaSyDZkfN-v-tppKZa-AbVLN8vFcny0fE_b84",
-];
-
-export async function searchName(
-  connection: web3.Connection,
-  namespaceName: string,
-  entryName: string
-) {
-  let searchNames: string[] = [];
-  for (let i = 0; i < GOOGLE_API_KEYS.length; i++) {
-    try {
-      if (!(searchNames.length > 0)) {
-        const result = await fetch(
-          `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEYS[i]}&cx=93585a1fc79535d75&q=${entryName}`
-        );
-        const json = await result.json();
-        searchNames = json.items.map((item: any) => {
-          const match = item?.title?.match(/\(@(.*)\)/);
-          return match ? match[1] : null;
-        });
-      }
-    } catch (e) {
-      console.log(`Error fetching google names: ${e}`);
-    }
-  }
-  const filteredNames = [
-    entryName,
-    ...Array.from(
-      new Set(searchNames.filter((n) => n !== entryName && n != null))
-    ),
-  ];
-  const nameEntries = await namespaces.getNameEntries(
-    connection,
-    namespaceName,
-    filteredNames
-  );
-  console.log(nameEntries);
-
-  const mintIds = nameEntries
-    .map((nameEntry) => nameEntry?.parsed?.mint)
-    .filter((mintId) => mintId);
-  const certificateIdsTuple = await Promise.all(
-    mintIds.map((mintId) => certificates.certificateIdForMint(mintId))
-  );
-  const certificateIds = certificateIdsTuple.map((tup) => tup[0]);
-  const certificateDatas = await certificates.getCertificates(
-    connection,
-    certificateIds
-  );
-  const mintStringToCertificate = certificateDatas.reduce(
-    (acc: { [key: string]: any }, certificateData) => {
-      if (certificateData.parsed?.mint) {
-        acc[certificateData.parsed?.mint.toString()] = certificateData;
-      }
-      return acc;
-    },
-    {}
-  );
-  const results = [];
-  for (let i = 0; i < nameEntries.length; i++) {
-    results.push({
-      nameEntry: nameEntries[i],
-      certificate:
-        mintStringToCertificate[nameEntries[i]?.parsed?.mint?.toString() || ""],
-    });
-  }
-  return results;
 }
