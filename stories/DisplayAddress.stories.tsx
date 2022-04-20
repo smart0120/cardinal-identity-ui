@@ -30,25 +30,34 @@ const Template: ComponentStory<typeof DisplayAddress> = ({ ...args }) => {
   if (publicKey) {
     return (
       <WalletIdentityProvider>
-        <DisplayAddress
-          address={publicKey}
-          connection={
-            args.connection ||
-            new Connection('https://api.mainnet-beta.solana.com')
-          }
-          style={args.style}
-          height={args.height}
-          width={args.width}
-          dark={args.dark}
-        />
+        <div className="flex items-center justify-center">
+          <DisplayAddress
+            address={publicKey}
+            connection={
+              args.connection ||
+              new Connection('https://api.mainnet-beta.solana.com')
+            }
+            style={args.style}
+            height={args.height}
+            width={args.width}
+            dark={args.dark}
+          />
+        </div>
       </WalletIdentityProvider>
     )
   }
   return <div>Invalid Public Key</div>
 }
 
-export const Primary = Template.bind({})
-Primary.args = {
+export const Light = Template.bind({})
+Light.args = {
   address: new PublicKey('DNVVBNkdyv6tMentHdjVz5cpYmjQYcquLfYkz1fApT7Q'),
   connection: new Connection('https://api.mainnet-beta.solana.com'),
+}
+
+export const Dark = Template.bind({})
+Dark.args = {
+  address: new PublicKey('DNVVBNkdyv6tMentHdjVz5cpYmjQYcquLfYkz1fApT7Q'),
+  connection: new Connection('https://api.mainnet-beta.solana.com'),
+  dark: true,
 }
