@@ -1,20 +1,20 @@
-import { formatShortAddress } from "@cardinal/namespaces-components";
-import styled from "@emotion/styled";
-import type { PublicKey } from "@solana/web3.js";
-import { notify } from "common/Notification";
-import copy from "copy-to-clipboard";
-import { useEnvironmentCtx } from "providers/EnvironmentProvider";
-import React from "react";
-import { FaRegCopy } from "react-icons/fa";
-import tw from "twin.macro";
+import { formatShortAddress } from '@cardinal/namespaces-components'
+import styled from '@emotion/styled'
+import type { PublicKey } from '@solana/web3.js'
+import { notify } from 'common/Notification'
+import copy from 'copy-to-clipboard'
+import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
+import React from 'react'
+import { FaRegCopy } from 'react-icons/fa'
+import tw from 'twin.macro'
 
 interface Props {
-  address: PublicKey;
-  className?: string;
-  showCopy?: boolean;
-  children?: React.ReactNode;
-  showRaw?: boolean;
-  shorten?: boolean;
+  address: PublicKey
+  className?: string
+  showCopy?: boolean
+  children?: React.ReactNode
+  showRaw?: boolean
+  shorten?: boolean
 }
 
 export const AddressLink: React.FC<Props> = ({
@@ -25,13 +25,13 @@ export const AddressLink: React.FC<Props> = ({
   showRaw = true,
   children,
 }: Props) => {
-  const { environment } = useEnvironmentCtx();
+  const { environment } = useEnvironmentCtx()
   return (
     <Wrapper>
       <StyledA
         className={className}
         href={`https://explorer.solana.com/address/${address.toString()}?cluster=${
-          environment.label === "devnet" ? "devnet" : ""
+          environment.label === 'devnet' ? 'devnet' : ''
         }`}
         target="_blank"
         rel="noopener noreferrer"
@@ -46,18 +46,18 @@ export const AddressLink: React.FC<Props> = ({
       {showCopy && (
         <CopyIcon
           onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            copy(address.toString());
-            notify({ message: "Copied address to clipboard." });
+            e.preventDefault()
+            e.stopPropagation()
+            copy(address.toString())
+            notify({ message: 'Copied address to clipboard.' })
           }}
         />
       )}
     </Wrapper>
-  );
-};
+  )
+}
 
-const StyledA = styled.a``;
+const StyledA = styled.a``
 
 const Wrapper = styled.div`
   ${tw`inline-flex items-center`}
@@ -71,8 +71,8 @@ const Wrapper = styled.div`
       opacity: 0.7;
     }
   }
-`;
+`
 
 const CopyIcon = styled(FaRegCopy)`
-  ${tw`ml-1 cursor-pointer text-gray-800 dark:text-warmGray-200 hover:text-primary`}
-`;
+  ${tw`ml-1 cursor-pointer text-gray-800 dark:text-gray-200 hover:text-gray-600`}
+`

@@ -2,13 +2,13 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import React from 'react'
 
-import { AddressImage } from '../lib/components/AddressImage'
+import { ProfileSmall } from '../lib/components/ProfileSmall'
 import { WalletIdentityProvider } from '../lib/providers/WalletIdentityProvider'
 import { tryPublicKey } from '../lib/utils/format'
 
 export default {
-  title: 'Components/AddressImage',
-  component: AddressImage,
+  title: 'Components/ProfileSmall',
+  component: ProfileSmall,
   argTypes: {
     connection: {
       options: ['mainnet', 'devnet', 'testnet'],
@@ -23,24 +23,22 @@ export default {
       },
     },
   },
-} as ComponentMeta<typeof AddressImage>
+} as ComponentMeta<typeof ProfileSmall>
 
-const Template: ComponentStory<typeof AddressImage> = ({ ...args }) => {
+const Template: ComponentStory<typeof ProfileSmall> = ({ ...args }) => {
   const publicKey = tryPublicKey(args.address)
   if (publicKey) {
     return (
       <WalletIdentityProvider>
-        <AddressImage
-          address={publicKey}
-          connection={
-            args.connection ||
-            new Connection('https://api.mainnet-beta.solana.com')
-          }
-          style={args.style}
-          height={args.height}
-          width={args.width}
-          dark={args.dark}
-        />
+        <div className="ml-[40%]">
+          <ProfileSmall
+            address={publicKey}
+            connection={
+              args.connection ||
+              new Connection('https://api.mainnet-beta.solana.com')
+            }
+          />
+        </div>
       </WalletIdentityProvider>
     )
   }

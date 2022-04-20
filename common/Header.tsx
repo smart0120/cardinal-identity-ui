@@ -1,7 +1,6 @@
+import styled from "@emotion/styled";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useEnvironmentCtx } from "providers/EnvironmentProvider";
-import styled from "@emotion/styled";
-import Colors from "./colors";
 
 export const StyledHeader = styled.div`
   z-index: 100;

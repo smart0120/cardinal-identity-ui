@@ -17,9 +17,17 @@ export const formatTwitterLink = (handle: string | undefined) => {
   );
 };
 
+export function shortPubKey(pubkey: PublicKey | string | null | undefined) {
+  if (!pubkey) return "";
+  return `${pubkey?.toString().substring(0, 4)}..${pubkey
+    ?.toString()
+    .substring(pubkey?.toString().length - 4)}`;
+}
+
 export const tryPublicKey = (
-  publicKeyString: string | string[] | undefined | null
+  publicKeyString: PublicKey | string | string[] | undefined | null
 ): PublicKey | null => {
+  if (publicKeyString instanceof PublicKey) return publicKeyString;
   if (!publicKeyString) return null;
   try {
     return new PublicKey(publicKeyString);
