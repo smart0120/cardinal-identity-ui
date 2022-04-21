@@ -1,6 +1,6 @@
 {
-  "name": "@cardinal/namespaces-components",
-  "version": "2.5.11",
+  "name": "cardinal-identity-ui",
+  "version": "1.0.0",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "scripts": {
