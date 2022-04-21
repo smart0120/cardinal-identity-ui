@@ -21,6 +21,6 @@
     "forceConsistentCasingInFileNames": true,
     "noErrorTruncation": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "common/*.ts", "common/*.tsx", "components/*.ts", "components/*.tsx", "pages/*.ts", "pages/*.tsx", "providers/*.ts", "providers/*.tsx", "utils/*.ts", "utils/*.tsx"],
   "exclude": ["node_modules"]
 }
