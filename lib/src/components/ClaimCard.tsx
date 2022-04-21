@@ -1,19 +1,19 @@
-import styled from "@emotion/styled";
-import type { Wallet } from "@saberhq/solana-contrib";
-import type { Connection } from "@solana/web3.js";
+import styled from '@emotion/styled'
+import type { Wallet } from '@saberhq/solana-contrib'
+import type { Connection } from '@solana/web3.js'
 
-import { NameEntryClaim } from "./NameEntryClaim";
+import { NameEntryClaim } from './NameEntryClaim'
 
 export type ClaimCardProps = {
-  dev?: boolean;
-  cluster?: string;
-  connection: Connection | null;
-  wallet: Wallet | null;
-  appName?: string;
-  appTwitter?: string;
-  notify?: (arg: { message?: string; txid?: string }) => void;
-  onComplete?: (arg: string) => void;
-};
+  dev?: boolean
+  cluster?: string
+  connection: Connection | null
+  wallet: Wallet | null
+  appName?: string
+  appTwitter?: string
+  notify?: (arg: { message?: string; txid?: string }) => void
+  onComplete?: (arg: string) => void
+}
 
 export const ClaimCard = ({
   appName,
@@ -40,8 +40,8 @@ export const ClaimCard = ({
         />
       </ClaimCardOuter>
     </>
-  );
-};
+  )
+}
 
 export const ClaimCardOuter = styled.div`
   width 100%;
@@ -50,4 +50,4 @@ export const ClaimCardOuter = styled.div`
   margin: 0px auto;
   min-height: 200px;
   padding: 0px 20px;
-`;
+`

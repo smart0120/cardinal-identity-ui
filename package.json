@@ -102,7 +102,21 @@
     "postcss": "^8.4.5",
     "prettier": "^2.5.1",
     "prettier-plugin-tailwindcss": "^0.1.1",
+    "webpack": "^5.70.0",
+    
     "storybook-dark-mode": "^1.0.9",
-    "webpack": "^5.70.0"
+    "@storybook/addon-actions": "^6.4.22",
+    "@storybook/addon-controls": "^6.4.22",
+    "@storybook/addon-docs": "^6.4.22",
+    "@storybook/addon-essentials": "^6.4.22",
+    "@storybook/addon-info": "^5.3.21",
+    "@storybook/addon-interactions": "^6.4.22",
+    "@storybook/addon-links": "^6.4.22",
+    "@storybook/addon-postcss": "^2.0.0",
+    "@storybook/addon-storysource": "^6.4.22",
+    "@storybook/builder-webpack5": "^6.4.22",
+    "@storybook/manager-webpack5": "^6.4.22",
+    "@storybook/react": "^6.4.22",
+    "@storybook/testing-library": "^0.0.10"
   }
 }

@@ -1,16 +1,16 @@
-import styled from "@emotion/styled";
-import { lighten } from "polished";
+import styled from '@emotion/styled'
+import { lighten } from 'polished'
 
-import { LoadingSpinner } from "../common/LoadingSpinner";
+import { LoadingSpinner } from '../common/LoadingSpinner'
 
 interface Props
   extends React.DetailedHTMLProps<
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     HTMLButtonElement
   > {
-  loading?: boolean;
-  complete?: boolean;
-  footer?: React.ReactNode;
+  loading?: boolean
+  complete?: boolean
+  footer?: React.ReactNode
 }
 
 export const ButtonWithFooter: React.FC<Props> = ({
@@ -34,8 +34,8 @@ export const ButtonWithFooter: React.FC<Props> = ({
       </BigButton>
       <FooterText>{footer}</FooterText>
     </BottomArea>
-  );
-};
+  )
+}
 
 export const BottomArea = styled.div`
   margin-top: 40px;
@@ -46,7 +46,7 @@ export const BottomArea = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 18px;
-`;
+`
 
 export const FooterText = styled.div`
   font-size: 12px;
@@ -57,7 +57,7 @@ export const FooterText = styled.div`
     color: #696969;
     font-weight: bold;
   }
-`;
+`
 
 export const BigButton = styled.button`
   border: none;
@@ -74,13 +74,13 @@ export const BigButton = styled.button`
   text-align: center;
   background: #000000;
   color: #fff;
-  cursor: ${({ disabled }) => (disabled ? "default" : "pointer")};
+  cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
 
   opacity: ${({ disabled }) => (disabled ? 0.3 : 1)};
   &:hover {
-    background: ${({ disabled }) => (disabled ? "" : lighten(0.133, "#000"))};
+    background: ${({ disabled }) => (disabled ? '' : lighten(0.133, '#000'))};
   }
   &:active {
-    background: ${({ disabled }) => (disabled ? "" : lighten(0.212, "#000"))};
+    background: ${({ disabled }) => (disabled ? '' : lighten(0.212, '#000'))};
   }
-`;
+`
