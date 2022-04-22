@@ -1,12 +1,12 @@
 import styled from '@emotion/styled'
 import type { Wallet } from '@saberhq/solana-contrib'
-import type { Connection } from '@solana/web3.js'
+import type { Cluster, Connection } from '@solana/web3.js'
 
 import { NameEntryClaim } from './NameEntryClaim'
 
 export type ClaimCardProps = {
   dev?: boolean
-  cluster?: string
+  cluster?: Cluster
   connection: Connection | null
   wallet: Wallet | null
   appName?: string

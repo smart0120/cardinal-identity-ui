@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import type { Wallet } from '@saberhq/solana-contrib'
-import type { Connection } from '@solana/web3.js'
+import type { Cluster, Connection } from '@solana/web3.js'
 import { useEffect, useState } from 'react'
 
 import { Alert } from '../common/Alert'
@@ -37,7 +37,7 @@ const tweetIdFromTweetUrl = (raw: string | undefined): string | undefined => {
 
 export const NameEntryClaim = ({
   dev = false,
-  cluster = 'mainnet',
+  cluster = 'mainnet-beta',
   connection,
   wallet,
   namespaceName = 'twitter',
@@ -47,7 +47,7 @@ export const NameEntryClaim = ({
   onComplete,
 }: {
   dev?: boolean
-  cluster?: string
+  cluster?: Cluster
   connection: Connection | null
   wallet: Wallet | null
   namespaceName?: string
