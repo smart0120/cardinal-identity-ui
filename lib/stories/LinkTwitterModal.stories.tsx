@@ -1,6 +1,5 @@
 import { WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
-import { getWalletAdapters } from '@solana/wallet-adapter-wallets'
 import { Connection, PublicKey } from '@solana/web3.js'
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import React from 'react'
@@ -24,6 +23,12 @@ export default {
       address: {
         control: 'text',
       },
+      appName: {
+        control: 'text',
+      },
+      appTwitter: {
+        control: 'text',
+      },
     },
   },
 } as ComponentMeta<typeof ConnectTwitterButton>
@@ -33,9 +38,12 @@ const Template: ComponentStory<typeof ConnectTwitterButton> = ({ ...args }) => {
   require('@solana/wallet-adapter-react-ui/styles.css')
   if (publicKey) {
     return (
-      <WalletProvider wallets={getWalletAdapters()}>
+      <WalletProvider wallets={[]}>
         <WalletModalProvider>
-          <WalletIdentityProvider>
+          <WalletIdentityProvider
+            appName="App Name"
+            appTwitter="@cardinal_labs"
+          >
             <div
               style={{
                 display: 'flex',

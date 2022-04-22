@@ -1,9 +1,9 @@
 import type { Connection, PublicKey } from '@solana/web3.js'
 import { HiUserCircle } from 'react-icons/hi'
 
+import { shortPubKey } from '../utils/format'
 import { AddressImage } from './AddressImage'
 import { DisplayAddress } from './DisplayAddress'
-import { shortPubKey } from '../utils/format'
 
 export const ProfileSmall = ({
   connection,

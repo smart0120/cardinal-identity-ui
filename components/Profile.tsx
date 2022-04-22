@@ -1,6 +1,9 @@
 import {
   ConnectTwitterButton,
   formatShortAddress,
+  formatTwitterLink,
+  useAddressImage,
+  useAddressName,
 } from '@cardinal/namespaces-components'
 import styled from '@emotion/styled'
 import { useWallet } from '@solana/wallet-adapter-react'
@@ -13,8 +16,6 @@ import { FaShare, FaUserAlt } from 'react-icons/fa'
 
 import { AddressLink } from './AddressLink'
 import { Alert } from './Alert'
-import { useAddressImage } from './useAddressImage'
-import { formatTwitterLink, useAddressName } from './useAddressName'
 
 interface Props {
   address: PublicKey
@@ -34,8 +35,12 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
   const { connection, environment } = useEnvironmentCtx()
   const dev = router.query['dev'] === 'true'
   const addressStr = address.toString()
-  const { displayName, loadingName } = useAddressName(address)
-  const { addressImage, loadingImage } = useAddressImage(address, dev)
+  const { displayName, loadingName } = useAddressName(connection, address)
+  const { addressImage, loadingImage } = useAddressImage(
+    connection,
+    address,
+    dev
+  )
   return (
     <div
       style={{

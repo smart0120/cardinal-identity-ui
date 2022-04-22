@@ -1,18 +1,19 @@
-import { notification } from "antd";
-import "antd/lib/notification/style/index.css";
+import 'antd/lib/notification/style/index.css'
+
+import { notification } from 'antd'
 
 export function notify({
   message,
   description,
   txid,
-  type = "info",
-  placement = "topRight",
+  type = 'info',
+  placement = 'topRight',
 }: {
-  message: string;
-  description?: string | JSX.Element;
-  txid?: string;
-  type?: string;
-  placement?: string;
+  message: string
+  description?: string | JSX.Element
+  txid?: string
+  type?: string
+  placement?: string
 }) {
   // @ts-ignore
   notification[type]({
@@ -24,7 +25,7 @@ export function notify({
           <a
             rel="noreferrer"
             target="_blank"
-            href={"https://explorer.solana.com/tx/" + txid}
+            href={'https://explorer.solana.com/tx/' + txid}
           >
             View transaction {txid.slice(0, 8)}...{txid.slice(txid.length - 8)}
           </a>
@@ -32,5 +33,5 @@ export function notify({
       </>
     ),
     placement,
-  });
+  })
 }
