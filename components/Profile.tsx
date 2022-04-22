@@ -41,6 +41,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
     address,
     dev
   )
+
   return (
     <div
       style={{

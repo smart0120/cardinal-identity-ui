@@ -1,9 +1,13 @@
 import { Connection } from '@solana/web3.js'
+import { firstParam } from 'common/utils'
+import type { NextPageContext } from 'next'
+import { useRouter } from 'next/router'
 import React, { useContext, useMemo, useState } from 'react'
 
 export interface Environment {
   label: string
   value: string
+  override?: string
 }
 
 export interface EnvironmentContextValues {
@@ -15,7 +19,9 @@ export interface EnvironmentContextValues {
 export const ENVIRONMENTS: Environment[] = [
   {
     label: 'mainnet',
-    value: 'https://ssc-dao.genesysgo.net/',
+    value:
+      'https://solana-api.syndica.io/access-token/bkBr4li7aGVa3euVG0q4iSI6uuMiEo2jYQD35r8ytGZrksM7pdJi2a57pmlYRqCw',
+    override: 'https://ssc-dao.genesysgo.net',
   },
   {
     label: 'testnet',
@@ -34,17 +40,46 @@ export const ENVIRONMENTS: Environment[] = [
 const EnvironmentContext: React.Context<null | EnvironmentContextValues> =
   React.createContext<null | EnvironmentContextValues>(null)
 
-export function EnvironmentContextProvider({
+export const getInitialProps = async ({
+  ctx,
+}: {
+  ctx: NextPageContext
+}): Promise<{ cluster: string }> => {
+  const cluster = (ctx.query.project || ctx.query.host)?.includes('dev')
+    ? 'devnet'
+    : (ctx.query.project || ctx.query.host)?.includes('test')
+    ? 'testnet'
+    : ctx.query.cluster || process.env.BASE_CLUSTER
+  return {
+    cluster: firstParam(cluster),
+  }
+}
+
+export function EnvironmentProvider({
   children,
+  defaultCluster,
 }: {
   children: React.ReactChild
+  defaultCluster: string
 }) {
-  // could be used by environment selector
-  const [environment, setEnvironment] = useState<Environment>(ENVIRONMENTS[0]!)
+  const { query } = useRouter()
+  const cluster = (query.project || query.host)?.includes('dev')
+    ? 'devnet'
+    : (query.project || query.host)?.includes('test')
+    ? 'testnet'
+    : query.cluster || defaultCluster || process.env.BASE_CLUSTER
+  const foundEnvironment = ENVIRONMENTS.find((e) => e.label === cluster)
+  const [environment, setEnvironment] = useState<Environment>(
+    foundEnvironment ?? ENVIRONMENTS[0]!
+  )
 
-  // only update connection if environment changes
+  useMemo(() => {
+    const foundEnvironment = ENVIRONMENTS.find((e) => e.label === cluster)
+    setEnvironment(foundEnvironment ?? ENVIRONMENTS[0]!)
+  }, [cluster])
+
   const connection = useMemo(
-    () => new Connection(environment.value, 'recent'),
+    () => new Connection(environment.value, { commitment: 'recent' }),
     [environment]
   )
 
