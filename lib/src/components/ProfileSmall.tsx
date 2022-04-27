@@ -11,6 +11,8 @@ export const ProfileSmall = ({
   dark,
   onClick,
   placeholder,
+  className,
+  style,
 }: {
   /** Solana RPC Connection to load this profile  */
   connection: Connection
@@ -22,9 +24,17 @@ export const ProfileSmall = ({
   onClick?: () => void
   /** Placeholder for showing while the avatar is loading */
   placeholder?: React.ReactNode
+  /** Optional class name to add to the profile div */
+  className?: string
+  /** Optional style prop to add to the profile div */
+  style?: React.CSSProperties
 }) => {
   return (
-    <div className="flex cursor-pointer gap-2 text-sm" onClick={onClick}>
+    <div
+      className={`${className} flex cursor-pointer gap-2 text-sm`}
+      style={style}
+      onClick={onClick}
+    >
       <AddressImage
         connection={connection}
         address={address || undefined}
@@ -33,15 +43,7 @@ export const ProfileSmall = ({
         dark={dark}
         placeholder={
           placeholder || (
-            <div
-              className="text-gray-300"
-              style={{
-                cursor: 'pointer',
-                overflow: 'hidden',
-                height: '40px',
-                width: '40px',
-              }}
-            >
+            <div className="h-[40px] w-[40px] cursor-pointer overflow-hidden text-gray-300">
               <HiUserCircle className="relative left-[-5px] top-[-5px] h-[50px] w-[50px]" />
             </div>
           )
