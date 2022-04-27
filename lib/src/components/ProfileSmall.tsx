@@ -43,8 +43,25 @@ export const ProfileSmall = ({
         dark={dark}
         placeholder={
           placeholder || (
-            <div className="h-[40px] w-[40px] cursor-pointer overflow-hidden text-gray-300">
-              <HiUserCircle className="relative left-[-5px] top-[-5px] h-[50px] w-[50px]" />
+            <div
+              style={{
+                color: 'rgb(209, 213, 219)',
+                cursor: 'pointer',
+                overflow: 'hidden',
+                height: '40px',
+                width: '40px',
+              }}
+            >
+              <HiUserCircle
+                style={{
+                  position: 'relative',
+                  height: '50px',
+                  width: '50px',
+                  left: '-5px',
+                  top: '-5px',
+                }}
+                className="relative left-[-5px] top-[-5px] h-[50px] w-[50px]"
+              />
             </div>
           )
         }
