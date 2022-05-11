@@ -8,6 +8,7 @@ import {
 import styled from '@emotion/styled'
 import { useWallet } from '@solana/wallet-adapter-react'
 import type { PublicKey } from '@solana/web3.js'
+import { Connection } from '@solana/web3.js'
 import { notify } from 'common/Notification'
 import { useRouter } from 'next/router'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
@@ -177,6 +178,11 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
             // @ts-ignore
             wallet={wallet}
             connection={connection}
+            secondaryConnection={
+              environment.secondary
+                ? new Connection(environment.secondary)
+                : connection
+            }
             cluster={environment.label}
           />
         </div>
