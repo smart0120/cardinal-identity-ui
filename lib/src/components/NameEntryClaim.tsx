@@ -39,6 +39,7 @@ export const NameEntryClaim = ({
   dev = false,
   cluster = 'mainnet-beta',
   connection,
+  secondaryConnection,
   wallet,
   namespaceName = 'twitter',
   appName,
@@ -49,6 +50,7 @@ export const NameEntryClaim = ({
   dev?: boolean
   cluster?: Cluster
   connection: Connection | null
+  secondaryConnection?: Connection
   wallet: Wallet | null
   namespaceName?: string
   appName?: string
@@ -81,7 +83,7 @@ export const NameEntryClaim = ({
   )
 
   const { nameEntryData, loadingNameEntry, refreshNameEntryData } =
-    useNameEntryData(connection, namespaceName, handle)
+    useNameEntryData(secondaryConnection || connection, namespaceName, handle)
 
   const { claimRequest, loadingClaimRequest, getClaimRequestData } =
     useClaimRequest(connection, namespaceName, handle, wallet?.publicKey)

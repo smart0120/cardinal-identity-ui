@@ -172,8 +172,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
         <div style={{ margin: '10px auto' }}>
           <ConnectTwitterButton
             disabled={address?.toString() !== wallet?.publicKey?.toString()}
-            // @ts-ignore
-            address={wallet.publicKey}
+            address={wallet.publicKey!}
             dev={dev}
             // @ts-ignore
             wallet={wallet}

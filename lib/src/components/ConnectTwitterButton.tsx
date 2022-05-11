@@ -16,6 +16,7 @@ interface Props
   > {
   cluster: Cluster
   connection: web3.Connection
+  secondaryConnection?: web3.Connection
   wallet: Wallet
   address: web3.PublicKey
   disabled?: boolean
@@ -28,6 +29,7 @@ export const ConnectTwitterButton: React.FC<Props> = ({
   dev,
   cluster,
   connection,
+  secondaryConnection,
   wallet,
   address,
   disabled,
@@ -39,7 +41,9 @@ export const ConnectTwitterButton: React.FC<Props> = ({
       variant={variant}
       disabled={disabled}
       {...buttonProps}
-      onClick={() => !disabled && show(wallet, connection, cluster, dev)}
+      onClick={() =>
+        !disabled && show(wallet, connection, cluster, secondaryConnection, dev)
+      }
     >
       <div style={{ height: '14px', width: '20px' }}>
         <TwitterIcon disabled={disabled} height={14} width={20} />

@@ -7,8 +7,9 @@ import { NameEntryClaim } from './NameEntryClaim'
 export type ClaimCardProps = {
   dev?: boolean
   cluster?: Cluster
-  connection: Connection | null
-  wallet: Wallet | null
+  connection: Connection | undefined
+  secondaryConnection: Connection | undefined
+  wallet: Wallet | undefined
   appName?: string
   appTwitter?: string
   notify?: (arg: { message?: string; txid?: string }) => void
@@ -21,6 +22,7 @@ export const ClaimCard = ({
   dev,
   cluster,
   connection,
+  secondaryConnection,
   wallet,
   notify,
   onComplete,
@@ -31,8 +33,9 @@ export const ClaimCard = ({
         <NameEntryClaim
           dev={dev}
           cluster={cluster}
-          connection={connection}
-          wallet={wallet}
+          connection={connection ?? null}
+          secondaryConnection={secondaryConnection}
+          wallet={wallet ?? null}
           appName={appName}
           appTwitter={appTwitter}
           notify={notify}

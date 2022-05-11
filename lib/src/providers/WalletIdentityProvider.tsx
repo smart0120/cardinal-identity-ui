@@ -11,6 +11,7 @@ export interface WalletIdentity {
     wallet: Wallet,
     connection: Connection,
     cluster: Cluster,
+    secondaryConnection?: Connection,
     dev?: boolean
   ) => void
   handle: string | undefined
@@ -32,8 +33,9 @@ export const WalletIdentityProvider: React.FC<Props> = ({
   appTwitter,
   children,
 }: Props) => {
-  const [wallet, setWallet] = useState<Wallet | null>(null)
-  const [connection, setConnection] = useState<Connection | null>(null)
+  const [wallet, setWallet] = useState<Wallet>()
+  const [connection, setConnection] = useState<Connection>()
+  const [secondaryConnection, setSecondaryConnection] = useState<Connection>()
   const [cluster, setCluster] = useState<Cluster | undefined>(undefined)
   const [dev, setDev] = useState<boolean | undefined>(undefined)
   const [showIdentityModal, setShowIdentityModal] = useState<boolean>(false)
@@ -42,10 +44,11 @@ export const WalletIdentityProvider: React.FC<Props> = ({
   return (
     <WalletIdentityContext.Provider
       value={{
-        show: (wallet, connection, cluster, dev) => {
+        show: (wallet, connection, cluster, secondaryConnection, dev) => {
           setWallet(wallet)
           setConnection(connection)
           setCluster(cluster)
+          setSecondaryConnection(secondaryConnection)
           setDev(dev)
           setShowIdentityModal(true)
         },
@@ -63,6 +66,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
           cluster={cluster}
           wallet={wallet}
           connection={connection}
+          secondaryConnection={secondaryConnection}
           appName={appName}
           appTwitter={appTwitter}
           onComplete={(handle: string) => {
