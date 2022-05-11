@@ -139,7 +139,7 @@ export const Header = ({ title }: { title?: string }) => {
       </div>
       {title && <div className="center">{title}</div>}
       <div className="right">
-        {environment.label !== 'mainnet' && (
+        {environment.label !== 'mainnet-beta' && (
           <div
             style={{
               color: 'rgb(101,119,134,1)',
