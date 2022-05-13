@@ -1,6 +1,6 @@
 {
   "name": "@cardinal/namespaces-components",
-  "version": "3.0.6",
+  "version": "3.0.13",
   "description": "Solana namespaces react components library",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -21,6 +21,7 @@
   },
   "scripts": {
     "build": "rm -fr dist/ && tsc && tsc -P tsconfig.esm.json",
+    "postbuild": "NODE_ENV=production tailwindcss build ./styles.css -o dist/esm/styles.css && NODE_ENV=production tailwindcss build ./styles.css -o dist/cjs/styles.css",
     "test": "echo \"Error: no test specified\" && exit 1",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook -o docs -s ./stories/assets"
