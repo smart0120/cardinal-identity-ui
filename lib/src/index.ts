@@ -1,3 +1,4 @@
+export * from './components/AccountConnect'
 export * from './components/AccountPopover'
 export * from './components/AddressImage'
 export * from './components/ClaimCard'
