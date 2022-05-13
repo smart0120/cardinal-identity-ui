@@ -31,7 +31,7 @@ export const AccountPopover = ({
   return (
     <div className="w-screen max-w-[300px] ">
       <div
-        className="w-11/12 rounded-lg shadow-2xl md:w-full"
+        className="w-full rounded-lg shadow-2xl"
         style={{
           ...style,
           backgroundColor: dark ? 'rgb(42, 44, 52)' : 'rgb(255, 255, 255)',
