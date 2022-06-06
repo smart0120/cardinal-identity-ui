@@ -1,10 +1,14 @@
+import { getNameEntry } from '@cardinal/namespaces'
+import { tryPublicKey } from '@cardinal/namespaces-components'
 import styled from '@emotion/styled'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { PublicKey } from '@solana/web3.js'
+import type { PublicKey } from '@solana/web3.js'
 import { Header } from 'common/Header'
+import { firstParam } from 'common/utils'
 import { PlaceholderProfile, Profile } from 'components/Profile'
 import { useRouter } from 'next/router'
-import { useMemo } from 'react'
+import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
+import { useMemo, useState } from 'react'
 
 export const TwitterBackground = styled.div`
   z-index: -1;
@@ -19,14 +23,11 @@ export const TwitterBackground = styled.div`
 const TwitterClaim = () => {
   const wallet = useWallet()
   const router = useRouter()
-
+  const [address, setAddress] = useState<PublicKey>()
+  const { connection } = useEnvironmentCtx()
   const { addressId } = router.query
-  let address
-  try {
-    address = new PublicKey(addressId || '')
-  } catch (err) {}
 
-  useMemo(() => {
+  useMemo(async () => {
     if (
       wallet.connected &&
       addressId?.toString() !== wallet.publicKey?.toString()
@@ -34,6 +35,18 @@ const TwitterClaim = () => {
       router.push(`/${wallet?.publicKey?.toString()}`, undefined, {
         shallow: true,
       })
+    }
+
+    const tryAddress = tryPublicKey(addressId)
+    if (tryAddress) {
+      setAddress(tryAddress)
+    } else {
+      const nameEntry = await getNameEntry(
+        connection,
+        'twitter',
+        firstParam(addressId)
+      )
+      nameEntry.parsed.data && setAddress(nameEntry.parsed.data as PublicKey)
     }
   }, [wallet.connected, wallet.publicKey, addressId, router])
 
