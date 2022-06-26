@@ -1,11 +1,11 @@
 import { getNameEntry } from '@cardinal/namespaces'
-import { tryPublicKey } from '@cardinal/namespaces-components'
 import styled from '@emotion/styled'
 import { useWallet } from '@solana/wallet-adapter-react'
 import type { PublicKey } from '@solana/web3.js'
 import { Header } from 'common/Header'
 import { firstParam } from 'common/utils'
 import { PlaceholderProfile, Profile } from 'components/Profile'
+import { tryPublicKey } from 'lib/src'
 import { useRouter } from 'next/router'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
 import { useMemo, useState } from 'react'
@@ -17,7 +17,6 @@ export const TwitterBackground = styled.div`
   height: 100%;
   position: fixed;
   background: #1da1f2;
-  //   background: linear-gradient(-45deg, #23a6d5, #1da1f2);
 `
 
 const TwitterClaim = () => {

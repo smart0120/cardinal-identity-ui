@@ -22,7 +22,6 @@
     "@cardinal/common": "^1.0.10",
     "@cardinal/eslint-config-react": "^1.0.10",
     "@cardinal/namespaces": "^3.0.22",
-    "@cardinal/namespaces-components": "^3.0.3",
     "@cardinal/stake-pool": "^1.0.4",
     "@emotion/core": "^11.0.0",
     "@emotion/css": "^11.7.1",

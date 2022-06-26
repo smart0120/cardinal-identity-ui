@@ -1,15 +1,15 @@
+import styled from '@emotion/styled'
+import { useWallet } from '@solana/wallet-adapter-react'
+import type { PublicKey } from '@solana/web3.js'
+import { Connection } from '@solana/web3.js'
+import { notify } from 'common/Notification'
 import {
   ConnectTwitterButton,
   formatShortAddress,
   formatTwitterLink,
   useAddressImage,
   useAddressName,
-} from '@cardinal/namespaces-components'
-import styled from '@emotion/styled'
-import { useWallet } from '@solana/wallet-adapter-react'
-import type { PublicKey } from '@solana/web3.js'
-import { Connection } from '@solana/web3.js'
-import { notify } from 'common/Notification'
+} from 'lib/src'
 import { useRouter } from 'next/router'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
 import ContentLoader from 'react-content-loader'
