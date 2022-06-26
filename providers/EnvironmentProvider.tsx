@@ -15,13 +15,13 @@ export interface EnvironmentContextValues {
   environment: Environment
   setEnvironment: (newEnvironment: Environment) => void
   connection: Connection
+  secondaryConnection: Connection
 }
 
 export const ENVIRONMENTS: Environment[] = [
   {
     label: 'mainnet-beta',
-    primary:
-      'https://solana-api.syndica.io/access-token/bkBr4li7aGVa3euVG0q4iSI6uuMiEo2jYQD35r8ytGZrksM7pdJi2a57pmlYRqCw',
+    primary: process.env.MAINNET_PRIMARY || 'https://ssc-dao.genesysgo.net',
     secondary: 'https://ssc-dao.genesysgo.net',
   },
   {
@@ -42,7 +42,8 @@ export const getInitialProps = async ({
 }: {
   ctx: NextPageContext
 }): Promise<{ cluster: string }> => {
-  const cluster = (ctx.query.project || ctx.query.host)?.includes('dev')
+  const host = ctx.req?.headers.host || ctx.query.host
+  const cluster = host?.includes('dev')
     ? 'devnet'
     : (ctx.query.project || ctx.query.host)?.includes('test')
     ? 'testnet'
@@ -62,7 +63,7 @@ export function EnvironmentProvider({
   const { query } = useRouter()
   const cluster = (query.project || query.host)?.includes('dev')
     ? 'devnet'
-    : (query.project || query.host)?.includes('test')
+    : query.host?.includes('test')
     ? 'testnet'
     : query.cluster || defaultCluster || process.env.BASE_CLUSTER
   const foundEnvironment = ENVIRONMENTS.find((e) => e.label === cluster)
@@ -80,12 +81,21 @@ export function EnvironmentProvider({
     [environment]
   )
 
+  const secondaryConnection = useMemo(
+    () =>
+      new Connection(environment.secondary ?? environment.primary, {
+        commitment: 'recent',
+      }),
+    [environment]
+  )
+
   return (
     <EnvironmentContext.Provider
       value={{
         environment,
         setEnvironment,
         connection,
+        secondaryConnection,
       }}
     >
       {children}
