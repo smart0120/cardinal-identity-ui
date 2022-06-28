@@ -1,6 +1,7 @@
 import { WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
-import { Connection, PublicKey } from '@solana/web3.js'
+import type { Transaction } from '@solana/web3.js'
+import { Connection } from '@solana/web3.js'
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import React from 'react'
 
@@ -20,20 +21,24 @@ export default {
         devnet: new Connection('https://api.devnet.solana.com'),
         testnet: new Connection('https://api.testnet.solana.com'),
       },
-      address: {
-        control: 'text',
-      },
-      appName: {
-        control: 'text',
-      },
-      appTwitter: {
-        control: 'text',
-      },
+    },
+    address: {
+      control: 'text',
+    },
+    appName: {
+      control: 'text',
+    },
+    appTwitter: {
+      control: 'text',
     },
   },
 } as ComponentMeta<typeof ConnectTwitterButton>
 
-const Template: ComponentStory<typeof ConnectTwitterButton> = ({ ...args }) => {
+type LinkTwitterModalControls = (
+  props: React.ComponentProps<typeof ConnectTwitterButton> & { address: string }
+) => JSX.Element
+
+const Template: ComponentStory<LinkTwitterModalControls> = ({ ...args }) => {
   const publicKey = tryPublicKey(args.address)
   require('@solana/wallet-adapter-react-ui/styles.css')
   if (publicKey) {
@@ -53,7 +58,6 @@ const Template: ComponentStory<typeof ConnectTwitterButton> = ({ ...args }) => {
               }}
             >
               <ConnectTwitterButton
-                address={publicKey}
                 variant={args.variant}
                 dev={args.dev}
                 cluster={args.cluster}
@@ -61,9 +65,14 @@ const Template: ComponentStory<typeof ConnectTwitterButton> = ({ ...args }) => {
                   args.connection ||
                   new Connection('https://api.mainnet-beta.solana.com')
                 }
-                wallet={args.wallet}
+                wallet={{
+                  publicKey: publicKey,
+                  signTransaction: async (tx: Transaction) => tx,
+                  signAllTransactions: async (txs: Transaction[]) => txs,
+                }}
                 style={args.style}
                 disabled={args.disabled}
+                showManage={args.showManage}
               />
             </div>
           </WalletIdentityProvider>
@@ -76,6 +85,6 @@ const Template: ComponentStory<typeof ConnectTwitterButton> = ({ ...args }) => {
 
 export const Primary = Template.bind({})
 Primary.args = {
-  address: new PublicKey('DNVVBNkdyv6tMentHdjVz5cpYmjQYcquLfYkz1fApT7Q'),
+  address: 'DNVVBNkdyv6tMentHdjVz5cpYmjQYcquLfYkz1fApT7Q',
   connection: new Connection('https://api.mainnet-beta.solana.com'),
 }

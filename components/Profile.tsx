@@ -183,7 +183,6 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
             disabled={address?.toString() !== wallet?.publicKey?.toString()}
             dev={dev}
             wallet={wallet as Wallet}
-            address={wallet.publicKey ?? undefined}
             connection={connection}
             secondaryConnection={
               environment.secondary
