@@ -1,39 +1,26 @@
-import type { AccountData } from "@cardinal/certificates";
-import type { ReverseEntryData } from "@cardinal/namespaces";
-import { getReverseEntry } from "@cardinal/namespaces";
-import type { Connection, PublicKey } from "@solana/web3.js";
-import { useMemo, useState } from "react";
+import type { AccountData } from '@cardinal/common'
+import type { ReverseEntryData } from '@cardinal/namespaces'
+import { findNamespaceId, tryGetReverseEntry } from '@cardinal/namespaces'
+import type { Connection, PublicKey } from '@solana/web3.js'
+import { useQuery } from 'react-query'
 
 export const useReverseEntry = (
-  connection: Connection | null,
+  connection: Connection | undefined,
+  namespaceName: string,
   pubkey: PublicKey | undefined
 ) => {
-  const [loading, setLoading] = useState<boolean | undefined>(undefined);
-  const [reverseEntryData, setReverseEntry] = useState<
-    AccountData<ReverseEntryData> | undefined
-  >(undefined);
-
-  const getReverseEntryData = async () => {
-    setLoading(true);
-    try {
-      if (!pubkey || !connection) return;
-      const data = await getReverseEntry(connection, pubkey);
-      setReverseEntry(data);
-    } catch (e) {
-      setReverseEntry(undefined);
-      console.log(`Failed to get claim request: ${e}`, e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useMemo(async () => {
-    getReverseEntryData();
-  }, [connection, pubkey]);
-
-  return {
-    reverseEntryData,
-    getReverseEntryData,
-    loading,
-  };
-};
+  return useQuery<AccountData<ReverseEntryData> | undefined>(
+    ['useReverseEntry', namespaceName, pubkey?.toString()],
+    async () => {
+      if (!pubkey || !connection) return
+      const [namespaceId] = await findNamespaceId(namespaceName)
+      const reverseEntry = await tryGetReverseEntry(
+        connection,
+        namespaceId,
+        pubkey
+      )
+      return reverseEntry || undefined
+    },
+    { refetchOnMount: false }
+  )
+}

@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@cardinal/certificates": "^2.0.0",
-    "@cardinal/namespaces": "^3.1.0",
+    "@cardinal/namespaces": "^4.1.10",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
     "@headlessui/react": "^1.6.1",

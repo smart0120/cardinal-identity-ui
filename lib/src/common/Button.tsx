@@ -1,12 +1,18 @@
 import { css } from '@emotion/react'
 import styled from '@emotion/styled'
-import lighten from 'polished/lib/color/lighten'
+import { lighten } from 'polished'
+import { useState } from 'react'
 
-export const Button = styled.button<{
-  variant: 'primary' | 'secondary'
+import { LoadingSpinner } from './LoadingSpinner'
+
+export type ButtonProps = {
+  variant: 'primary' | 'secondary' | 'tertiary'
   boxShadow?: boolean
   disabled?: boolean
-}>`
+  bgColor?: string
+}
+
+export const Button = styled.button<ButtonProps>`
   display: flex;
   align-items: center;
   gap: 5px;
@@ -22,21 +28,36 @@ export const Button = styled.button<{
   border-radius: 4px;
   padding: 0 12px;
   transition: 0.2s background;
-  ${({ variant = 'primary', disabled }) => {
-    if (disabled) return
-    return variant === 'primary'
+  ${({ variant = 'primary', disabled, bgColor = undefined }) => {
+    return bgColor
+      ? css`
+          background: ${bgColor};
+          color: ${getColorByBgColor(bgColor)};
+          &:hover {
+            background: ${!disabled && lighten(0.1, bgColor)}};
+          }
+        `
+      : variant === 'primary'
       ? css`
           background: rgb(29, 155, 240);
           color: #fff;
           &:hover {
-            background: ${lighten(0.1, 'rgb(29, 155, 240)')}};
+            background: ${!disabled && lighten(0.1, 'rgb(29, 155, 240)')}};
           }
         `
-      : css`
+      : variant === 'secondary'
+      ? css`
           background: #000;
           color: #fff;
           &:hover {
-            background: ${lighten(0.1, '#000')};
+            background: ${!disabled && lighten(0.1, '#000')};
+          }
+        `
+      : css`
+          background: rgb(255, 255, 255, 0.15);
+          color: #fff;
+          &:hover {
+            background: ${!disabled && lighten(0.05, '#000')};
           }
         `
   }}
@@ -44,3 +65,113 @@ export const Button = styled.button<{
     font-size: 14px;
   }
 `
+
+export const ButtonLight = styled.div`
+  border-radius: 5px;
+  padding: 5px 8px;
+  border: none;
+  background: #eee;
+  color: #777;
+  cursor: pointer;
+  transition: 0.1s all;
+  &:hover {
+    background: #ddd;
+  }
+`
+
+export const hexColor = (colorString: string): string => {
+  if (colorString.includes('#')) return colorString
+  const [r, g, b] = colorString
+    .replace('rgb(', '')
+    .replace('rgba(', '')
+    .replace(')', '')
+    .replace(' ', '')
+    .split(',')
+  return (
+    '#' +
+    [r, g, b]
+      .map((x) => {
+        const hex = parseInt(x || '').toString(16)
+        return hex.length === 1 ? '0' + hex : hex
+      })
+      .join('')
+  )
+}
+
+export const getColorByBgColor = (bgColor: string) => {
+  if (!bgColor) {
+    return ''
+  }
+  return parseInt(hexColor(bgColor).replace('#', ''), 16) > 0xffffff / 2
+    ? '#000'
+    : '#fff'
+}
+
+export const AsyncButton = ({
+  children,
+  handleClick,
+  className,
+  color,
+  ...buttonProps
+}: {
+  children: JSX.Element | JSX.Element[] | string
+  className?: string
+  color?: string
+  handleClick: () => void
+} & ButtonProps) => {
+  const [loading, setLoading] = useState(false)
+
+  return (
+    <Button
+      {...buttonProps}
+      className={className}
+      onClick={async () => {
+        try {
+          setLoading(true)
+          await handleClick()
+        } finally {
+          setLoading(false)
+        }
+      }}
+    >
+      {loading ? (
+        <LoadingSpinner fill={color ? color : '#FFF'} height="15px" />
+      ) : (
+        children
+      )}
+    </Button>
+  )
+}
+
+export const AsyncButtonLight = ({
+  children,
+  handleClick,
+  className,
+  color,
+}: {
+  children: JSX.Element | JSX.Element[] | string
+  className?: string
+  color?: string
+  handleClick: () => void
+}) => {
+  const [loading, setLoading] = useState(false)
+  return (
+    <ButtonLight
+      className={className}
+      onClick={async () => {
+        try {
+          setLoading(true)
+          await handleClick()
+        } finally {
+          setLoading(false)
+        }
+      }}
+    >
+      {loading ? (
+        <LoadingSpinner fill={color ? color : '#FFF'} height="15px" />
+      ) : (
+        children
+      )}
+    </ButtonLight>
+  )
+}

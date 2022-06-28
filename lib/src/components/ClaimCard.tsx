@@ -1,5 +1,4 @@
 import styled from '@emotion/styled'
-import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, Connection } from '@solana/web3.js'
 
 import { NameEntryClaim } from './NameEntryClaim'
@@ -7,9 +6,8 @@ import { NameEntryClaim } from './NameEntryClaim'
 export type ClaimCardProps = {
   dev?: boolean
   cluster?: Cluster
-  connection: Connection | undefined
-  secondaryConnection: Connection | undefined
-  wallet: Wallet | undefined
+  connection?: Connection
+  secondaryConnection?: Connection
   appName?: string
   appTwitter?: string
   notify?: (arg: { message?: string; txid?: string }) => void
@@ -23,7 +21,6 @@ export const ClaimCard = ({
   cluster,
   connection,
   secondaryConnection,
-  wallet,
   notify,
   onComplete,
 }: ClaimCardProps) => {
@@ -33,9 +30,8 @@ export const ClaimCard = ({
         <NameEntryClaim
           dev={dev}
           cluster={cluster}
-          connection={connection ?? null}
+          connection={connection}
           secondaryConnection={secondaryConnection}
-          wallet={wallet ?? null}
           appName={appName}
           appTwitter={appTwitter}
           notify={notify}

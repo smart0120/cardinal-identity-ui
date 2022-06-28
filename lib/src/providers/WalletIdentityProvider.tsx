@@ -1,10 +1,14 @@
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, Connection } from '@solana/web3.js'
 import React, { useContext, useState } from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { ReactQueryDevtools } from 'react-query/devtools'
 
 import { ClaimCard } from '..'
 import { Modal } from '../modal'
 import { withSleep } from '../utils/transactions'
+
+const DEBUG = true
 
 export interface WalletIdentity {
   show: (
@@ -14,7 +18,12 @@ export interface WalletIdentity {
     secondaryConnection?: Connection,
     dev?: boolean
   ) => void
-  handle: string | undefined
+  handle?: string
+  wallet?: Wallet
+  connection?: Connection
+  secondaryConnection?: Connection
+  cluster?: Cluster
+  dev?: boolean
   showIdentityModal: boolean
 }
 
@@ -54,30 +63,36 @@ export const WalletIdentityProvider: React.FC<Props> = ({
         },
         handle,
         showIdentityModal,
+        wallet,
+        connection,
+        cluster,
+        dev,
       }}
     >
-      <Modal
-        isOpen={showIdentityModal}
-        onDismiss={() => setShowIdentityModal(false)}
-        darkenOverlay={true}
-      >
-        <ClaimCard
-          dev={dev}
-          cluster={cluster}
-          wallet={wallet}
-          connection={connection}
-          secondaryConnection={secondaryConnection}
-          appName={appName}
-          appTwitter={appTwitter}
-          onComplete={(handle: string) => {
-            setHandle(handle)
-            withSleep(() => {
-              setShowIdentityModal(false)
-            }, 1000)
-          }}
-        />
-      </Modal>
-      {children}
+      <QueryClientProvider client={new QueryClient()}>
+        <Modal
+          isOpen={showIdentityModal}
+          onDismiss={() => setShowIdentityModal(false)}
+          darkenOverlay={true}
+        >
+          <ClaimCard
+            dev={dev}
+            cluster={cluster}
+            connection={connection}
+            secondaryConnection={secondaryConnection}
+            appName={appName}
+            appTwitter={appTwitter}
+            onComplete={(handle: string) => {
+              setHandle(handle)
+              withSleep(() => {
+                setShowIdentityModal(false)
+              }, 1000)
+            }}
+          />
+        </Modal>
+        {children}
+        {DEBUG && <ReactQueryDevtools initialIsOpen={false} />}
+      </QueryClientProvider>
     </WalletIdentityContext.Provider>
   )
 }

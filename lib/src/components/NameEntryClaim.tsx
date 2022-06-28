@@ -1,13 +1,14 @@
 import styled from '@emotion/styled'
-import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, Connection } from '@solana/web3.js'
 import { useEffect, useState } from 'react'
 
 import { Alert } from '../common/Alert'
+import { ButtonLight } from '../common/Button'
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import { useClaimRequest } from '../hooks/useClaimRequest'
 import { useNameEntryData } from '../hooks/useNameEntryData'
 import { useReverseEntry } from '../hooks/useReverseEntry'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import {
   apiBase,
   claimEntry,
@@ -16,10 +17,12 @@ import {
   setReverseEntry,
   tryGetNameEntry,
 } from '../utils/api'
+import { TWITTER_NAMESPACE_NAME } from '../utils/constants'
 import { formatShortAddress, formatTwitterLink } from '../utils/format'
 import { ButtonWithFooter } from './ButtonWithFooter'
 import { Link, Megaphone, Verified } from './icons'
 import { LabeledInput } from './LabeledInput'
+import { NameManager } from './NameManager'
 import { PostTweet } from './PostTweet'
 import { PoweredByFooter } from './PoweredByFooter'
 import { StepDetail } from './StepDetail'
@@ -40,8 +43,7 @@ export const NameEntryClaim = ({
   cluster = 'mainnet-beta',
   connection,
   secondaryConnection,
-  wallet,
-  namespaceName = 'twitter',
+  namespaceName = TWITTER_NAMESPACE_NAME,
   appName,
   appTwitter,
   notify,
@@ -49,15 +51,16 @@ export const NameEntryClaim = ({
 }: {
   dev?: boolean
   cluster?: Cluster
-  connection: Connection | null
+  connection?: Connection
   secondaryConnection?: Connection
-  wallet: Wallet | null
   namespaceName?: string
   appName?: string
   appTwitter?: string
   notify?: (arg: { message?: string; txid?: string }) => void
   onComplete?: (arg0: string) => void
 }) => {
+  const { wallet } = useWalletIdentity()
+  const [showManage, setShowManage] = useState(false)
   const [verifyError, setVerifyError] = useState<React.ReactNode | undefined>(
     undefined
   )
@@ -77,8 +80,9 @@ export const NameEntryClaim = ({
   const tweetId = tweetIdFromTweetUrl(tweetUrl)
   const [claimed, setClaimed] = useState(false)
 
-  const { reverseEntryData, getReverseEntryData } = useReverseEntry(
+  const reverseEntry = useReverseEntry(
     connection,
+    namespaceName,
     wallet?.publicKey
   )
 
@@ -214,7 +218,7 @@ export const NameEntryClaim = ({
           namespaceName,
           handle,
           null,
-          reverseEntryData?.pubkey!,
+          reverseEntry.data?.pubkey!,
           claimRequest!.pubkey,
           checkNameEntry.parsed.mint,
           nameEntryData!.owner!
@@ -231,7 +235,7 @@ export const NameEntryClaim = ({
       }
     } finally {
       refreshNameEntryData()
-      getReverseEntryData()
+      reverseEntry.remove()
       setLoadingClaim(false)
     }
   }
@@ -243,109 +247,129 @@ export const NameEntryClaim = ({
       ? true
       : false
 
+  console.log(
+    '---',
+    reverseEntry.isFetched,
+    reverseEntry.isFetching,
+    reverseEntry
+  )
+
   return (
     <Wrapper>
-      <>
-        <Instruction>
-          {appName ? `${appName} uses` : 'Use'} Cardinal to link your Twitter
-          identity to your <strong>Solana</strong> address.
-        </Instruction>
-        {(!wallet?.publicKey || !connection) && (
-          <Alert
-            style={{ marginBottom: '20px' }}
-            message={
-              <>
-                <div>Connect wallet to continue</div>
-              </>
-            }
-            type="warning"
-            showIcon
-          />
-        )}
-        {reverseEntryData?.parsed.entryName && (
-          <Alert
-            style={{ marginBottom: '20px', width: '100%' }}
-            message={
-              <>
-                <div>
-                  Your address is linked to{' '}
-                  {formatTwitterLink(
-                    reverseEntryData?.parsed.entryName as string
-                  )}
-                  . You can change your Twitter handle by linking a new profile.
-                </div>
-              </>
-            }
-            type="info"
-            showIcon
-          />
-        )}
-        <DetailsWrapper>
-          <StepDetail
-            disabled={!wallet?.publicKey || !connection}
-            icon={<Megaphone />}
-            title="Tweet!"
-            description={
-              <>
-                <div>Tweet your public key</div>
-                <PostTweet
-                  wallet={wallet}
-                  appName={appName}
-                  appTwitter={appTwitter}
-                  disabled={false}
-                  callback={() => setTweetSent(true)}
-                  cluster={cluster}
-                />
-              </>
-            }
-          />
-          <StepDetail
-            disabled={!tweetSent}
-            icon={<Link />}
-            title="Paste the URL of the tweet"
-            description={
+      <Instruction>
+        {appName ? `${appName} uses` : 'Use'} Cardinal to link your Twitter
+        identity to your <strong>Solana</strong> address.
+      </Instruction>
+      {(!wallet?.publicKey || !connection) && (
+        <Alert
+          style={{ marginBottom: '20px' }}
+          message={
+            <>
+              <div>Connect wallet to continue</div>
+            </>
+          }
+          type="warning"
+          showIcon
+        />
+      )}
+      {!reverseEntry.isFetching && reverseEntry.data?.parsed.entryName && (
+        <Alert
+          style={{ marginBottom: '20px', width: '100%' }}
+          message={
+            <>
               <div>
-                <LabeledInput
-                  disabled={!tweetSent}
-                  label="Tweet"
-                  name="tweet"
-                  onChange={(e) => setTweetUrl(e.target.value)}
-                />
+                Your address is linked to{' '}
+                {formatTwitterLink(reverseEntry.data?.parsed.entryName)}. Link a
+                new Twitter handle below.
               </div>
-            }
-          />
-          <StepDetail
-            disabled={!handle}
-            icon={<Verified />}
-            title="Claim your handle"
-            description={
-              <>
+            </>
+          }
+          type="info"
+          showIcon
+        />
+      )}
+      {connection && wallet?.publicKey && (
+        <ButtonLight
+          className="absolute right-8"
+          onClick={() => setShowManage(!showManage)}
+        >
+          {showManage ? 'Add' : 'Manage'}
+        </ButtonLight>
+      )}
+      {connection && wallet && showManage ? (
+        <NameManager
+          cluster={cluster}
+          connection={connection}
+          wallet={wallet}
+          namespaceName={namespaceName}
+        />
+      ) : (
+        <>
+          <DetailsWrapper>
+            <StepDetail
+              disabled={!wallet?.publicKey || !connection}
+              icon={<Megaphone />}
+              title="Tweet!"
+              description={
+                <>
+                  <div>Tweet your public key</div>
+                  <PostTweet
+                    wallet={wallet}
+                    appName={appName}
+                    appTwitter={appTwitter}
+                    disabled={false}
+                    callback={() => setTweetSent(true)}
+                    cluster={cluster}
+                  />
+                </>
+              }
+            />
+            <StepDetail
+              disabled={!tweetSent}
+              icon={<Link />}
+              title="Paste the URL of the tweet"
+              description={
                 <div>
-                  You will receive a non-tradeable NFT to prove you own your
-                  Twitter handle.
+                  <LabeledInput
+                    disabled={!tweetSent}
+                    label="Tweet"
+                    name="tweet"
+                    onChange={(e) => setTweetUrl(e.target.value)}
+                  />
                 </div>
-                {handle && (
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '20px',
-                      paddingTop: '20px',
-                    }}
-                  >
-                    <TwitterHandleNFT
-                      handle={handle}
-                      cluster={cluster}
-                      dev={dev}
-                    />
+              }
+            />
+            <StepDetail
+              disabled={!handle}
+              icon={<Verified />}
+              title="Claim your handle"
+              description={
+                <>
+                  <div>
+                    You will receive a non-tradeable NFT to prove you own your
+                    Twitter handle.
+                  </div>
+                  {handle && (
                     <div
                       style={{
-                        padding: '10px',
-                        maxWidth: 'calc(100% - 120px - 20px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '20px',
+                        paddingTop: '20px',
                       }}
                     >
-                      {claimRequest && claimRequest.parsed.isApproved ? (
-                        <StyledAlert>
+                      <TwitterHandleNFT
+                        handle={handle}
+                        cluster={cluster}
+                        dev={dev}
+                      />
+                      <div
+                        style={{
+                          padding: '10px',
+                          maxWidth: 'calc(100% - 120px - 20px)',
+                        }}
+                      >
+                        {claimRequest && claimRequest.parsed.isApproved ? (
                           <Alert
                             style={{
                               margin: '10px 0px',
@@ -363,89 +387,91 @@ export const NameEntryClaim = ({
                             type="success"
                             showIcon
                           />
-                        </StyledAlert>
-                      ) : loadingVerify || loadingClaimRequest ? (
-                        <div style={{ padding: '10px' }}>
-                          <LoadingSpinner fill="#000" />
-                        </div>
-                      ) : (
-                        <StyledAlert>
-                          <Alert
-                            style={{
-                              marginTop: '10px',
-                              height: 'auto',
-                              wordBreak: 'break-word',
-                            }}
-                            message={
-                              <>
-                                <div>{verifyError}</div>
-                              </>
-                            }
-                            type="error"
-                            showIcon
-                          />
-                          <ButtonWrapper>
-                            <ButtonLight onClick={() => verifyTwitter()}>
-                              Retry
-                            </ButtonLight>
-                          </ButtonWrapper>
-                        </StyledAlert>
-                      )}
-                      {claimRequest &&
-                        claimRequest.parsed.isApproved &&
-                        !claimed &&
-                        (loadingNameEntry || loadingRevoke ? (
+                        ) : loadingVerify || loadingClaimRequest ? (
                           <div style={{ padding: '10px' }}>
                             <LoadingSpinner fill="#000" />
                           </div>
                         ) : (
-                          alreadyOwned && (
-                            <>
-                              <Alert
-                                style={{
-                                  marginBottom: '10px',
-                                  height: 'auto',
-                                  wordBreak: 'break-word',
-                                }}
-                                message={
+                          <>
+                            <Alert
+                              style={{
+                                marginTop: '10px',
+                                height: 'auto',
+                                wordBreak: 'break-word',
+                              }}
+                              message={
+                                <>
+                                  <div>{verifyError}</div>
+                                </>
+                              }
+                              type="error"
+                              showIcon
+                            />
+                            <ButtonWrapper>
+                              <ButtonLight onClick={() => verifyTwitter()}>
+                                Retry
+                              </ButtonLight>
+                            </ButtonWrapper>
+                          </>
+                        )}
+                        {claimRequest &&
+                          claimRequest.parsed.isApproved &&
+                          !claimed &&
+                          (loadingNameEntry || loadingRevoke ? (
+                            <div style={{ padding: '10px' }}>
+                              <LoadingSpinner fill="#000" />
+                            </div>
+                          ) : (
+                            alreadyOwned && (
+                              <>
+                                <Alert
+                                  style={{
+                                    marginBottom: '10px',
+                                    height: 'auto',
+                                    wordBreak: 'break-word',
+                                  }}
+                                  message={
+                                    <>
+                                      <div>
+                                        Owned by{' '}
+                                        {formatShortAddress(
+                                          nameEntryData?.owner
+                                        )}
+                                      </div>
+                                    </>
+                                  }
+                                  type="warning"
+                                  showIcon
+                                />
+                                {nameEntryData?.owner?.toString() ===
+                                wallet?.publicKey?.toString() ? (
                                   <>
                                     <div>
-                                      Owned by{' '}
-                                      {formatShortAddress(nameEntryData?.owner)}
+                                      You already own this handle! If you want
+                                      to set it as your default, click below.
                                     </div>
+                                    <ButtonWrapper>
+                                      <ButtonLight onClick={() => setDefault()}>
+                                        Set Default
+                                      </ButtonLight>
+                                    </ButtonWrapper>
                                   </>
-                                }
-                                type="warning"
-                                showIcon
-                              />
-                              {nameEntryData?.owner?.toString() ===
-                              wallet?.publicKey?.toString() ? (
-                                <>
-                                  <div>
-                                    You already own this handle! If you want to
-                                    set it as your default, click below.
-                                  </div>
-                                  <ButtonWrapper>
-                                    <ButtonLight onClick={() => setDefault()}>
-                                      Set Default
-                                    </ButtonLight>
-                                  </ButtonWrapper>
-                                </>
-                              ) : (
-                                <>
-                                  <div>
-                                    If you wish to continue, you will revoke
-                                    this handle from them.
-                                  </div>
-                                  <ButtonWrapper>
-                                    <ButtonLight onClick={() => revokeHandle()}>
-                                      Revoke
-                                    </ButtonLight>
-                                  </ButtonWrapper>
-                                </>
-                              )}
-                              {ownedError && (
-                                <StyledAlert>
+                                ) : (
+                                  <>
+                                    <div>
+                                      If you wish to continue, you will revoke
+                                      this handle from them.
+                                    </div>
+                                    <ButtonWrapper>
+                                      <ButtonLight
+                                        onClick={() => revokeHandle()}
+                                      >
+                                        Revoke
+                                      </ButtonLight>
+                                    </ButtonWrapper>
+                                  </>
+                                )}
+                                {ownedError && (
                                   <Alert
                                     style={{
                                       marginTop: '10px',
@@ -460,13 +486,11 @@ export const NameEntryClaim = ({
                                     type="error"
                                     showIcon
                                   />
-                                </StyledAlert>
-                              )}
-                            </>
-                          )
-                        ))}
-                      {claimError && (
-                        <StyledAlert>
+                                )}
+                              </>
+                            )
+                          ))}
+                        {claimError && (
                           <Alert
                             style={{ marginTop: '10px', height: 'auto' }}
                             message={
@@ -477,30 +501,30 @@ export const NameEntryClaim = ({
                             type="error"
                             showIcon
                           />
-                        </StyledAlert>
-                      )}
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </>
+                  )}
+                </>
+              }
+            />
+          </DetailsWrapper>
+          <ButtonWithFooter
+            loading={loadingClaim}
+            complete={claimed}
+            disabled={
+              !claimRequest ||
+              !claimRequest.parsed.isApproved ||
+              loadingNameEntry ||
+              alreadyOwned
             }
-          />
-        </DetailsWrapper>
-        <ButtonWithFooter
-          loading={loadingClaim}
-          complete={claimed}
-          disabled={
-            !claimRequest ||
-            !claimRequest.parsed.isApproved ||
-            loadingNameEntry ||
-            alreadyOwned
-          }
-          onClick={handleClaim}
-          footer={<PoweredByFooter />}
-        >
-          Claim {handle && `@${handle}`}
-        </ButtonWithFooter>
-      </>
+            onClick={handleClaim}
+          >
+            Claim {handle && `@${handle}`}
+          </ButtonWithFooter>
+        </>
+      )}
+      <PoweredByFooter />
     </Wrapper>
   )
 }
@@ -511,23 +535,9 @@ const ButtonWrapper = styled.div`
   justify-content: center;
 `
 
-const ButtonLight = styled.div`
-  border-radius: 5px;
-  padding: 5px 8px;
-  border: none;
-  background: #eee;
-  color: #777;
-  cursor: pointer;
-  transition: 0.1s all;
-  &:hover {
-    background: #ddd;
-  }
-`
-
-const StyledAlert = styled.div``
-
 const Wrapper = styled.div`
   padding: 10px 28px 28px 28px;
+  position: relative;
 `
 
 const Instruction = styled.h2`

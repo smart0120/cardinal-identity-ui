@@ -1,43 +1,44 @@
-import { shortenAddress } from "@cardinal/namespaces";
-import { PublicKey } from "@solana/web3.js";
+import { shortenAddress } from '@cardinal/namespaces'
+import { PublicKey } from '@solana/web3.js'
 
-import { apiBase } from "./api";
+import { apiBase } from './api'
+import { TWITTER_NAMESPACE_NAME } from './constants'
 
 export const formatTwitterLink = (handle: string | undefined) => {
-  if (!handle) return <></>;
+  if (!handle) return <></>
   return (
     <a
       href={`https://twitter.com/${handle}`}
-      style={{ color: "#177ddc" }}
+      style={{ color: '#177ddc' }}
       target="_blank"
       rel="noreferrer"
     >
       {handle}
     </a>
-  );
-};
+  )
+}
 
 export function shortPubKey(pubkey: PublicKey | string | null | undefined) {
-  if (!pubkey) return "";
+  if (!pubkey) return ''
   return `${pubkey?.toString().substring(0, 4)}..${pubkey
     ?.toString()
-    .substring(pubkey?.toString().length - 4)}`;
+    .substring(pubkey?.toString().length - 4)}`
 }
 
 export const tryPublicKey = (
   publicKeyString: PublicKey | string | string[] | undefined | null
 ): PublicKey | null => {
-  if (publicKeyString instanceof PublicKey) return publicKeyString;
-  if (!publicKeyString) return null;
+  if (publicKeyString instanceof PublicKey) return publicKeyString
+  if (!publicKeyString) return null
   try {
-    return new PublicKey(publicKeyString);
+    return new PublicKey(publicKeyString)
   } catch (e) {
-    return null;
+    return null
   }
-};
+}
 
 export const formatShortAddress = (address: PublicKey | undefined) => {
-  if (!address) return <></>;
+  if (!address) return <></>
   return (
     <a
       href={`https://explorer.solana.com/address/${address.toString()}`}
@@ -46,26 +47,29 @@ export const formatShortAddress = (address: PublicKey | undefined) => {
     >
       {shortenAddress(address.toString())}
     </a>
-  );
-};
+  )
+}
 
 export async function tryGetImageUrl(
-  handle: string,
+  namespace: string,
+  name: string,
   dev?: boolean
 ): Promise<string | undefined> {
   try {
-    const response = await fetch(
-      `${apiBase(
-        dev
-      )}/twitter/proxy?url=https://api.twitter.com/2/users/by&usernames=${handle}&user.fields=profile_image_url`
-    );
-    const json = (await response.json()) as {
-      data: { profile_image_url: string }[];
-    };
-    return json?.data[0]?.profile_image_url.replace("_normal", "") as string;
+    if (namespace === TWITTER_NAMESPACE_NAME) {
+      const response = await fetch(
+        `${apiBase(
+          dev
+        )}/twitter/proxy?url=https://api.twitter.com/2/users/by&usernames=${name}&user.fields=profile_image_url`
+      )
+      const json = (await response.json()) as {
+        data: { profile_image_url: string }[]
+      }
+      return json?.data[0]?.profile_image_url.replace('_normal', '') as string
+    }
   } catch (e) {
-    console.log(e);
-    return undefined;
+    console.log(e)
+    return undefined
   }
 }
 
@@ -81,25 +85,25 @@ export async function tryGetProfile(
       `${apiBase(
         dev
       )}/twitter/proxy?url=https://api.twitter.com/2/users/by&usernames=${handle}&user.fields=profile_image_url`
-    );
+    )
     const json = (await response.json()) as {
       data: {
-        profile_image_url: string;
-        username: string;
-        id: string;
-        name: string;
-      }[];
-    };
+        profile_image_url: string
+        username: string
+        id: string
+        name: string
+      }[]
+    }
     return {
       profile_image_url: json?.data[0]?.profile_image_url.replace(
-        "_normal",
-        ""
+        '_normal',
+        ''
       ) as string,
       username: json?.data[0]?.username as string,
       id: json?.data[0]?.id as string,
       name: json?.data[0]?.name as string,
-    };
+    }
   } catch (e) {
-    return undefined;
+    return undefined
   }
 }

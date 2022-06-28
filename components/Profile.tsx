@@ -10,6 +10,7 @@ import {
   useAddressImage,
   useAddressName,
 } from 'lib/src'
+import { TWITTER_NAMESPACE_NAME } from 'lib/src/utils/constants'
 import { useRouter } from 'next/router'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
 import ContentLoader from 'react-content-loader'
@@ -31,15 +32,16 @@ const ShareIcon = styled.div`
 `
 
 export const Profile: React.FC<Props> = ({ address }: Props) => {
-  const router = useRouter()
+  const { query } = useRouter()
   const wallet = useWallet()
   const { connection, environment } = useEnvironmentCtx()
-  const dev = router.query['dev'] === 'true'
+  const dev = query['dev'] === 'true'
   const addressStr = address.toString()
   const { displayName, loadingName } = useAddressName(connection, address)
   const { addressImage, loadingImage } = useAddressImage(
     connection,
     address,
+    TWITTER_NAMESPACE_NAME,
     dev
   )
 
