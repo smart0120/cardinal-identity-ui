@@ -39,7 +39,6 @@ export const ClaimCard = ({
   showManage: showManageDefault,
   namespaceName = TWITTER_NAMESPACE_NAME,
 }: ClaimCardProps) => {
-  console.log(showManageDefault)
   const [showManage, setShowManage] = useState(showManageDefault)
   const reverseEntry = useReverseEntry(
     connection,
@@ -101,6 +100,7 @@ export const ClaimCard = ({
             <NameEntryClaim
               dev={dev}
               cluster={cluster}
+              wallet={wallet}
               connection={connection}
               secondaryConnection={secondaryConnection}
               appName={appName}
