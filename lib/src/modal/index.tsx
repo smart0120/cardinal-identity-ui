@@ -1,22 +1,22 @@
-import { css, Global } from "@emotion/react";
-import styled from "@emotion/styled";
-import { DialogContent, DialogOverlay } from "@reach/dialog";
-import { animated, useSpring, useTransition } from "@react-spring/web";
-import darken from "polished/lib/color/darken";
-import React from "react";
-import { isMobile } from "react-device-detect";
-import { useGesture } from "react-use-gesture";
+import { css, Global } from '@emotion/react'
+import styled from '@emotion/styled'
+import { DialogContent, DialogOverlay } from '@reach/dialog'
+import { animated, useSpring, useTransition } from '@react-spring/web'
+import darken from 'polished/lib/color/darken'
+import React from 'react'
+import { isMobile } from 'react-device-detect'
+import { useGesture } from 'react-use-gesture'
 
-import { BackIcon, CloseIcon } from "./icons";
+import { BackIcon, CloseIcon } from './icons'
 
 export interface ModalProps {
-  children: React.ReactNode;
-  isOpen: boolean;
-  onDismiss: () => void;
-  darkenOverlay?: boolean;
+  children: React.ReactNode
+  isOpen: boolean
+  onDismiss: () => void
+  darkenOverlay?: boolean
 
-  onBack?: () => void;
-  hideCloseButton?: boolean;
+  onBack?: () => void
+  hideCloseButton?: boolean
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -33,25 +33,25 @@ export const Modal: React.FC<ModalProps> = ({
     from: { opacity: 0 },
     enter: { opacity: 1 },
     leave: { opacity: 0 },
-  });
+  })
 
   const [{ y }, set] = useSpring(() => ({
     y: 0,
     config: { mass: 1, tension: 210, friction: 20 },
-  }));
+  }))
   const bind = useGesture({
     onDrag: (state) => {
       set({
         y: state.down ? state.movement[1] : 0,
-      });
+      })
       if (
         state.movement[1] > 300 ||
         (state.velocity > 3 && state.direction[1] > 0)
       ) {
-        onDismiss();
+        onDismiss()
       }
     },
-  });
+  })
 
   return (
     <>
@@ -108,9 +108,9 @@ export const Modal: React.FC<ModalProps> = ({
                     <ButtonIcon
                       href="#"
                       onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        onBack();
+                        e.stopPropagation()
+                        e.preventDefault()
+                        onBack()
                       }}
                     >
                       <BackIcon />
@@ -124,9 +124,9 @@ export const Modal: React.FC<ModalProps> = ({
                     <ButtonIcon
                       href="#"
                       onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        onDismiss();
+                        e.stopPropagation()
+                        e.preventDefault()
+                        onDismiss()
                       }}
                     >
                       <CloseIcon />
@@ -139,8 +139,8 @@ export const Modal: React.FC<ModalProps> = ({
           )
       )}
     </>
-  );
-};
+  )
+}
 
 const LogoWrapper = styled.div`
   flex: 1 1 auto;
@@ -151,7 +151,7 @@ const LogoWrapper = styled.div`
   svg {
     width: 35%;
   }
-`;
+`
 
 const TopArea = styled.div`
   padding: 12px 16px 0px 16px;
@@ -161,26 +161,26 @@ const TopArea = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-`;
+`
 
 const ButtonIcon = styled.a`
   flex: 0 0 24px;
   color: #ccd2e3;
   &:hover {
-    color: ${darken(0.1, "#ccd2e3")};
+    color: ${darken(0.1, '#ccd2e3')};
   }
   transition: 0.1s ease;
-`;
+`
 
-const Content = styled.div``;
+const Content = styled.div``
 
 const ModalWrapper = styled(animated(DialogContent))`
   * {
     box-sizing: border-box;
   }
-  font-family: SFHello, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-    "Segoe UI Symbol";
+  font-family: SFHello, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol';
   position: relative;
   box-shadow: 0px 4px 16px rgba(207, 207, 207, 0.25);
   width: 100%;
@@ -193,14 +193,14 @@ const ModalWrapper = styled(animated(DialogContent))`
   line-height: 15px;
   letter-spacing: -0.02em;
   color: #696969;
-`;
+`
 
 const StyledDialogOverlay = styled(animated(DialogOverlay), {
   shouldForwardProp(prop) {
-    return prop !== "darkenOverlay";
+    return prop !== 'darkenOverlay'
   },
 })<{
-  darkenOverlay: boolean;
+  darkenOverlay: boolean
 }>`
   [data-reach-dialog-content] {
     padding: 0;
@@ -213,4 +213,4 @@ const StyledDialogOverlay = styled(animated(DialogOverlay), {
       : css`
           background: none;
         `}
-`;
+`
