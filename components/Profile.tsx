@@ -1,4 +1,5 @@
 import styled from '@emotion/styled'
+import type { Wallet } from '@saberhq/solana-contrib'
 import { useWallet } from '@solana/wallet-adapter-react'
 import type { PublicKey } from '@solana/web3.js'
 import { Connection } from '@solana/web3.js'
@@ -9,6 +10,7 @@ import {
   formatTwitterLink,
   useAddressImage,
   useAddressName,
+  useWalletIdentity,
 } from 'lib/src'
 import { TWITTER_NAMESPACE_NAME } from 'lib/src/utils/constants'
 import { useRouter } from 'next/router'
@@ -33,6 +35,7 @@ const ShareIcon = styled.div`
 
 export const Profile: React.FC<Props> = ({ address }: Props) => {
   const { query } = useRouter()
+  const { show } = useWalletIdentity()
   const wallet = useWallet()
   const { connection, environment } = useEnvironmentCtx()
   const dev = query['dev'] === 'true'
@@ -172,7 +175,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           </span>
           <AddressLink address={address} />
         </div>
-        <div style={{ margin: '10px auto' }}>
+        <div className="mt-5">
           <ConnectTwitterButton
             disabled={address?.toString() !== wallet?.publicKey?.toString()}
             address={wallet.publicKey!}
@@ -188,6 +191,31 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
             cluster={environment.label}
           />
         </div>
+        <button
+          disabled={address?.toString() !== wallet?.publicKey?.toString()}
+          className="rounded-md px-3 py-1 text-xs text-white"
+          onClick={() =>
+            show(
+              wallet as Wallet,
+              connection,
+              environment.label,
+              environment.secondary
+                ? new Connection(environment.secondary)
+                : connection,
+              dev,
+              true
+            )
+          }
+          style={{
+            borderColor: '#657786',
+            background: '#64748b20',
+            color: '#657786',
+            opacity:
+              address?.toString() !== wallet?.publicKey?.toString() ? 0.5 : 1,
+          }}
+        >
+          Manage Profiles
+        </button>
       </div>
     </div>
   )

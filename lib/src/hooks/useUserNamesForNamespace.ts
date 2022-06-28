@@ -102,7 +102,6 @@ export const useUserNamesForNamespace = (
               tokenAccount.pubkey.toString()
             ]?.data?.data?.name.includes(TWITTER_NAMESPACE_NAME))
       )
-      console.log(tokenAccounts)
 
       // lookup delegates
       const delegateIds = tokenAccounts.map((tokenAccount) =>

@@ -10,6 +10,7 @@ export type ClaimCardProps = {
   secondaryConnection?: Connection
   appName?: string
   appTwitter?: string
+  showManage?: boolean
   notify?: (arg: { message?: string; txid?: string }) => void
   onComplete?: (arg: string) => void
 }
@@ -21,6 +22,7 @@ export const ClaimCard = ({
   cluster,
   connection,
   secondaryConnection,
+  showManage,
   notify,
   onComplete,
 }: ClaimCardProps) => {
@@ -35,6 +37,7 @@ export const ClaimCard = ({
           appName={appName}
           appTwitter={appTwitter}
           notify={notify}
+          showManageDefault={showManage}
           onComplete={onComplete}
         />
       </ClaimCardOuter>

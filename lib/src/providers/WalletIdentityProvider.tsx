@@ -16,7 +16,8 @@ export interface WalletIdentity {
     connection: Connection,
     cluster: Cluster,
     secondaryConnection?: Connection,
-    dev?: boolean
+    dev?: boolean,
+    showManage?: boolean
   ) => void
   handle?: string
   wallet?: Wallet
@@ -24,6 +25,7 @@ export interface WalletIdentity {
   secondaryConnection?: Connection
   cluster?: Cluster
   dev?: boolean
+  showManageDefault?: boolean
   showIdentityModal: boolean
 }
 
@@ -45,6 +47,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
   const [wallet, setWallet] = useState<Wallet>()
   const [connection, setConnection] = useState<Connection>()
   const [secondaryConnection, setSecondaryConnection] = useState<Connection>()
+  const [showManage, setShowManage] = useState<boolean>(false)
   const [cluster, setCluster] = useState<Cluster | undefined>(undefined)
   const [dev, setDev] = useState<boolean | undefined>(undefined)
   const [showIdentityModal, setShowIdentityModal] = useState<boolean>(false)
@@ -53,13 +56,21 @@ export const WalletIdentityProvider: React.FC<Props> = ({
   return (
     <WalletIdentityContext.Provider
       value={{
-        show: (wallet, connection, cluster, secondaryConnection, dev) => {
+        show: (
+          wallet,
+          connection,
+          cluster,
+          secondaryConnection,
+          dev,
+          showManage
+        ) => {
           setWallet(wallet)
           setConnection(connection)
           setCluster(cluster)
           setSecondaryConnection(secondaryConnection)
           setDev(dev)
           setShowIdentityModal(true)
+          setShowManage(showManage || false)
         },
         handle,
         showIdentityModal,
@@ -82,6 +93,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
             secondaryConnection={secondaryConnection}
             appName={appName}
             appTwitter={appTwitter}
+            showManage={showManage}
             onComplete={(handle: string) => {
               setHandle(handle)
               withSleep(() => {

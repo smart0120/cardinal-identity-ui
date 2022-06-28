@@ -52,7 +52,7 @@ const TwitterClaim = () => {
   return (
     <>
       <Header />
-      <div style={{ marginTop: '45vh', transform: 'translateY(-50%)' }}>
+      <div style={{ marginTop: '10vh' }}>
         {address ? (
           <div
             style={{

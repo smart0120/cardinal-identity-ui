@@ -7,7 +7,7 @@ import { TwitterIcon } from '../common/TwitterIcon'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
 interface Props
-  extends Omit<
+  extends Omixt<
     React.DetailedHTMLProps<
       React.ButtonHTMLAttributes<HTMLButtonElement>,
       HTMLButtonElement

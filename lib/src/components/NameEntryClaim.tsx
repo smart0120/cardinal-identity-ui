@@ -46,6 +46,7 @@ export const NameEntryClaim = ({
   namespaceName = TWITTER_NAMESPACE_NAME,
   appName,
   appTwitter,
+  showManageDefault = false,
   notify,
   onComplete,
 }: {
@@ -56,11 +57,12 @@ export const NameEntryClaim = ({
   namespaceName?: string
   appName?: string
   appTwitter?: string
+  showManageDefault?: boolean
   notify?: (arg: { message?: string; txid?: string }) => void
   onComplete?: (arg0: string) => void
 }) => {
   const { wallet } = useWalletIdentity()
-  const [showManage, setShowManage] = useState(false)
+  const [showManage, setShowManage] = useState(showManageDefault)
   const [verifyError, setVerifyError] = useState<React.ReactNode | undefined>(
     undefined
   )
@@ -247,13 +249,6 @@ export const NameEntryClaim = ({
       ? true
       : false
 
-  console.log(
-    '---',
-    reverseEntry.isFetched,
-    reverseEntry.isFetching,
-    reverseEntry
-  )
-
   return (
     <Wrapper>
       <Instruction>
@@ -293,12 +288,11 @@ export const NameEntryClaim = ({
           className="absolute right-8"
           onClick={() => setShowManage(!showManage)}
         >
-          {showManage ? 'Add' : 'Manage'}
+          {showManage ? 'Back to linking' : 'Manage linked accounts'}
         </ButtonLight>
       )}
       {connection && wallet && showManage ? (
         <NameManager
-          cluster={cluster}
           connection={connection}
           wallet={wallet}
           namespaceName={namespaceName}

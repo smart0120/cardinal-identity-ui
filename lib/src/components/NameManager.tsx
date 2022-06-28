@@ -145,7 +145,7 @@ export const NameEntryRow = ({
                   formatName(
                     namespaceName,
                     reverseEntry.data.parsed.entryName
-                  ) !==
+                  ) ===
                     formatName(
                       ...nameFromMint(
                         userTokenData.metaplexData?.data.data.name || '',
@@ -161,7 +161,14 @@ export const NameEntryRow = ({
                   reverseEntry.remove()
                   setSuccess(
                     <div>
-                      Succesfully unlinked name{' '}
+                      Succesfully unlinked{' '}
+                      {formatTwitterLink(
+                        nameFromMint(
+                          userTokenData.metaplexData?.data.data.name || '',
+                          userTokenData.metaplexData?.data.data.uri || ''
+                        )[1]
+                      )}
+                      . Changes will be reflected shortly.{' '}
                       <a
                         className="cursor-pointer text-blue-500"
                         target={`_blank`}
@@ -169,7 +176,6 @@ export const NameEntryRow = ({
                       >
                         transaction
                       </a>
-                      . Changes will be reflected shortly.
                     </div>
                   )
                 },
@@ -193,7 +199,6 @@ export const NameEntryRow = ({
 }
 
 export const NameManager = ({
-  cluster,
   connection,
   wallet,
   namespaceName,

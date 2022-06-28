@@ -35,6 +35,7 @@ export const useHandleUnlink = (
           revokeRecipient: namespaceId,
         })
       } else if (userTokenData.tokenManager) {
+        // invalidate token manager
       }
 
       if (reverseNameEntryData) {
@@ -53,7 +54,10 @@ export const useHandleUnlink = (
         await connection.getRecentBlockhash('max')
       ).blockhash
       await wallet.signTransaction(transaction)
-      return sendAndConfirmRawTransaction(connection, transaction.serialize())
+      console.log(transaction)
+      return sendAndConfirmRawTransaction(connection, transaction.serialize(), {
+        skipPreflight: true,
+      })
     }
   )
 }
