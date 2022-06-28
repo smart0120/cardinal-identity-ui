@@ -2,7 +2,7 @@ import type { AccountData, CertificateData } from '@cardinal/certificates'
 import { certificateIdForMint, getCertificate } from '@cardinal/certificates'
 import type { EntryData } from '@cardinal/namespaces'
 import { getNameEntry, NAMESPACES_PROGRAM_ID } from '@cardinal/namespaces'
-import * as metaplex from '@metaplex/js'
+import * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import * as anchor from '@project-serum/anchor'
 import * as splToken from '@solana/spl-token'
 import type { Connection, TokenAccountBalancePair } from '@solana/web3.js'
@@ -12,7 +12,7 @@ import { useMemo, useState } from 'react'
 export type NameEntryData = {
   nameEntry: AccountData<EntryData>
   certificate: AccountData<CertificateData>
-  metaplexData: any
+  metaplexData?: { pubkey: PublicKey; data: metaplex.MetadataData } | null
   arweaveData: { pubkey: PublicKey; parsed: any }
   largestHolders: TokenAccountBalancePair[]
   owner: PublicKey | undefined
@@ -30,18 +30,16 @@ export async function getNameEntryData(
   const [[metaplexId], [certificateId]] = await Promise.all([
     PublicKey.findProgramAddress(
       [
-        anchor.utils.bytes.utf8.encode(
-          metaplex.programs.metadata.MetadataProgram.PREFIX
-        ),
-        metaplex.programs.metadata.MetadataProgram.PUBKEY.toBuffer(),
+        anchor.utils.bytes.utf8.encode(metaplex.MetadataProgram.PREFIX),
+        metaplex.MetadataProgram.PUBKEY.toBuffer(),
         mint.toBuffer(),
       ],
-      metaplex.programs.metadata.MetadataProgram.PUBKEY
+      metaplex.MetadataProgram.PUBKEY
     ),
     certificateIdForMint(mint),
   ])
   const [metaplexData, certificate] = await Promise.all([
-    metaplex.programs.metadata.Metadata.load(connection, metaplexId),
+    metaplex.Metadata.load(connection, metaplexId),
     getCertificate(connection, certificateId),
   ])
   let json

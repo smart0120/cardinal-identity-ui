@@ -77,16 +77,16 @@ export const NameEntryRow = ({
       >
         {formatTwitterLink(
           nameFromMint(
-            userTokenData.metaplexData?.data.data.name || '',
-            userTokenData.metaplexData?.data.data.uri || ''
+            userTokenData.metaplexData?.parsed.data.name || '',
+            userTokenData.metaplexData?.parsed.data.uri || ''
           )[1]
         )}
         {reverseEntry.data &&
           formatName(namespaceName, reverseEntry.data.parsed.entryName) ===
             formatName(
               ...nameFromMint(
-                userTokenData.metaplexData?.data.data.name || '',
-                userTokenData.metaplexData?.data.data.uri || ''
+                userTokenData.metaplexData?.parsed.data.name || '',
+                userTokenData.metaplexData?.parsed.data.uri || ''
               )
             ) && <AiFillStar />}
       </div>
@@ -95,8 +95,8 @@ export const NameEntryRow = ({
           formatName(namespaceName, reverseEntry.data.parsed.entryName) !==
             formatName(
               ...nameFromMint(
-                userTokenData.metaplexData?.data.data.name || '',
-                userTokenData.metaplexData?.data.data.uri || ''
+                userTokenData.metaplexData?.parsed.data.name || '',
+                userTokenData.metaplexData?.parsed.data.uri || ''
               )
             ) && (
             <ButtonLight
@@ -108,7 +108,7 @@ export const NameEntryRow = ({
                   {
                     onSuccess: (txid) => {
                       userNamesForNamespace.remove()
-                      reverseEntry.remove()
+                      reverseEntry.refetch()
                       setSuccess(
                         <div>
                           Succesfully set default with{' '}
@@ -148,8 +148,8 @@ export const NameEntryRow = ({
                   ) ===
                     formatName(
                       ...nameFromMint(
-                        userTokenData.metaplexData?.data.data.name || '',
-                        userTokenData.metaplexData?.data.data.uri || ''
+                        userTokenData.metaplexData?.parsed.data.name || '',
+                        userTokenData.metaplexData?.parsed.data.uri || ''
                       )
                     )
                     ? reverseEntry.data
@@ -158,14 +158,14 @@ export const NameEntryRow = ({
               {
                 onSuccess: (txid) => {
                   userNamesForNamespace.remove()
-                  reverseEntry.remove()
+                  reverseEntry.refetch()
                   setSuccess(
                     <div>
                       Succesfully unlinked{' '}
                       {formatTwitterLink(
                         nameFromMint(
-                          userTokenData.metaplexData?.data.data.name || '',
-                          userTokenData.metaplexData?.data.data.uri || ''
+                          userTokenData.metaplexData?.parsed.data.name || '',
+                          userTokenData.metaplexData?.parsed.data.uri || ''
                         )[1]
                       )}
                       . Changes will be reflected shortly.{' '}
@@ -250,8 +250,8 @@ export const NameManager = ({
           formatName(namespaceName, reverseEntry.data.parsed.entryName) ===
             formatName(
               ...nameFromMint(
-                userTokenData.metaplexData?.data.data.name || '',
-                userTokenData.metaplexData?.data.data.uri || ''
+                userTokenData.metaplexData?.parsed.data.name || '',
+                userTokenData.metaplexData?.parsed.data.uri || ''
               )
             )
             ? -1

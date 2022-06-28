@@ -9,13 +9,18 @@ export const useAddressName = (
   connection: Connection,
   address: PublicKey | undefined,
   namespaceName = TWITTER_NAMESPACE_NAME
-): { displayName: string | undefined; loadingName: boolean } => {
+): {
+  displayName: string | undefined
+  loadingName: boolean
+  refreshName: () => void
+} => {
   const { handle } = useWalletIdentity()
   const [displayName, setDisplayName] = useState<string | undefined>()
   const [loadingName, setLoadingName] = useState<boolean>(true)
 
   const refreshName = async () => {
     try {
+      console.log('REFRESHINGNAME')
       setLoadingName(true)
       if (address) {
         const [namespaceId] = await findNamespaceId(namespaceName)
@@ -31,5 +36,5 @@ export const useAddressName = (
     void refreshName()
   }, [connection, address?.toString(), namespaceName, handle])
 
-  return { displayName, loadingName }
+  return { displayName, loadingName, refreshName }
 }

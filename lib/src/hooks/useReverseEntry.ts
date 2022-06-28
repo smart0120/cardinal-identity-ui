@@ -21,6 +21,6 @@ export const useReverseEntry = (
       )
       return reverseEntry || undefined
     },
-    { refetchOnMount: false }
+    { refetchOnMount: false, refetchOnWindowFocus: false }
   )
 }

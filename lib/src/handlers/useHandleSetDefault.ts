@@ -23,10 +23,10 @@ export const useHandleSetDefault = (
       userTokenData: UserTokenData
     }): Promise<string> => {
       const transaction = new Transaction()
-      const entryMint = new PublicKey(userTokenData.metaplexData?.data.mint!)
+      const entryMint = new PublicKey(userTokenData.metaplexData?.parsed.mint!)
       const [, entryName] = nameFromMint(
-        userTokenData.metaplexData?.data.data.name || '',
-        userTokenData.metaplexData?.data.data.uri || ''
+        userTokenData.metaplexData?.parsed.data.name || '',
+        userTokenData.metaplexData?.parsed.data.uri || ''
       )
       if (userTokenData.certificate) {
         await deprecated.withSetReverseEntry(
@@ -52,9 +52,14 @@ export const useHandleSetDefault = (
         await connection.getRecentBlockhash('max')
       ).blockhash
       await wallet.signTransaction(transaction)
-      return sendAndConfirmRawTransaction(connection, transaction.serialize(), {
-        skipPreflight: true,
-      })
+      const txid = await sendAndConfirmRawTransaction(
+        connection,
+        transaction.serialize(),
+        {
+          skipPreflight: true,
+        }
+      )
+      return txid
     }
   )
 }

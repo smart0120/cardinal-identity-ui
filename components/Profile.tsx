@@ -40,7 +40,10 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
   const { connection, environment } = useEnvironmentCtx()
   const dev = query['dev'] === 'true'
   const addressStr = address.toString()
-  const { displayName, loadingName } = useAddressName(connection, address)
+  const { displayName, loadingName, refreshName } = useAddressName(
+    connection,
+    address
+  )
   const { addressImage, loadingImage } = useAddressImage(
     connection,
     address,
@@ -178,16 +181,15 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
         <div className="mt-5">
           <ConnectTwitterButton
             disabled={address?.toString() !== wallet?.publicKey?.toString()}
-            address={wallet.publicKey!}
             dev={dev}
-            // @ts-ignore
-            wallet={wallet}
+            wallet={wallet as Wallet}
             connection={connection}
             secondaryConnection={
               environment.secondary
                 ? new Connection(environment.secondary)
                 : connection
             }
+            onClose={refreshName}
             cluster={environment.label}
           />
         </div>

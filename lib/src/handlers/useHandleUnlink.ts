@@ -28,7 +28,7 @@ export const useHandleUnlink = (
     }): Promise<string> => {
       const [namespaceId] = await namespaces.findNamespaceId(namespaceName)
       const transaction = new Transaction()
-      const entryMint = new PublicKey(userTokenData.metaplexData?.data.mint!)
+      const entryMint = new PublicKey(userTokenData.metaplexData?.parsed.mint!)
       if (userTokenData.certificate) {
         await withRevokeCertificateV2(connection, wallet, transaction, {
           certificateMint: entryMint,

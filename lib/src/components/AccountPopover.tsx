@@ -55,7 +55,11 @@ export const AccountPopover = ({
             <MenuItem
               dark={dark}
               onClick={async () =>
-                show(wallet as Wallet, connection, environment)
+                show({
+                  wallet: wallet as Wallet,
+                  connection,
+                  cluster: environment,
+                })
               }
             >
               <FaTwitter />

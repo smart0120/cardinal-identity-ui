@@ -22,7 +22,7 @@ export type UserTokenData = {
     pubkey: PublicKey
     account: AccountInfo<ParsedAccountData>
   }
-  metaplexData?: { pubkey: PublicKey; data: metaplex.MetadataData } | null
+  metaplexData?: { pubkey: PublicKey; parsed: metaplex.MetadataData } | null
   tokenManager?: AccountData<TokenManagerData>
   certificate?: AccountData<CertificateData> | null
 }
@@ -71,7 +71,7 @@ export const useUserNamesForNamespace = (
             acc[tokenAccounts[i]!.pubkey.toString()] = {
               pubkey: metaplexIds[i]!,
               ...accountInfo,
-              data: metaplex.MetadataData.deserialize(
+              parsed: metaplex.MetadataData.deserialize(
                 accountInfo?.data as Buffer
               ) as metaplex.MetadataData,
             }
@@ -81,7 +81,7 @@ export const useUserNamesForNamespace = (
         {} as {
           [tokenAccountId: string]: {
             pubkey: PublicKey
-            data: metaplex.MetadataData
+            parsed: metaplex.MetadataData
           }
         }
       )
@@ -91,16 +91,16 @@ export const useUserNamesForNamespace = (
         (tokenAccount) =>
           metaplexData[
             tokenAccount.pubkey.toString()
-          ]?.data?.data?.creators?.some(
+          ]?.parsed?.data?.creators?.some(
             (creator) =>
               creator.address.toString() === namespaceId.toString() &&
               creator.verified
           ) ||
-          (metaplexData[tokenAccount.pubkey.toString()]?.data?.data?.symbol ===
-            'NAME' &&
+          (metaplexData[tokenAccount.pubkey.toString()]?.parsed?.data
+            ?.symbol === 'NAME' &&
             metaplexData[
               tokenAccount.pubkey.toString()
-            ]?.data?.data?.name.includes(TWITTER_NAMESPACE_NAME))
+            ]?.parsed?.data?.name.includes(TWITTER_NAMESPACE_NAME))
       )
 
       // lookup delegates
@@ -127,6 +127,10 @@ export const useUserNamesForNamespace = (
           certificate: certificateData,
         }
       })
+    },
+    {
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
     }
   )
 }
