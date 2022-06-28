@@ -1,3 +1,5 @@
+import type { PublicKey } from '@solana/web3.js'
+
 import { Button } from '../common/Button'
 import { TwitterIcon } from '../common/TwitterIcon'
 import type { ShowParams } from '../providers/WalletIdentityProvider'
@@ -12,6 +14,7 @@ interface Props
       'onClick'
     >,
     ShowParams {
+  address?: PublicKey
   disabled?: boolean
   variant?: 'primary' | 'secondary'
 }
@@ -24,6 +27,7 @@ export const ConnectTwitterButton: React.FC<Props> = ({
   secondaryConnection,
   wallet,
   onClose,
+  address,
   disabled,
   ...buttonProps
 }: Props) => {
