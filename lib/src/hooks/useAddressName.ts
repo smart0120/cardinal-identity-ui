@@ -20,7 +20,6 @@ export const useAddressName = (
 
   const refreshName = async () => {
     try {
-      console.log('REFRESHINGNAME')
       setLoadingName(true)
       if (address) {
         const [namespaceId] = await findNamespaceId(namespaceName)

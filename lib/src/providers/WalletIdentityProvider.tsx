@@ -28,7 +28,6 @@ export interface WalletIdentity {
   secondaryConnection?: Connection
   cluster?: Cluster
   dev?: boolean
-  showManageDefault?: boolean
   showIdentityModal: boolean
 }
 
@@ -50,7 +49,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
   const [wallet, setWallet] = useState<Wallet>()
   const [connection, setConnection] = useState<Connection>()
   const [secondaryConnection, setSecondaryConnection] = useState<Connection>()
-  const [showManage, setShowManage] = useState<boolean>(false)
+  const [showManageDefault, setShowManageDefault] = useState<boolean>(false)
   const [cluster, setCluster] = useState<Cluster | undefined>(undefined)
   const [dev, setDev] = useState<boolean | undefined>(undefined)
   const [onClose, setOnClose] = useState<(() => void) | undefined>()
@@ -67,6 +66,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
           secondaryConnection,
           dev,
           onClose,
+          showManage: showManageDefault,
         }) => {
           setWallet(wallet)
           setConnection(connection)
@@ -75,7 +75,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
           setDev(dev)
           onClose && setOnClose(() => onClose)
           setShowIdentityModal(true)
-          setShowManage(showManage || false)
+          setShowManageDefault(showManageDefault || false)
         },
         handle,
         wallet,
@@ -102,7 +102,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
             secondaryConnection={secondaryConnection}
             appName={appName}
             appTwitter={appTwitter}
-            showManage={showManage}
+            showManage={showManageDefault}
             onComplete={(handle: string) => {
               setHandle(handle)
               withSleep(() => {

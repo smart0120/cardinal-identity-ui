@@ -197,16 +197,16 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           disabled={address?.toString() !== wallet?.publicKey?.toString()}
           className="rounded-md px-3 py-1 text-xs text-white"
           onClick={() =>
-            show(
-              wallet as Wallet,
-              connection,
-              environment.label,
-              environment.secondary
+            show({
+              wallet: wallet as Wallet,
+              connection: connection,
+              cluster: environment.label,
+              secondaryConnection: environment.secondary
                 ? new Connection(environment.secondary)
                 : connection,
               dev,
-              true
-            )
+              showManage: true,
+            })
           }
           style={{
             borderColor: '#657786',
@@ -234,11 +234,7 @@ export const PlaceholderProfile: React.FC = () => {
       }}
     >
       <div style={{ marginBottom: '40px' }}>
-        <Alert
-          message={'Connect wallet to continue'}
-          type="warning"
-          // showIcon
-        />
+        <Alert message={'Connect wallet to continue'} type="warning" />
       </div>
       <ContentLoader viewBox="0 0 320 280">
         <rect x="80" y="0" rx="5" ry="5" width="160" height="160" />

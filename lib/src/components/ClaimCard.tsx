@@ -39,6 +39,7 @@ export const ClaimCard = ({
   showManage: showManageDefault,
   namespaceName = TWITTER_NAMESPACE_NAME,
 }: ClaimCardProps) => {
+  console.log(showManageDefault)
   const [showManage, setShowManage] = useState(showManageDefault)
   const reverseEntry = useReverseEntry(
     connection,
@@ -83,8 +84,8 @@ export const ClaimCard = ({
           )}
           {connection && wallet?.publicKey && (
             <ButtonLight
-              className="absolute right-8"
-              onClick={() => setShowManage(!showManage)}
+              className="absolute right-8 z-10"
+              onClick={() => setShowManage((m) => !m)}
             >
               {showManage ? 'Back to linking' : 'Manage linked accounts'}
             </ButtonLight>
