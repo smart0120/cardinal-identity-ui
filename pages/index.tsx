@@ -5,6 +5,8 @@ import { PlaceholderProfile } from 'components/Profile'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
+import { useLinkingFlow } from './providers/LinkingFlowProvider'
+
 export const TwitterBackground = styled.div`
   z-index: -1;
   top: 0;
@@ -12,12 +14,12 @@ export const TwitterBackground = styled.div`
   height: 100%;
   position: fixed;
   background: #1da1f2;
-  //   background: linear-gradient(-45deg, #23a6d5, #1da1f2);
 `
 
 const TwitterHome = () => {
   const wallet = useWallet()
   const router = useRouter()
+  const { linkingFlow } = useLinkingFlow()
 
   useEffect(() => {
     if (wallet.connected) {
