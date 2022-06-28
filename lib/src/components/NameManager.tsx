@@ -103,7 +103,7 @@ export const NameEntryRow = ({
               onClick={() =>
                 handleSetDefault.mutate(
                   {
-                    userTokenData,
+                    tokenData: userTokenData,
                   },
                   {
                     onSuccess: (txid) => {

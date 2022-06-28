@@ -1226,10 +1226,10 @@
     tiny-invariant "^1.2.0"
     tslib "^2.3.1"
 
-"@cardinal/common@^2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@cardinal/common/-/common-2.0.2.tgz#ce3915fe1ff80de8c2173f4da71e93cb1d0658e9"
-  integrity sha512-XbqL2xB6Qsc7zdwgaTM9QAwbtYp37cjWIWzL9evx4MwGuCOQgkHYxzhAgdBJlBpbVTphD+m4PTDh6xAW+VrvjA==
+"@cardinal/common@^2.0.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@cardinal/common/-/common-2.0.4.tgz#46cfa4f60aa66ed0b625ed2cb38ac5f37c2be7fb"
+  integrity sha512-6Fzx8JAnfwqxANGFdTY4ztcudZ8+aiem/2IZrraPWcXzM3mfJ8EozGUYjDMdxKruTrVxbmIOL3sqfhuoDyz7XQ==
   dependencies:
     "@metaplex-foundation/mpl-token-metadata" "^1.2.5"
     "@project-serum/anchor" "^0.24.2"
@@ -1252,10 +1252,10 @@
     eslint-plugin-react "^7.29.3"
     eslint-plugin-react-hooks "^4.3.0"
 
-"@cardinal/namespaces@^4.1.11":
-  version "4.1.11"
-  resolved "https://registry.yarnpkg.com/@cardinal/namespaces/-/namespaces-4.1.11.tgz#ee887b862da05c416e7a595402608d5fbd7f7f74"
-  integrity sha512-8krlx09m61HWvANLoBlb0D5xNH9EzKNKL3jAzesm8r3rGKQXY+UpqL70gNRKIu+knSWSO6Nnf0ux99ad4N0SUg==
+"@cardinal/namespaces@^4.1.12":
+  version "4.1.12"
+  resolved "https://registry.yarnpkg.com/@cardinal/namespaces/-/namespaces-4.1.12.tgz#53c0c11f6199a4c78e77ebc85f29e82a9f8bb28c"
+  integrity sha512-rseqBNVvGgh+nU6vGWh0Ltg/g81GsLm1U1nRmndRFDdkjVGk8ycO2iURfg5LrU0ehE0gIPAxUBJO0thPeDFJBg==
   dependencies:
     "@cardinal/certificates" "^2.0.0"
     "@cardinal/common" "^2.0.1"

@@ -22,7 +22,7 @@ export type UserTokenData = {
     pubkey: PublicKey
     account: AccountInfo<ParsedAccountData>
   }
-  metaplexData?: { pubkey: PublicKey; parsed: metaplex.MetadataData } | null
+  metaplexData?: AccountData<metaplex.MetadataData>
   tokenManager?: AccountData<TokenManagerData>
   certificate?: AccountData<CertificateData> | null
 }

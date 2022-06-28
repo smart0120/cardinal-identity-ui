@@ -26,7 +26,6 @@ export async function tryGetNameEntry(
 }
 
 export async function revokeAndClaim(
-  cluster: string,
   connection: web3.Connection,
   wallet: Wallet,
   namespaceName: string,
@@ -40,15 +39,15 @@ export async function revokeAndClaim(
   const entry = await tryGetNameEntry(connection, namespaceName, entryName)
   const transaction = new web3.Transaction()
   if (!entry?.parsed.reverseEntry) {
-    // await namespaces.deprecated.withRevokeReverseEntry(
-    //   connection,
-    //   wallet,
-    //   namespaceName,
-    //   entryName,
-    //   reverseEntryId,
-    //   claimRequestId,
-    //   transaction
-    // )
+    await namespaces.withRevokeReverseEntry(
+      transaction,
+      connection,
+      wallet,
+      namespaceName,
+      entryName,
+      reverseEntryId,
+      claimRequestId
+    )
   }
   await namespaces.deprecated.withRevokeEntry(
     connection,
@@ -125,7 +124,6 @@ export async function setReverseEntry(
 }
 
 export async function initAndClaimEntry(
-  cluster: string,
   connection: web3.Connection,
   wallet: Wallet,
   namespaceName: string,
