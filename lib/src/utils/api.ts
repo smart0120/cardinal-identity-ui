@@ -1,9 +1,8 @@
-import type { AccountData, EntryData } from '@cardinal/namespaces'
+import type { AccountData } from '@cardinal/common'
+import type { EntryData } from '@cardinal/namespaces'
 import * as namespaces from '@cardinal/namespaces'
 import type { Wallet } from '@saberhq/solana-contrib'
 import * as web3 from '@solana/web3.js'
-
-import { signAndSendTransaction } from './transactions'
 
 export function apiBase(dev?: boolean): string {
   return `https://${dev ? 'dev-api' : 'api'}.cardinal.so`
@@ -41,17 +40,17 @@ export async function revokeAndClaim(
   const entry = await tryGetNameEntry(connection, namespaceName, entryName)
   const transaction = new web3.Transaction()
   if (!entry?.parsed.reverseEntry) {
-    await namespaces.withRevokeReverseEntry(
-      connection,
-      wallet,
-      namespaceName,
-      entryName,
-      reverseEntryId,
-      claimRequestId,
-      transaction
-    )
+    // await namespaces.deprecated.withRevokeReverseEntry(
+    //   connection,
+    //   wallet,
+    //   namespaceName,
+    //   entryName,
+    //   reverseEntryId,
+    //   claimRequestId,
+    //   transaction
+    // )
   }
-  await namespaces.withRevokeEntry(
+  await namespaces.deprecated.withRevokeEntry(
     connection,
     wallet,
     namespaceName,
@@ -72,7 +71,7 @@ export async function revokeAndClaim(
   )
 
   const transaction2 = new web3.Transaction()
-  await namespaces.withClaimEntry(
+  await namespaces.deprecated.withClaimEntry(
     connection,
     wallet,
     namespaceName,
@@ -81,7 +80,7 @@ export async function revokeAndClaim(
     duration || 0,
     transaction2
   )
-  await namespaces.withSetReverseEntry(
+  await namespaces.deprecated.withSetReverseEntry(
     connection,
     wallet,
     namespaceName,
@@ -104,7 +103,7 @@ export async function setReverseEntry(
   entryName: string,
   certificateMintId: web3.PublicKey
 ): Promise<string> {
-  const transaction = await namespaces.withSetReverseEntry(
+  const transaction = await namespaces.deprecated.withSetReverseEntry(
     connection,
     wallet,
     namespaceName,
@@ -135,7 +134,7 @@ export async function initAndClaimEntry(
 ): Promise<string> {
   const certificateMint = web3.Keypair.generate()
   const transaction = new web3.Transaction()
-  await namespaces.withInitEntry(
+  await namespaces.deprecated.withInitEntry(
     connection,
     wallet,
     certificateMint.publicKey,
@@ -143,7 +142,7 @@ export async function initAndClaimEntry(
     entryName,
     transaction
   )
-  await namespaces.withClaimEntry(
+  await namespaces.deprecated.withClaimEntry(
     connection,
     wallet,
     namespaceName,
@@ -152,7 +151,7 @@ export async function initAndClaimEntry(
     duration || 0,
     transaction
   )
-  await namespaces.withSetReverseEntry(
+  await namespaces.deprecated.withSetReverseEntry(
     connection,
     wallet,
     namespaceName,
@@ -177,7 +176,7 @@ export async function claimEntry(
   certificateMintId: web3.PublicKey,
   duration: number | null
 ): Promise<string> {
-  const transaction = await namespaces.withClaimEntry(
+  const transaction = await namespaces.deprecated.withClaimEntry(
     connection,
     wallet,
     namespaceName,
@@ -186,7 +185,7 @@ export async function claimEntry(
     duration || 0,
     new web3.Transaction()
   )
-  await namespaces.withSetReverseEntry(
+  await namespaces.deprecated.withSetReverseEntry(
     connection,
     wallet,
     namespaceName,
@@ -205,83 +204,4 @@ export async function claimEntry(
     transaction.serialize()
   )
   return txid
-}
-
-export async function setEntryData(
-  connection: web3.Connection,
-  wallet: Wallet,
-  namespaceName: string,
-  entryName: string,
-  entryData: string
-): Promise<string> {
-  const transaction = await namespaces.withSetEntryData(
-    connection,
-    wallet,
-    namespaceName,
-    entryName,
-    new web3.PublicKey(entryData),
-    new web3.Transaction()
-  )
-  transaction.feePayer = wallet.publicKey
-  transaction.recentBlockhash = (
-    await connection.getRecentBlockhash('max')
-  ).blockhash
-  await wallet.signTransaction(transaction)
-  let txid = null
-  txid = await web3.sendAndConfirmRawTransaction(
-    connection,
-    transaction.serialize()
-  )
-  return txid
-}
-
-export async function approveClaimRequest(
-  connection: web3.Connection,
-  wallet: Wallet,
-  namespaceName: string,
-  claimRequestId: web3.PublicKey
-): Promise<string> {
-  const transaction = await namespaces.withUpdateClaimRequest(
-    connection,
-    wallet,
-    namespaceName,
-    claimRequestId,
-    true,
-    new web3.Transaction()
-  )
-  transaction.feePayer = wallet.publicKey
-  transaction.recentBlockhash = (
-    await connection.getRecentBlockhash('max')
-  ).blockhash
-  await wallet.signTransaction(transaction)
-  let txid = null
-  txid = await web3.sendAndConfirmRawTransaction(
-    connection,
-    transaction.serialize()
-  )
-  return txid
-}
-
-export async function getPendingClaimRequests(connection: web3.Connection) {
-  return namespaces.getPendingClaimRequests(connection)
-}
-
-export async function createClaimRequest(
-  connection: web3.Connection,
-  wallet: Wallet,
-  namespaceName: string,
-  entryName: string
-): Promise<string> {
-  return await signAndSendTransaction(
-    connection,
-    wallet,
-    await namespaces.withCreateClaimRequest(
-      connection,
-      wallet,
-      namespaceName,
-      entryName,
-      wallet.publicKey,
-      new web3.Transaction()
-    )
-  )
 }

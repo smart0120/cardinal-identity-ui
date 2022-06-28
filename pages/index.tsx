@@ -30,7 +30,7 @@ const TwitterHome = () => {
   return (
     <>
       <Header />
-      <div style={{ marginTop: '45vh', transform: 'translateY(-50%)' }}>
+      <div style={{ marginTop: '10vh' }}>
         <div
           style={{
             width: '320px',
