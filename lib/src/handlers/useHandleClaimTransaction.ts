@@ -7,7 +7,7 @@ import type { Cluster, Connection, PublicKey } from '@solana/web3.js'
 import { sendAndConfirmRawTransaction, Transaction } from '@solana/web3.js'
 import { useMutation } from 'react-query'
 
-import { apiBase } from '../utils/api'
+import { apiBase } from '../utils/constants'
 
 export interface HandleSetParam {
   metaplexData?: {

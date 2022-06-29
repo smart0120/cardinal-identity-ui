@@ -6,7 +6,7 @@ import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, PublicKey } from '@solana/web3.js'
 import { useMutation } from 'react-query'
 
-import { apiBase } from '../utils/api'
+import { apiBase } from '../utils/constants'
 
 export interface HandleSetParam {
   metaplexData?: {

@@ -1,8 +1,7 @@
 import { shortenAddress } from '@cardinal/namespaces'
 import { PublicKey } from '@solana/web3.js'
 
-import { apiBase } from './api'
-import { TWITTER_NAMESPACE_NAME } from './constants'
+import { apiBase, TWITTER_NAMESPACE_NAME } from './constants'
 
 export const formatTwitterLink = (handle: string | undefined) => {
   if (!handle) return <></>
