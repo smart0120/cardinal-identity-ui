@@ -91,50 +91,51 @@ export const NameEntryRow = ({
             ) && <AiFillStar />}
       </div>
       <div className="flex items-center gap-2">
-        {reverseEntry.data &&
-          formatName(namespaceName, reverseEntry.data.parsed.entryName) !==
-            formatName(
-              ...nameFromMint(
-                userTokenData.metaplexData?.parsed.data.name || '',
-                userTokenData.metaplexData?.parsed.data.uri || ''
-              )
-            ) && (
-            <ButtonLight
-              onClick={() =>
-                handleSetDefault.mutate(
-                  {
-                    tokenData: userTokenData,
-                  },
-                  {
-                    onSuccess: (txid) => {
-                      userNamesForNamespace.remove()
-                      reverseEntry.refetch()
-                      setSuccess(
-                        <div>
-                          Succesfully set default with{' '}
-                          <a
-                            className="cursor-pointer text-blue-500"
-                            target={`_blank`}
-                            href={`https://explorer.solana.com/tx/${txid}?cluster=${cluster}`}
-                          >
-                            transaction
-                          </a>
-                          . Changes will be reflected shortly.
-                        </div>
-                      )
-                    },
-                    onError: (e) => setError(e),
-                  }
+        {(!reverseEntry.data ||
+          (reverseEntry.data &&
+            formatName(namespaceName, reverseEntry.data.parsed.entryName) !==
+              formatName(
+                ...nameFromMint(
+                  userTokenData.metaplexData?.parsed.data.name || '',
+                  userTokenData.metaplexData?.parsed.data.uri || ''
                 )
-              }
-            >
-              {handleSetDefault.isLoading ? (
-                <LoadingSpinner height="15px" fill="#000" />
-              ) : (
-                <>Set Default</>
-              )}
-            </ButtonLight>
-          )}
+              ))) && (
+          <ButtonLight
+            onClick={() =>
+              handleSetDefault.mutate(
+                {
+                  tokenData: userTokenData,
+                },
+                {
+                  onSuccess: (txid) => {
+                    userNamesForNamespace.remove()
+                    reverseEntry.refetch()
+                    setSuccess(
+                      <div>
+                        Succesfully set default with{' '}
+                        <a
+                          className="cursor-pointer text-blue-500"
+                          target={`_blank`}
+                          href={`https://explorer.solana.com/tx/${txid}?cluster=${cluster}`}
+                        >
+                          transaction
+                        </a>
+                        . Changes will be reflected shortly.
+                      </div>
+                    )
+                  },
+                  onError: (e) => setError(e),
+                }
+              )
+            }
+          >
+            {handleSetDefault.isLoading ? (
+              <LoadingSpinner height="15px" fill="#000" />
+            ) : (
+              <>Set Default</>
+            )}
+          </ButtonLight>
+        )}
         <ButtonLight
           className="flex items-center gap-1"
           onClick={async () =>
