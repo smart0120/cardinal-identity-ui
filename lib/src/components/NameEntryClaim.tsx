@@ -208,10 +208,11 @@ export const NameEntryClaim = ({
                         showIcon
                       />
                     )}
-                    {nameEntryData.isFetching ? (
+                    {nameEntryData.isFetching || claimRequest.isFetching ? (
                       <div className="mb-2 h-8 min-w-full animate-pulse rounded-lg bg-gray-200"></div>
                     ) : (
-                      alreadyOwned && (
+                      alreadyOwned &&
+                      !claimRequest.data?.parsed.isApproved && (
                         <>
                           <Alert
                             style={{
@@ -265,6 +266,7 @@ export const NameEntryClaim = ({
                                               message: 'Revoke successful',
                                             })
                                           nameEntryData.refetch()
+                                          claimRequest.refetch()
                                         },
                                       }
                                     )
@@ -323,7 +325,10 @@ export const NameEntryClaim = ({
       <ButtonWithFooter
         loading={handleClaimTransaction.isLoading}
         complete={claimed}
-        disabled={!handleVerify.isSuccess || alreadyOwned}
+        disabled={
+          !handleVerify.isSuccess ||
+          (alreadyOwned && !claimRequest.data?.parsed.isApproved)
+        }
         onClick={() =>
           handleClaimTransaction.mutate(
             {
