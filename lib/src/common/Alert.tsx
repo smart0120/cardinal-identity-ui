@@ -41,6 +41,9 @@ const AlertIcon = styled.div<{
   type: 'success' | 'info' | 'warning' | 'error'
 }>`
   margin-right: 8px;
+  position: absolute;
+  top: -8px;
+  left: -6px;
   ${({ type = 'info' }) => {
     return {
       info: css`
@@ -56,7 +59,7 @@ const AlertIcon = styled.div<{
         color: #ff4d4f;
       `,
     }[type]
-  }}
+  }};
 `
 
 const StyledAlert = styled.div<{

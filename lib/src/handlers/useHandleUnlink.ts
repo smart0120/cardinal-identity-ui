@@ -12,7 +12,6 @@ import {
 } from '@solana/web3.js'
 import { useMutation } from 'react-query'
 
-import { nameFromMint } from '../components/NameManager'
 import type { UserTokenData } from '../hooks/useUserNamesForNamespace'
 
 export const useHandleUnlink = (
@@ -30,10 +29,6 @@ export const useHandleUnlink = (
       const [namespaceId] = await namespaces.findNamespaceId(namespaceName)
       const transaction = new Transaction()
       const entryMint = new PublicKey(userTokenData.metaplexData?.parsed.mint!)
-      const [, entryName] = nameFromMint(
-        userTokenData.metaplexData?.parsed.data.name!,
-        userTokenData.metaplexData?.parsed.data.uri!
-      )
       if (userTokenData.certificate) {
         await withRevokeCertificateV2(connection, wallet, transaction, {
           certificateMint: entryMint,
@@ -43,7 +38,7 @@ export const useHandleUnlink = (
         // invalidate token manager
       }
       if (reverseNameEntryData) {
-await withInvalidateExpiredReverseEntry(
+        await withInvalidateExpiredReverseEntry(
           transaction,
           connection,
           wallet,
@@ -51,7 +46,7 @@ await withInvalidateExpiredReverseEntry(
           entryMint,
           reverseNameEntryData.parsed.entryName,
           reverseNameEntryData.pubkey
-                )
+        )
       }
       // TODO
       // await withInvalidateExpiredNameEntry(
