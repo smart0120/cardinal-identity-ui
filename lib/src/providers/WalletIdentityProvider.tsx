@@ -8,7 +8,7 @@ import { ClaimCard } from '..'
 import { Modal } from '../modal'
 import { withSleep } from '../utils/transactions'
 
-const DEBUG = true
+const DEBUG = false
 
 export type ShowParams = {
   connection: Connection
