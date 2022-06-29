@@ -5,10 +5,8 @@ import { useMemo, useState } from 'react'
 
 import { Alert } from '../common/Alert'
 import { ButtonLight } from '../common/Button'
-import { LoadingSpinner } from '../common/LoadingSpinner'
-import { useHandleClaim } from '../handlers/useHandleClaim'
+import { useHandleClaimTransaction } from '../handlers/useHandleClaimTransaction'
 import { useHandleRevoke } from '../handlers/useHandleRevoke'
-import { useHandleSetDefault } from '../handlers/useHandleSetDefault'
 import { useHandleVerify } from '../handlers/useHandleVerify'
 import { useClaimRequest } from '../hooks/useClaimRequest'
 import { useNameEntryData } from '../hooks/useNameEntryData'
@@ -41,6 +39,7 @@ export const NameEntryClaim = ({
   namespaceName = TWITTER_NAMESPACE_NAME,
   appName,
   appTwitter,
+  setShowManage,
   notify,
   onComplete,
 }: {
@@ -52,13 +51,11 @@ export const NameEntryClaim = ({
   namespaceName?: string
   appName?: string
   appTwitter?: string
+  setShowManage: (m: boolean) => void
   notify?: (arg: { message?: string; txid?: string }) => void
   onComplete?: (arg0: string) => void
 }) => {
   const [ownedError, setOwnedError] = useState<React.ReactNode | undefined>(
-    undefined
-  )
-  const [claimError, setClaimError] = useState<React.ReactNode | undefined>(
     undefined
   )
   const [tweetSent, setTweetSent] = useState(false)
@@ -86,11 +83,11 @@ export const NameEntryClaim = ({
 
   const handleVerify = useHandleVerify(wallet, cluster, dev)
   const handleRevoke = useHandleRevoke(wallet, cluster, dev)
-  const handleClaim = useHandleClaim(connection, wallet, namespaceName)
-  const handleSetDefault = useHandleSetDefault(
+  const handleClaimTransaction = useHandleClaimTransaction(
     connection,
     wallet,
-    namespaceName
+    cluster,
+    dev
   )
 
   useMemo(() => {
@@ -179,10 +176,23 @@ export const NameEntryClaim = ({
                   <div
                     style={{
                       padding: '10px',
-                      maxWidth: 'calc(100% - 120px - 20px)',
+                      width: 'calc(100% - 120px - 20px)',
                     }}
                   >
-                    {claimRequest && claimRequest?.data?.parsed.isApproved ? (
+                    {handleVerify.isLoading ? (
+                      <div className="mb-2 h-8 w-full animate-pulse rounded-lg bg-gray-200"></div>
+                    ) : handleVerify.error ? (
+                      <Alert
+                        style={{
+                          margin: '10px 0px',
+                          height: 'auto',
+                          wordBreak: 'break-word',
+                        }}
+                        message={<>{`${handleVerify.error}`}</>}
+                        type="error"
+                        showIcon
+                      />
+                    ) : (
                       <Alert
                         style={{
                           margin: '10px 0px',
@@ -199,41 +209,99 @@ export const NameEntryClaim = ({
                         type="success"
                         showIcon
                       />
-                    ) : handleVerify.isLoading || claimRequest.isFetching ? (
-                      <div style={{ padding: '10px' }}>
-                        <LoadingSpinner fill="#000" />
-                      </div>
-                    ) : (
-                      <>
-                        <Alert
-                          style={{
-                            marginTop: '10px',
-                            height: 'auto',
-                            wordBreak: 'break-word',
-                          }}
-                          message={
-                            <>
-                              <div>{`${handleVerify.error}`}</div>
-                            </>
-                          }
-                          type="error"
-                          showIcon
-                        />
-                        <ButtonWrapper>
-                          <ButtonLight
-                            onClick={() =>
-                              handleVerify.mutate(
-                                { tweetId, handle },
-                                { onSettled: () => claimRequest.refetch() }
-                              )
-                            }
-                          >
-                            Retry
-                          </ButtonLight>
-                        </ButtonWrapper>
-                      </>
                     )}
-                    {claimRequest &&
+                    {nameEntryData.isFetching ? (
+                      <div className="mb-2 h-8 min-w-full animate-pulse rounded-lg bg-gray-200"></div>
+                    ) : (
+                      alreadyOwned && (
+                        <>
+                          <Alert
+                            style={{
+                              marginBottom: '10px',
+                              height: 'auto',
+                              wordBreak: 'break-word',
+                            }}
+                            message={
+                              <>
+                                <div>
+                                  Owned by{' '}
+                                  {formatShortAddress(
+                                    nameEntryData?.data?.owner
+                                  )}
+                                </div>
+                              </>
+                            }
+                            type="warning"
+                            showIcon
+                          />
+                          {nameEntryData?.data?.owner?.toString() ===
+                          wallet?.publicKey?.toString() ? (
+                            <>
+                              <div>
+                                You already own this handle! If you want to set
+                                it as your default, visit the{' '}
+                                <span
+                                  className="cursor-pointer text-blue-500"
+                                  onClick={() => setShowManage(true)}
+                                >
+                                  manage
+                                </span>{' '}
+                                tab.
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div>
+                                If you wish to continue, you will revoke this
+                                handle from them.
+                              </div>
+                              <ButtonWrapper>
+                                <ButtonLight
+                                  onClick={() =>
+                                    handleRevoke.mutate(
+                                      { tweetId, handle },
+                                      {
+                                        onSuccess: () => {
+                                          notify &&
+                                            notify({
+                                              message: 'Revoke successful',
+                                            })
+                                          setClaimed(true)
+                                          onComplete && onComplete(handle)
+                                        },
+                                        onError: (e) =>
+                                          setOwnedError(
+                                            `Failed to set default handle: ${e}`
+                                          ),
+                                      }
+                                    )
+                                  }
+                                >
+                                  Revoke
+                                </ButtonLight>
+                              </ButtonWrapper>
+                            </>
+                          )}
+                          {ownedError && (
+                            <Alert
+                              style={{
+                                marginTop: '10px',
+                                height: 'auto',
+                                wordBreak: 'break-word',
+                              }}
+                              message={
+                                <>
+                                  <div>{ownedError}</div>
+                                </>
+                              }
+                              type="error"
+                              showIcon
+                            />
+                          )}
+                        </>
+                      )
+                    )}
+                    {/* {claimRequest &&
                       claimRequest.data?.parsed.isApproved &&
                       !claimed &&
                       (nameEntryData.isFetching || handleRevoke.isLoading ? (
@@ -349,54 +417,63 @@ export const NameEntryClaim = ({
                             )}
                           </>
                         )
-                      ))}
-                    {claimError && (
-                      <Alert
-                        style={{
-                          marginTop: '10px',
-                          height: 'auto',
-                          wordBreak: 'break-word',
-                        }}
-                        message={
-                          <>
-                            <div>{claimError}</div>
-                          </>
-                        }
-                        type="error"
-                        showIcon
-                      />
-                    )}
+                      ))} */}
                   </div>
                 </div>
               )}
             </>
           }
         />
+        {handleClaimTransaction.error && (
+          <Alert
+            style={{
+              height: 'auto',
+              wordBreak: 'break-word',
+            }}
+            message={
+              <>
+                <div>{`${handleClaimTransaction.error}`}</div>
+              </>
+            }
+            type="error"
+            showIcon
+          />
+        )}
       </DetailsWrapper>
       <ButtonWithFooter
-        loading={handleClaim.isLoading}
+        loading={handleClaimTransaction.isLoading}
         complete={claimed}
-        disabled={
-          !claimRequest.data?.parsed.isApproved ||
-          nameEntryData.isFetching ||
-          alreadyOwned
-        }
-        onClick={() =>
-          handleClaim.mutate(
-            {
-              handle,
-              claimRequest: claimRequest.data,
-              nameEntryData: nameEntryData.data,
-            },
-            {
-              onError: (e) => setClaimError(`${e}`),
-              onSuccess: () => {
-                nameEntryData.remove()
-                reverseEntry.remove()
-                onComplete && onComplete(handle || '')
+        disabled={!handleVerify.isSuccess || alreadyOwned}
+        onClick={
+          () =>
+            handleClaimTransaction.mutate(
+              {
+                tweetId,
+                handle,
               },
-            }
-          )
+              {
+                onSuccess: () => {
+                  nameEntryData.remove()
+                  reverseEntry.remove()
+                  onComplete && onComplete(handle || '')
+                },
+              }
+            )
+          // handleClaim.mutate(
+          //   {
+          //     handle,
+          //     claimRequest: claimRequest.data,
+          //     nameEntryData: nameEntryData.data,
+          //   },
+          //   {
+          //     onError: (e) => setClaimError(`${e}`),
+          //     onSuccess: () => {
+          //       nameEntryData.remove()
+          //       reverseEntry.remove()
+          //       onComplete && onComplete(handle || '')
+          //     },
+          //   }
+          // )
         }
       >
         Claim {handle && `@${handle}`}

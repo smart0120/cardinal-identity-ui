@@ -3,7 +3,8 @@ import type { AccountData } from '@cardinal/common'
 import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
 import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
-import type { Cluster, PublicKey } from '@solana/web3.js'
+import type { Cluster, Connection, PublicKey } from '@solana/web3.js'
+import { sendAndConfirmRawTransaction, Transaction } from '@solana/web3.js'
 import { useMutation } from 'react-query'
 
 import { apiBase } from '../utils/api'
@@ -17,7 +18,8 @@ export interface HandleSetParam {
   certificate?: AccountData<CertificateData> | null
 }
 
-export const useHandleVerify = (
+export const useHandleClaimTransaction = (
+  connection: Connection,
   wallet: Wallet,
   cluster: Cluster,
   dev: boolean
@@ -30,24 +32,31 @@ export const useHandleVerify = (
     }: {
       tweetId?: string
       handle?: string
-    }): Promise<void> => {
-      if (!handle || !tweetId) return
+    }): Promise<string> => {
+      if (!handle || !tweetId) return ''
       const response = await fetch(
         `${apiBase(
           dev
-        )}/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
+        )}/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
           cluster && `&cluster=${cluster}`
-        }`
+        }`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            account: wallet.publicKey.toString(),
+          }),
+        }
       )
       const json = await response.json()
-      if (response.status !== 200) throw new Error(json.message)
-      console.log('Verification response: ', json)
-      return
-    },
-    {
-      onError: (e) => {
-        console.log(e)
-      },
+      if (response.status !== 200 || json.error) throw new Error(json.error)
+      const { transaction } = json
+      const buffer = Buffer.from(decodeURIComponent(transaction), 'base64')
+      const tx = Transaction.from(buffer)
+      await wallet.signTransaction!(tx)
+      return sendAndConfirmRawTransaction(connection, tx.serialize(), {
+        skipPreflight: true,
+      })
     }
   )
 }

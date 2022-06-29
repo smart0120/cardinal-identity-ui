@@ -107,6 +107,7 @@ export const ClaimCard = ({
                 secondaryConnection={secondaryConnection}
                 appName={appName}
                 appTwitter={appTwitter}
+                setShowManage={setShowManage}
                 notify={notify}
                 onComplete={onComplete}
               />
