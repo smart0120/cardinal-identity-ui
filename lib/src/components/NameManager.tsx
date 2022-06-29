@@ -225,7 +225,7 @@ export const NameManager = ({
     namespaceName,
     wallet.publicKey
   )
-  return !userNamesForNamespace.isFetched || !reverseEntry.isFetched ? (
+  return (
     <div className="mb-10 flex flex-col gap-2">
       <StepDetail
         icon={<BoltIcon />}
@@ -233,84 +233,84 @@ export const NameManager = ({
         description={<></>}
       />
       <div className="my-1 h-[1px] bg-gray-200"></div>
-      <div className="h-8 w-full animate-pulse rounded-lg bg-gray-200"></div>
-      <div className="h-8 w-full animate-pulse rounded-lg bg-gray-200"></div>
-    </div>
-  ) : (
-    <div className="mb-10 flex flex-col gap-2">
-      <StepDetail
-        icon={<BoltIcon />}
-        title="Manage existing handles"
-        description={<></>}
-      />
-      <div className="my-1 h-[1px] bg-gray-200"></div>
-      {userNamesForNamespace.data
-        ?.sort((userTokenData) =>
-          reverseEntry.data &&
-          formatName(namespaceName, reverseEntry.data.parsed.entryName) ===
-            formatName(
-              ...nameFromMint(
-                userTokenData.metaplexData?.parsed.data.name || '',
-                userTokenData.metaplexData?.parsed.data.uri || ''
-              )
+      {!userNamesForNamespace.isFetched || !reverseEntry.isFetched ? (
+        <>
+          <div className="h-8 w-full animate-pulse rounded-lg bg-gray-200"></div>
+          <div className="h-8 w-full animate-pulse rounded-lg bg-gray-200"></div>
+        </>
+      ) : userNamesForNamespace.data?.length === 0 ? (
+        <div className="px-2 text-gray-400">No names found</div>
+      ) : (
+        <>
+          {userNamesForNamespace.data
+            ?.sort((userTokenData) =>
+              reverseEntry.data &&
+              formatName(namespaceName, reverseEntry.data.parsed.entryName) ===
+                formatName(
+                  ...nameFromMint(
+                    userTokenData.metaplexData?.parsed.data.name || '',
+                    userTokenData.metaplexData?.parsed.data.uri || ''
+                  )
+                )
+                ? -1
+                : 1
             )
-            ? -1
-            : 1
-        )
-        .map((userTokenData) => (
-          <NameEntryRow
-            key={userTokenData.tokenAccount?.pubkey.toString()}
-            connection={connection}
-            wallet={wallet}
-            namespaceName={namespaceName}
-            userTokenData={userTokenData}
-            setError={setError}
-            setSuccess={setSuccess}
-          />
-        ))}
-      {handleSetDefault.error && (
-        <Alert
-          style={{
-            marginTop: '10px',
-            height: 'auto',
-            wordBreak: 'break-word',
-          }}
-          message={
-            <>
-              <div>{`${handleSetDefault.error}`}</div>
-            </>
-          }
-          type="error"
-          showIcon
-        />
-      )}
-      {error && (
-        <Alert
-          style={{
-            marginTop: '10px',
-            height: 'auto',
-            wordBreak: 'break-word',
-          }}
-          message={
-            <>
-              <div>{`${error}`}</div>
-            </>
-          }
-          type="error"
-          showIcon
-        />
-      )}
-      {success && (
-        <Alert
-          style={{
-            marginTop: '10px',
-            height: 'auto',
-            wordBreak: 'break-word',
-          }}
-          message={success}
-          type="success"
-          showIcon
-        />
+            .map((userTokenData) => (
+              <NameEntryRow
+                key={userTokenData.tokenAccount?.pubkey.toString()}
+                connection={connection}
+                wallet={wallet}
+                namespaceName={namespaceName}
+                userTokenData={userTokenData}
+                setError={setError}
+                setSuccess={setSuccess}
+              />
+            ))}
+          {handleSetDefault.error && (
+            <Alert
+              style={{
+                marginTop: '10px',
+                height: 'auto',
+                wordBreak: 'break-word',
+              }}
+              message={
+                <>
+                  <div>{`${handleSetDefault.error}`}</div>
+                </>
+              }
+              type="error"
+              showIcon
+            />
+          )}
+          {error && (
+            <Alert
+              style={{
+                marginTop: '10px',
+                height: 'auto',
+                wordBreak: 'break-word',
+              }}
+              message={
+                <>
+                  <div>{`${error}`}</div>
+                </>
+              }
+              type="error"
+              showIcon
+            />
+          )}
+          {success && (
+            <Alert
+              style={{
+                marginTop: '10px',
+                height: 'auto',
+                wordBreak: 'break-word',
+              }}
+              message={success}
+              type="success"
+              showIcon
+            />
+          )}
+        </>
       )}
     </div>
   )
