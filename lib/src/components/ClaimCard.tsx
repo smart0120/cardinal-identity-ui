@@ -48,7 +48,7 @@ export const ClaimCard = ({
   return (
     <>
       <ClaimCardOuter>
-        <Wrapper>
+        <div className="relative px-2 pb-8 md:px-8 md:pt-2">
           <Instruction>
             {appName ? `${appName} uses` : 'Use'} Cardinal to link your Twitter
             identity to your <strong>Solana</strong> address.
@@ -113,7 +113,7 @@ export const ClaimCard = ({
               />
             ))}
           <PoweredByFooter />
-        </Wrapper>
+        </div>
       </ClaimCardOuter>
     </>
   )
@@ -126,11 +126,6 @@ export const ClaimCardOuter = styled.div`
   margin: 0px auto;
   min-height: 200px;
   padding: 0px 20px;
-`
-
-const Wrapper = styled.div`
-  padding: 10px 28px 28px 28px;
-  position: relative;
 `
 
 const Instruction = styled.h2`

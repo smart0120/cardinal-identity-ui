@@ -34,7 +34,7 @@ export const useHandleRevoke = (
       const response = await fetch(
         `${apiBase(
           dev
-        )}/twitter/revoke?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
+        )}/namespaces/twitter/revoke?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
           cluster && `&cluster=${cluster}`
         }`
       )

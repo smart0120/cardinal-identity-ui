@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react'
 
 import { Alert } from '../common/Alert'
 import { ButtonLight } from '../common/Button'
+import { LoadingSpinner } from '../common/LoadingSpinner'
 import { useHandleClaimTransaction } from '../handlers/useHandleClaimTransaction'
 import { useHandleRevoke } from '../handlers/useHandleRevoke'
 import { useHandleVerify } from '../handlers/useHandleVerify'
@@ -263,14 +264,17 @@ export const NameEntryClaim = ({
                                             notify({
                                               message: 'Revoke successful',
                                             })
-                                          setClaimed(true)
-                                          onComplete && onComplete(handle)
+                                          nameEntryData.refetch()
                                         },
                                       }
                                     )
                                   }
                                 >
-                                  Revoke
+                                  {handleRevoke.isLoading ? (
+                                    <LoadingSpinner height="15px" fill="#000" />
+                                  ) : (
+                                    <>Revoke</>
+                                  )}
                                 </ButtonLight>
                               </ButtonWrapper>
                             </>
