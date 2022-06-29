@@ -1,7 +1,6 @@
 import { withRevokeCertificateV2 } from '@cardinal/certificates'
 import type { AccountData } from '@cardinal/common'
 import type { ReverseEntryData } from '@cardinal/namespaces'
-import { withInvalidateExpiredReverseEntry } from '@cardinal/namespaces'
 import * as namespaces from '@cardinal/namespaces'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Connection } from '@solana/web3.js'
@@ -38,15 +37,18 @@ export const useHandleUnlink = (
         // invalidate token manager
       }
       if (reverseNameEntryData) {
-        await withInvalidateExpiredReverseEntry(
-          transaction,
-          connection,
-          wallet,
-          namespaceName,
-          entryMint,
-          reverseNameEntryData.parsed.entryName,
-          reverseNameEntryData.pubkey
+        throw new Error(
+          'You are trying to unlink your default handle. Select a new default handle before unlinking.'
         )
+        // await withInvalidateExpiredReverseEntry(
+        //   transaction,
+        //   connection,
+        //   wallet,
+        //   namespaceName,
+        //   entryMint,
+        //   reverseNameEntryData.parsed.entryName,
+        //   reverseNameEntryData.pubkey
+        // )
       }
       // TODO
       // await withInvalidateExpiredNameEntry(
