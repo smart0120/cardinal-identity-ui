@@ -1,3 +1,4 @@
+import { firstParam } from '@cardinal/common'
 import type { Cluster } from '@solana/web3.js'
 import { Connection } from '@solana/web3.js'
 import type { NextPageContext } from 'next'

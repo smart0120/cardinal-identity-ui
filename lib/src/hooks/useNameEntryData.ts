@@ -1,139 +1,100 @@
-import type {
-  AccountData,
-  CertificateData} from "@cardinal/certificates";
-import {
-  certificateIdForMint,
-  getCertificate,
-} from "@cardinal/certificates";
-import type {
-  EntryData} from "@cardinal/namespaces";
-import {
-  getNameEntry,
-  NAMESPACES_PROGRAM_ID,
-} from "@cardinal/namespaces";
-import * as metaplex from "@metaplex/js";
-import * as anchor from "@project-serum/anchor";
-import * as splToken from "@solana/spl-token";
-import type {
-  Connection,
-  TokenAccountBalancePair} from "@solana/web3.js";
-import {
-  PublicKey
-} from "@solana/web3.js";
-import { useMemo, useState } from "react";
+import type { AccountData, CertificateData } from '@cardinal/certificates'
+import { certificateIdForMint, getCertificate } from '@cardinal/certificates'
+import { tryGetAccount } from '@cardinal/common'
+import type { EntryData } from '@cardinal/namespaces'
+import { getNameEntry, NAMESPACES_PROGRAM_ID } from '@cardinal/namespaces'
+import * as metaplex from '@metaplex-foundation/mpl-token-metadata'
+import * as anchor from '@project-serum/anchor'
+import * as splToken from '@solana/spl-token'
+import type { Connection, TokenAccountBalancePair } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
+import { useQuery } from 'react-query'
 
 export type NameEntryData = {
-  nameEntry: AccountData<EntryData>;
-  certificate: AccountData<CertificateData>;
-  metaplexData: any;
-  arweaveData: { pubkey: PublicKey; parsed: any };
-  largestHolders: TokenAccountBalancePair[];
-  owner: PublicKey | undefined;
-  isOwnerPDA: boolean;
-};
+  nameEntry: AccountData<EntryData>
+  certificate?: AccountData<CertificateData>
+  metaplexData?: AccountData<metaplex.MetadataData>
+  arweaveData?: AccountData<any>
+  largestHolders: TokenAccountBalancePair[]
+  owner: PublicKey | undefined
+  isOwnerPDA: boolean
+}
 
 export async function getNameEntryData(
   connection: Connection,
   namespaceName: string,
   entryName: string
 ): Promise<NameEntryData> {
-  const nameEntry = await getNameEntry(connection, namespaceName, entryName);
-  const { mint } = nameEntry.parsed;
+  const nameEntry = await getNameEntry(connection, namespaceName, entryName)
+  const { mint } = nameEntry.parsed
 
   const [[metaplexId], [certificateId]] = await Promise.all([
-    PublicKey.findProgramAddress(
-      [
-        anchor.utils.bytes.utf8.encode(
-          metaplex.programs.metadata.MetadataProgram.PREFIX
-        ),
-        metaplex.programs.metadata.MetadataProgram.PUBKEY.toBuffer(),
-        mint.toBuffer(),
-      ],
-      metaplex.programs.metadata.MetadataProgram.PUBKEY
-    ),
+    metaplex.MetadataProgram.findMetadataAccount(new PublicKey(mint)),
     certificateIdForMint(mint),
-  ]);
+  ])
   const [metaplexData, certificate] = await Promise.all([
-    metaplex.programs.metadata.Metadata.load(connection, metaplexId),
-    getCertificate(connection, certificateId),
-  ]);
-  let json;
+    metaplex.Metadata.load(connection, metaplexId),
+    tryGetAccount(() => getCertificate(connection, certificateId)),
+  ])
+  let json
   try {
     json =
       metaplexData.data.data.uri &&
-      (await fetch(metaplexData.data.data.uri).then((r) => r.json()));
+      (await fetch(metaplexData.data.data.uri).then((r) => r.json()))
   } catch (e) {
-    console.log("Failed to get json", json);
+    console.log('Failed to get json', json)
   }
 
-  const largestHolders = await connection.getTokenLargestAccounts(mint);
+  const largestHolders = await connection.getTokenLargestAccounts(mint)
   const certificateMintToken = new splToken.Token(
     connection,
     mint,
     splToken.TOKEN_PROGRAM_ID,
     // not used
     anchor.web3.Keypair.generate()
-  );
+  )
 
   const largestTokenAccount =
     largestHolders?.value[0]?.address &&
     (await certificateMintToken.getAccountInfo(
       largestHolders?.value[0]?.address
-    ));
+    ))
 
-  let isOwnerPDA = false;
+  let isOwnerPDA = false
   if (largestTokenAccount?.owner) {
     const ownerAccountInfo = await connection.getAccountInfo(
       largestTokenAccount?.owner
-    );
+    )
     isOwnerPDA =
-      ownerAccountInfo?.owner.toString() === NAMESPACES_PROGRAM_ID.toString();
+      ownerAccountInfo?.owner.toString() === NAMESPACES_PROGRAM_ID.toString()
   }
 
   return {
     nameEntry,
-    certificate,
-    metaplexData,
+    certificate: certificate ?? undefined,
+    metaplexData: { pubkey: metaplexData.pubkey, parsed: metaplexData.data },
     arweaveData: { pubkey: metaplexId, parsed: json },
     largestHolders: largestHolders.value,
     owner: largestTokenAccount?.owner,
     isOwnerPDA,
-  };
+  }
 }
 
 export const useNameEntryData = (
-  connection: Connection | null,
+  connection: Connection | undefined,
   namespaceName: string,
   entryName: string | undefined
 ) => {
-  const [loadingNameEntry, setLoadingNameEntry] = useState<boolean | undefined>(
-    undefined
-  );
-  const [nameEntryData, setNameEntryData] = useState<NameEntryData | undefined>(
-    undefined
-  );
-
-  const refreshNameEntryData = async () => {
-    if (!entryName || !connection) return;
-    setLoadingNameEntry(true);
-    try {
-      const data = await getNameEntryData(connection, namespaceName, entryName);
-      setNameEntryData(data);
-    } catch (e) {
-      setNameEntryData(undefined);
-      console.log("Failed to get name entry: ", e);
-    } finally {
-      setLoadingNameEntry(false);
+  return useQuery<NameEntryData | undefined>(
+    ['useNameEntryData', namespaceName, entryName],
+    async () => {
+      if (!entryName || !connection) return
+      return getNameEntryData(connection, namespaceName, entryName)
+    },
+    {
+      enabled: !!entryName && !!connection,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
     }
-  };
-
-  useMemo(async () => {
-    refreshNameEntryData();
-  }, [connection, namespaceName, entryName]);
-
-  return {
-    nameEntryData,
-    refreshNameEntryData,
-    loadingNameEntry,
-  };
-};
+  )
+}

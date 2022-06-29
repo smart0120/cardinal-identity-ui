@@ -1,4 +1,5 @@
 import styled from '@emotion/styled'
+import type { Wallet } from '@saberhq/solana-contrib'
 import { useWallet } from '@solana/wallet-adapter-react'
 import type { PublicKey } from '@solana/web3.js'
 import { Connection } from '@solana/web3.js'
@@ -9,7 +10,9 @@ import {
   formatTwitterLink,
   useAddressImage,
   useAddressName,
+  useWalletIdentity,
 } from 'lib/src'
+import { TWITTER_NAMESPACE_NAME } from 'lib/src/utils/constants'
 import { useRouter } from 'next/router'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
 import ContentLoader from 'react-content-loader'
@@ -31,15 +34,20 @@ const ShareIcon = styled.div`
 `
 
 export const Profile: React.FC<Props> = ({ address }: Props) => {
-  const router = useRouter()
+  const { query } = useRouter()
+  const { show } = useWalletIdentity()
   const wallet = useWallet()
   const { connection, environment } = useEnvironmentCtx()
-  const dev = router.query['dev'] === 'true'
+  const dev = query['dev'] === 'true'
   const addressStr = address.toString()
-  const { displayName, loadingName } = useAddressName(connection, address)
+  const { displayName, loadingName, refreshName } = useAddressName(
+    connection,
+    address
+  )
   const { addressImage, loadingImage } = useAddressImage(
     connection,
     address,
+    TWITTER_NAMESPACE_NAME,
     dev
   )
 
@@ -170,22 +178,46 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           </span>
           <AddressLink address={address} />
         </div>
-        <div style={{ margin: '10px auto' }}>
+        <div className="mt-5">
           <ConnectTwitterButton
             disabled={address?.toString() !== wallet?.publicKey?.toString()}
-            address={wallet.publicKey!}
             dev={dev}
-            // @ts-ignore
-            wallet={wallet}
+            wallet={wallet as Wallet}
             connection={connection}
             secondaryConnection={
               environment.secondary
                 ? new Connection(environment.secondary)
                 : connection
             }
+            onClose={refreshName}
             cluster={environment.label}
           />
         </div>
+        <button
+          disabled={address?.toString() !== wallet?.publicKey?.toString()}
+          className="rounded-md px-3 py-1 text-xs text-white"
+          onClick={() =>
+            show({
+              wallet: wallet as Wallet,
+              connection: connection,
+              cluster: environment.label,
+              secondaryConnection: environment.secondary
+                ? new Connection(environment.secondary)
+                : connection,
+              dev,
+              showManage: true,
+            })
+          }
+          style={{
+            borderColor: '#657786',
+            background: '#64748b20',
+            color: '#657786',
+            opacity:
+              address?.toString() !== wallet?.publicKey?.toString() ? 0.5 : 1,
+          }}
+        >
+          Manage Profiles
+        </button>
       </div>
     </div>
   )
@@ -202,11 +234,7 @@ export const PlaceholderProfile: React.FC = () => {
       }}
     >
       <div style={{ marginBottom: '40px' }}>
-        <Alert
-          message={'Connect wallet to continue'}
-          type="warning"
-          // showIcon
-        />
+        <Alert message={'Connect wallet to continue'} type="warning" />
       </div>
       <ContentLoader viewBox="0 0 320 280">
         <rect x="80" y="0" rx="5" ry="5" width="160" height="160" />

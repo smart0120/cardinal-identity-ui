@@ -1,26 +1,18 @@
-import type { web3 } from '@project-serum/anchor'
-import type { Wallet } from '@saberhq/solana-contrib'
-import type { Cluster } from '@solana/web3.js'
-
 import { Button } from '../common/Button'
 import { TwitterIcon } from '../common/TwitterIcon'
+import type { ShowParams } from '../providers/WalletIdentityProvider'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
 interface Props
   extends Omit<
-    React.DetailedHTMLProps<
-      React.ButtonHTMLAttributes<HTMLButtonElement>,
-      HTMLButtonElement
+      React.DetailedHTMLProps<
+        React.ButtonHTMLAttributes<HTMLButtonElement>,
+        HTMLButtonElement
+      >,
+      'onClick'
     >,
-    'onClick'
-  > {
-  cluster: Cluster
-  connection: web3.Connection
-  secondaryConnection?: web3.Connection
-  wallet: Wallet
-  address: web3.PublicKey
+    ShowParams {
   disabled?: boolean
-  dev?: boolean
   variant?: 'primary' | 'secondary'
 }
 
@@ -31,8 +23,9 @@ export const ConnectTwitterButton: React.FC<Props> = ({
   connection,
   secondaryConnection,
   wallet,
-  address,
+  onClose,
   disabled,
+  showManage,
   ...buttonProps
 }: Props) => {
   const { show } = useWalletIdentity()
@@ -42,7 +35,16 @@ export const ConnectTwitterButton: React.FC<Props> = ({
       disabled={disabled}
       {...buttonProps}
       onClick={() =>
-        !disabled && show(wallet, connection, cluster, secondaryConnection, dev)
+        !disabled &&
+        show({
+          wallet,
+          connection,
+          cluster,
+          secondaryConnection,
+          dev,
+          onClose,
+          showManage,
+        })
       }
     >
       <div style={{ height: '14px', width: '20px' }}>

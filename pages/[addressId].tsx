@@ -1,9 +1,9 @@
+import { firstParam } from '@cardinal/common'
 import { getNameEntry } from '@cardinal/namespaces'
 import styled from '@emotion/styled'
 import { useWallet } from '@solana/wallet-adapter-react'
 import type { PublicKey } from '@solana/web3.js'
 import { Header } from 'common/Header'
-import { firstParam } from 'common/utils'
 import { PlaceholderProfile, Profile } from 'components/Profile'
 import { tryPublicKey } from 'lib/src'
 import { useRouter } from 'next/router'
@@ -52,7 +52,7 @@ const TwitterClaim = () => {
   return (
     <>
       <Header />
-      <div style={{ marginTop: '45vh', transform: 'translateY(-50%)' }}>
+      <div style={{ marginTop: '10vh' }}>
         {address ? (
           <div
             style={{

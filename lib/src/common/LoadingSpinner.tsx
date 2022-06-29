@@ -1,6 +1,12 @@
-export const LoadingSpinner = ({ fill = "#FFF" }: { fill?: string }) => {
+export const LoadingSpinner = ({
+  fill = '#FFF',
+  height = '40px',
+}: {
+  fill?: string
+  height?: string
+}) => {
   return (
-    <div style={{ height: "40px" }}>
+    <div style={{ height }}>
       <svg
         version="1.1"
         id="loader-1"
@@ -8,8 +14,8 @@ export const LoadingSpinner = ({ fill = "#FFF" }: { fill?: string }) => {
         xmlnsXlink="http://www.w3.org/1999/xlink"
         x="0px"
         y="0px"
-        width="40px"
-        height="40px"
+        width={height}
+        height={height}
         viewBox="0 0 40 40"
         enableBackground="new 0 0 40 40"
         xmlSpace="preserve"
@@ -37,5 +43,5 @@ export const LoadingSpinner = ({ fill = "#FFF" }: { fill?: string }) => {
         </path>
       </svg>
     </div>
-  );
-};
+  )
+}

@@ -1,8 +1,8 @@
-import styled from "@emotion/styled";
-import type { Wallet } from "@saberhq/solana-contrib";
+import styled from '@emotion/styled'
+import type { Wallet } from '@saberhq/solana-contrib'
 
-import { Button } from "../common/Button";
-import { TwitterIcon } from "../common/TwitterIcon";
+import { Button } from '../common/Button'
+import { TwitterIcon } from '../common/TwitterIcon'
 
 export const PostTweet = ({
   wallet,
@@ -12,19 +12,19 @@ export const PostTweet = ({
   callback,
   cluster,
 }: {
-  wallet: Wallet | null;
-  appTwitter?: string | undefined;
-  appName?: string | undefined;
-  disabled: boolean;
-  callback?: () => void;
-  cluster?: string | undefined;
+  wallet?: Wallet
+  appTwitter?: string | undefined
+  appName?: string | undefined
+  disabled: boolean
+  callback?: () => void
+  cluster?: string | undefined
 }) => {
   const link = useGenerateLink(
     wallet?.publicKey?.toString(),
     appName,
     appTwitter,
     cluster
-  );
+  )
   return (
     <TwitterButtonWrapper
       href={link}
@@ -35,17 +35,17 @@ export const PostTweet = ({
       <TwitterButton variant="primary" disabled={disabled}>
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
+            display: 'flex',
+            alignItems: 'center',
           }}
         >
           <TwitterIcon />
           <span
             style={{
-              position: "relative",
-              bottom: "1px",
-              marginLeft: "6px",
-              marginRight: "12px",
+              position: 'relative',
+              bottom: '1px',
+              marginLeft: '6px',
+              marginRight: '12px',
             }}
           >
             Verify
@@ -54,13 +54,13 @@ export const PostTweet = ({
         {/* <i className="fas fa-chevron-right" /> */}
       </TwitterButton>
     </TwitterButtonWrapper>
-  );
-};
+  )
+}
 
 const TwitterButtonWrapper = styled.a`
   margin-top: 5px;
   display: inline-block;
-`;
+`
 
 const TwitterButton = styled(Button)`
   display: flex;
@@ -68,7 +68,7 @@ const TwitterButton = styled(Button)`
   justify-content: space-between;
   font-size: 12px;
   padding: 0 12px;
-`;
+`
 
 const useGenerateLink = (
   pubkey: string | undefined,
@@ -76,19 +76,19 @@ const useGenerateLink = (
   appTwitter: string | undefined,
   cluster?: string | undefined
 ): string => {
-  if (!pubkey) return "";
+  if (!pubkey) return ''
   const link = [
     `https://twitter.com/intent/tweet?text=`,
     encodeURIComponent(
       [
         `Claiming my Twitter handle as a @Solana NFT${
-          appTwitter || appName ? ` on ${appTwitter || appName}` : ""
+          appTwitter || appName ? ` on ${appTwitter || appName}` : ''
         } using @cardinal_labs protocol and linking it to my address ${pubkey}\n\n`,
         `Verify and claim yours at https://twitter.cardinal.so${
-          cluster === "devnet" ? "?cluster=devnet" : ""
+          cluster === 'devnet' ? '?cluster=devnet' : ''
         }!`,
-      ].join("")
+      ].join('')
     ),
-  ].join("");
-  return link;
-};
+  ].join('')
+  return link
+}
