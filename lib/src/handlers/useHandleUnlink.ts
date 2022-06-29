@@ -1,7 +1,8 @@
 import { withRevokeCertificateV2 } from '@cardinal/certificates'
 import type { AccountData } from '@cardinal/common'
+import type { ReverseEntryData } from '@cardinal/namespaces'
 import {
-  ReverseEntryData,
+  withInvalidateExpiredNameEntry,
   withInvalidateExpiredReverseEntry,
 } from '@cardinal/namespaces'
 import * as namespaces from '@cardinal/namespaces'
@@ -14,6 +15,7 @@ import {
 } from '@solana/web3.js'
 import { useMutation } from 'react-query'
 
+import { nameFromMint } from '../components/NameManager'
 import type { UserTokenData } from '../hooks/useUserNamesForNamespace'
 
 export const useHandleUnlink = (
@@ -31,6 +33,10 @@ export const useHandleUnlink = (
       const [namespaceId] = await namespaces.findNamespaceId(namespaceName)
       const transaction = new Transaction()
       const entryMint = new PublicKey(userTokenData.metaplexData?.parsed.mint!)
+      const [, entryName] = nameFromMint(
+        userTokenData.metaplexData?.parsed.data.name!,
+        userTokenData.metaplexData?.parsed.data.uri!
+      )
       if (userTokenData.certificate) {
         await withRevokeCertificateV2(connection, wallet, transaction, {
           certificateMint: entryMint,
@@ -40,9 +46,6 @@ export const useHandleUnlink = (
         // invalidate token manager
       }
       if (reverseNameEntryData) {
-        // throw new Error(
-        //   'You are trying to unlink your default handle. Select a new default handle before unlinking.'
-        // )
         await withInvalidateExpiredReverseEntry(
           transaction,
           connection,
@@ -53,16 +56,14 @@ export const useHandleUnlink = (
           reverseNameEntryData.pubkey
         )
       }
-      // TODO
-      // await withInvalidateExpiredNameEntry(
-      //   transaction,
-      //   connection,
-      //   wallet,
-      //   namespaceName,
-      //   entryMint,
-      //   entryName,
-      //   wallet.publicKey
-      // )
+      await withInvalidateExpiredNameEntry(
+        transaction,
+        connection,
+        wallet,
+        namespaceName,
+        entryMint,
+        entryName
+      )
       transaction.feePayer = wallet.publicKey
       transaction.recentBlockhash = (
         await connection.getRecentBlockhash('max')

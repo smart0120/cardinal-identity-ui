@@ -57,14 +57,3 @@ export const Header = ({ title }: { title?: string }) => {
     </div>
   )
 }
-
-// .subscript {
-//   font-size: 10px;
-//   font-style: italic;
-//   position: absolute;
-//   bottom: -5px;
-//   right: -35px;
-//   background: rgba(255, 255, 255, 0.3);
-//   border-radius: 6px;
-//   padding: 3px 5px;
-// }
