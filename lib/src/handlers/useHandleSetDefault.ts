@@ -1,4 +1,8 @@
+import type { CertificateData } from '@cardinal/certificates'
+import type { AccountData } from '@cardinal/common'
 import { deprecated, withSetNamespaceReverseEntry } from '@cardinal/namespaces'
+import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
+import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Connection } from '@solana/web3.js'
 import {
@@ -9,7 +13,15 @@ import {
 import { useMutation } from 'react-query'
 
 import { nameFromMint } from '../components/NameManager'
-import type { UserTokenData } from '../hooks/useUserNamesForNamespace'
+
+export interface HandleSetParam {
+  metaplexData?: {
+    pubkey: PublicKey
+    parsed: metaplex.MetadataData
+  } | null
+  tokenManager?: AccountData<TokenManagerData>
+  certificate?: AccountData<CertificateData> | null
+}
 
 export const useHandleSetDefault = (
   connection: Connection,
@@ -17,18 +29,15 @@ export const useHandleSetDefault = (
   namespaceName: string
 ) => {
   return useMutation(
-    async ({
-      userTokenData,
-    }: {
-      userTokenData: UserTokenData
-    }): Promise<string> => {
+    async ({ tokenData }: { tokenData?: HandleSetParam }): Promise<string> => {
+      if (!tokenData) return ''
       const transaction = new Transaction()
-      const entryMint = new PublicKey(userTokenData.metaplexData?.parsed.mint!)
+      const entryMint = new PublicKey(tokenData.metaplexData?.parsed.mint!)
       const [, entryName] = nameFromMint(
-        userTokenData.metaplexData?.parsed.data.name || '',
-        userTokenData.metaplexData?.parsed.data.uri || ''
+        tokenData.metaplexData?.parsed.data.name || '',
+        tokenData.metaplexData?.parsed.data.uri || ''
       )
-      if (userTokenData.certificate) {
+      if (tokenData.certificate) {
         await deprecated.withSetReverseEntry(
           connection,
           wallet,
@@ -37,7 +46,7 @@ export const useHandleSetDefault = (
           entryMint,
           transaction
         )
-      } else if (userTokenData.tokenManager) {
+      } else if (tokenData.tokenManager) {
         await withSetNamespaceReverseEntry(
           transaction,
           connection,

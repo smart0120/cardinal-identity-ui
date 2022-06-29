@@ -89,26 +89,29 @@ export const ClaimCard = ({
               {showManage ? 'Back to linking' : 'Manage linked accounts'}
             </ButtonLight>
           )}
-          {connection && wallet && showManage ? (
-            <NameManager
-              cluster={cluster}
-              connection={connection}
-              wallet={wallet}
-              namespaceName={namespaceName}
-            />
-          ) : (
-            <NameEntryClaim
-              dev={dev}
-              cluster={cluster}
-              wallet={wallet}
-              connection={connection}
-              secondaryConnection={secondaryConnection}
-              appName={appName}
-              appTwitter={appTwitter}
-              notify={notify}
-              onComplete={onComplete}
-            />
-          )}
+          {connection &&
+            wallet &&
+            (showManage ? (
+              <NameManager
+                cluster={cluster}
+                connection={connection}
+                wallet={wallet}
+                namespaceName={namespaceName}
+              />
+            ) : (
+              <NameEntryClaim
+                dev={dev}
+                cluster={cluster}
+                wallet={wallet}
+                connection={connection}
+                secondaryConnection={secondaryConnection}
+                appName={appName}
+                appTwitter={appTwitter}
+                setShowManage={setShowManage}
+                notify={notify}
+                onComplete={onComplete}
+              />
+            ))}
           <PoweredByFooter />
         </Wrapper>
       </ClaimCardOuter>

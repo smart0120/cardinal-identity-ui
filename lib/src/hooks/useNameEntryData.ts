@@ -1,5 +1,6 @@
 import type { AccountData, CertificateData } from '@cardinal/certificates'
 import { certificateIdForMint, getCertificate } from '@cardinal/certificates'
+import { tryGetAccount } from '@cardinal/common'
 import type { EntryData } from '@cardinal/namespaces'
 import { getNameEntry, NAMESPACES_PROGRAM_ID } from '@cardinal/namespaces'
 import * as metaplex from '@metaplex-foundation/mpl-token-metadata'
@@ -7,13 +8,13 @@ import * as anchor from '@project-serum/anchor'
 import * as splToken from '@solana/spl-token'
 import type { Connection, TokenAccountBalancePair } from '@solana/web3.js'
 import { PublicKey } from '@solana/web3.js'
-import { useMemo, useState } from 'react'
+import { useQuery } from 'react-query'
 
 export type NameEntryData = {
   nameEntry: AccountData<EntryData>
-  certificate: AccountData<CertificateData>
-  metaplexData?: { pubkey: PublicKey; data: metaplex.MetadataData } | null
-  arweaveData: { pubkey: PublicKey; parsed: any }
+  certificate?: AccountData<CertificateData>
+  metaplexData?: AccountData<metaplex.MetadataData>
+  arweaveData?: AccountData<any>
   largestHolders: TokenAccountBalancePair[]
   owner: PublicKey | undefined
   isOwnerPDA: boolean
@@ -28,19 +29,12 @@ export async function getNameEntryData(
   const { mint } = nameEntry.parsed
 
   const [[metaplexId], [certificateId]] = await Promise.all([
-    PublicKey.findProgramAddress(
-      [
-        anchor.utils.bytes.utf8.encode(metaplex.MetadataProgram.PREFIX),
-        metaplex.MetadataProgram.PUBKEY.toBuffer(),
-        mint.toBuffer(),
-      ],
-      metaplex.MetadataProgram.PUBKEY
-    ),
+    metaplex.MetadataProgram.findMetadataAccount(new PublicKey(mint)),
     certificateIdForMint(mint),
   ])
   const [metaplexData, certificate] = await Promise.all([
     metaplex.Metadata.load(connection, metaplexId),
-    getCertificate(connection, certificateId),
+    tryGetAccount(() => getCertificate(connection, certificateId)),
   ])
   let json
   try {
@@ -77,8 +71,8 @@ export async function getNameEntryData(
 
   return {
     nameEntry,
-    certificate,
-    metaplexData,
+    certificate: certificate ?? undefined,
+    metaplexData: { pubkey: metaplexData.pubkey, parsed: metaplexData.data },
     arweaveData: { pubkey: metaplexId, parsed: json },
     largestHolders: largestHolders.value,
     owner: largestTokenAccount?.owner,
@@ -91,34 +85,16 @@ export const useNameEntryData = (
   namespaceName: string,
   entryName: string | undefined
 ) => {
-  const [loadingNameEntry, setLoadingNameEntry] = useState<boolean | undefined>(
-    undefined
-  )
-  const [nameEntryData, setNameEntryData] = useState<NameEntryData | undefined>(
-    undefined
-  )
-
-  const refreshNameEntryData = async () => {
-    if (!entryName || !connection) return
-    setLoadingNameEntry(true)
-    try {
-      const data = await getNameEntryData(connection, namespaceName, entryName)
-      setNameEntryData(data)
-    } catch (e) {
-      setNameEntryData(undefined)
-      console.log('Failed to get name entry: ', e)
-    } finally {
-      setLoadingNameEntry(false)
+  return useQuery<NameEntryData | undefined>(
+    ['useNameEntryData', namespaceName, entryName],
+    async () => {
+      if (!entryName || !connection) return
+      return getNameEntryData(connection, namespaceName, entryName)
+    },
+    {
+      enabled: !!entryName && !!connection,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
     }
-  }
-
-  useMemo(async () => {
-    refreshNameEntryData()
-  }, [connection, namespaceName, entryName])
-
-  return {
-    nameEntryData,
-    refreshNameEntryData,
-    loadingNameEntry,
-  }
+  )
 }

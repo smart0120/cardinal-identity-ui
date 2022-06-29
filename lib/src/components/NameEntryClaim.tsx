@@ -1,22 +1,16 @@
 import styled from '@emotion/styled'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, Connection } from '@solana/web3.js'
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { Alert } from '../common/Alert'
 import { ButtonLight } from '../common/Button'
-import { LoadingSpinner } from '../common/LoadingSpinner'
+import { useHandleClaimTransaction } from '../handlers/useHandleClaimTransaction'
+import { useHandleRevoke } from '../handlers/useHandleRevoke'
+import { useHandleVerify } from '../handlers/useHandleVerify'
 import { useClaimRequest } from '../hooks/useClaimRequest'
 import { useNameEntryData } from '../hooks/useNameEntryData'
 import { useReverseEntry } from '../hooks/useReverseEntry'
-import {
-  apiBase,
-  claimEntry,
-  initAndClaimEntry,
-  revokeAndClaim,
-  setReverseEntry,
-  tryGetNameEntry,
-} from '../utils/api'
 import { TWITTER_NAMESPACE_NAME } from '../utils/constants'
 import { formatShortAddress, formatTwitterLink } from '../utils/format'
 import { ButtonWithFooter } from './ButtonWithFooter'
@@ -45,33 +39,22 @@ export const NameEntryClaim = ({
   namespaceName = TWITTER_NAMESPACE_NAME,
   appName,
   appTwitter,
+  setShowManage,
   notify,
   onComplete,
 }: {
   dev?: boolean
   cluster?: Cluster
-  wallet?: Wallet
-  connection?: Connection
+  wallet: Wallet
+  connection: Connection
   secondaryConnection?: Connection
   namespaceName?: string
   appName?: string
   appTwitter?: string
+  setShowManage: (m: boolean) => void
   notify?: (arg: { message?: string; txid?: string }) => void
   onComplete?: (arg0: string) => void
 }) => {
-  const [verifyError, setVerifyError] = useState<React.ReactNode | undefined>(
-    undefined
-  )
-  const [ownedError, setOwnedError] = useState<React.ReactNode | undefined>(
-    undefined
-  )
-  const [claimError, setClaimError] = useState<React.ReactNode | undefined>(
-    undefined
-  )
-  const [loadingVerify, setLoadingVerify] = useState(false)
-  const [loadingRevoke, setLoadingRevoke] = useState(false)
-  const [loadingClaim, setLoadingClaim] = useState(false)
-
   const [tweetSent, setTweetSent] = useState(false)
   const [tweetUrl, setTweetUrl] = useState<string | undefined>(undefined)
   const handle = handleFromTweetUrl(tweetUrl)
@@ -83,165 +66,47 @@ export const NameEntryClaim = ({
     namespaceName,
     wallet?.publicKey
   )
+  const nameEntryData = useNameEntryData(
+    secondaryConnection || connection,
+    namespaceName,
+    handle
+  )
+  const claimRequest = useClaimRequest(
+    connection,
+    namespaceName,
+    handle,
+    wallet?.publicKey
+  )
 
-  const { nameEntryData, loadingNameEntry, refreshNameEntryData } =
-    useNameEntryData(secondaryConnection || connection, namespaceName, handle)
+  const handleVerify = useHandleVerify(wallet, cluster, dev)
+  const handleRevoke = useHandleRevoke(wallet, cluster, dev)
+  const handleClaimTransaction = useHandleClaimTransaction(
+    connection,
+    wallet,
+    cluster,
+    dev
+  )
 
-  const { claimRequest, loadingClaimRequest, getClaimRequestData } =
-    useClaimRequest(connection, namespaceName, handle, wallet?.publicKey)
-
-  const verifyTwitter = async () => {
-    setLoadingVerify(true)
-    setVerifyError(undefined)
-    setOwnedError(undefined)
-    try {
-      const response = await fetch(
-        `${apiBase(
-          dev
-        )}/twitter/approve?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
-          cluster && `&cluster=${cluster}`
-        }`
+  useMemo(() => {
+    if (tweetUrl && tweetSent && !claimRequest?.data?.parsed?.isApproved) {
+      handleVerify.mutate(
+        { tweetId, handle },
+        {
+          onSuccess: () => claimRequest?.refetch(),
+        }
       )
-      const json = await response.json()
-      if (response.status !== 200) throw new Error(json.error)
-    } catch (e) {
-      setVerifyError(`Failed to approve tweet url: ${e}`)
-    } finally {
-      await getClaimRequestData()
-      setLoadingVerify(false)
     }
-  }
-
-  const revokeHandle = async () => {
-    setLoadingRevoke(true)
-    setOwnedError(undefined)
-    try {
-      const response = await fetch(
-        `${apiBase(
-          dev
-        )}/twitter/revoke?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
-          cluster && `&cluster=${cluster}`
-        }`
-      )
-      await refreshNameEntryData()
-      const json = await response.json()
-      if (response.status !== 200) throw new Error(json.error)
-    } catch (e) {
-      setOwnedError(`Failed to revoke tweet url: ${e}`)
-    } finally {
-      setLoadingRevoke(false)
-    }
-  }
-
-  const setDefault = async () => {
-    setLoadingRevoke(true)
-    setOwnedError(undefined)
-    try {
-      if (!handle) throw new Error('Handle not found')
-      if (!connection) throw new Error('Connection not found')
-      if (!wallet) throw new Error('Wallet not connected')
-      console.log('Setting reverse entry entry:', handle)
-      const txid = await setReverseEntry(
-        connection,
-        wallet,
-        namespaceName,
-        handle,
-        nameEntryData?.nameEntry.parsed.mint!
-      )
-      notify && notify({ message: 'Set default successful', txid })
-      setClaimed(true)
-      onComplete && onComplete(handle)
-    } catch (e) {
-      console.log(e)
-      setOwnedError(`Failed to set default handle: ${e}`)
-    } finally {
-      setLoadingRevoke(false)
-    }
-  }
-
-  useEffect(() => {
-    if (
-      tweetUrl &&
-      tweetSent &&
-      (!claimRequest || !claimRequest?.parsed?.isApproved)
-    ) {
-      verifyTwitter()
-    }
-  }, [wallet, tweetUrl, handle, tweetSent, tweetId, claimRequest])
-
-  const handleClaim = async () => {
-    try {
-      if (!handle) throw new Error('Handle not found')
-      if (!connection) throw new Error('Connection not found')
-      if (!wallet) throw new Error('Wallet not connected')
-      setLoadingClaim(true)
-      setClaimError(undefined)
-      const checkNameEntry = await tryGetNameEntry(
-        connection,
-        namespaceName,
-        handle
-      )
-      if (!checkNameEntry) {
-        console.log('Initializing and claiming entry:', handle)
-        const txid = await initAndClaimEntry(
-          cluster,
-          connection,
-          wallet,
-          namespaceName,
-          handle,
-          null
-        )
-        notify && notify({ message: 'Claim successful', txid })
-        setClaimed(true)
-        onComplete && onComplete(handle)
-      } else if (checkNameEntry && !checkNameEntry.parsed.isClaimed) {
-        console.log('Claiming entry:', handle)
-        const txid = await claimEntry(
-          connection,
-          wallet,
-          namespaceName,
-          handle,
-          checkNameEntry.parsed.mint,
-          null
-        )
-        notify && notify({ message: 'Claim successful', txid })
-        setClaimed(true)
-        onComplete && onComplete(handle)
-      } else {
-        console.log('Revoking and claiming entry:', handle)
-        const txid = await revokeAndClaim(
-          cluster,
-          connection,
-          wallet,
-          namespaceName,
-          handle,
-          null,
-          reverseEntry.data?.pubkey!,
-          claimRequest!.pubkey,
-          checkNameEntry.parsed.mint,
-          nameEntryData!.owner!
-        )
-        notify && notify({ message: 'Init and claim successful', txid })
-        setClaimed(true)
-        onComplete && onComplete(handle)
-      }
-    } catch (e: any) {
-      if (e?.message.includes('0x1')) {
-        setClaimError(<>Not enough sol!</>)
-      } else {
-        setClaimError(<>Failed to claim: {e?.message}</>)
-      }
-    } finally {
-      refreshNameEntryData()
-      reverseEntry.remove()
-      setLoadingClaim(false)
-    }
-  }
+  }, [
+    wallet.publicKey.toString(),
+    tweetUrl,
+    handle,
+    tweetSent,
+    tweetId,
+    claimRequest.data?.pubkey.toString(),
+  ])
 
   const alreadyOwned =
-    nameEntryData &&
-    nameEntryData.owner?.toString() &&
-    !nameEntryData.isOwnerPDA
+    nameEntryData.data?.owner?.toString() && !nameEntryData.data?.isOwnerPDA
       ? true
       : false
 
@@ -308,10 +173,23 @@ export const NameEntryClaim = ({
                   <div
                     style={{
                       padding: '10px',
-                      maxWidth: 'calc(100% - 120px - 20px)',
+                      width: 'calc(100% - 120px - 20px)',
                     }}
                   >
-                    {claimRequest && claimRequest.parsed.isApproved ? (
+                    {handleVerify.isLoading ? (
+                      <div className="mb-2 h-8 w-full animate-pulse rounded-lg bg-gray-200"></div>
+                    ) : handleVerify.error ? (
+                      <Alert
+                        style={{
+                          margin: '10px 0px',
+                          height: 'auto',
+                          wordBreak: 'break-word',
+                        }}
+                        message={<>{`${handleVerify.error}`}</>}
+                        type="error"
+                        showIcon
+                      />
+                    ) : (
                       <Alert
                         style={{
                           margin: '10px 0px',
@@ -328,116 +206,93 @@ export const NameEntryClaim = ({
                         type="success"
                         showIcon
                       />
-                    ) : loadingVerify || loadingClaimRequest ? (
-                      <div style={{ padding: '10px' }}>
-                        <LoadingSpinner fill="#000" />
-                      </div>
-                    ) : (
-                      <>
-                        <Alert
-                          style={{
-                            marginTop: '10px',
-                            height: 'auto',
-                            wordBreak: 'break-word',
-                          }}
-                          message={
-                            <>
-                              <div>{verifyError}</div>
-                            </>
-                          }
-                          type="error"
-                          showIcon
-                        />
-                        <ButtonWrapper>
-                          <ButtonLight onClick={() => verifyTwitter()}>
-                            Retry
-                          </ButtonLight>
-                        </ButtonWrapper>
-                      </>
                     )}
-                    {claimRequest &&
-                      claimRequest.parsed.isApproved &&
-                      !claimed &&
-                      (loadingNameEntry || loadingRevoke ? (
-                        <div style={{ padding: '10px' }}>
-                          <LoadingSpinner fill="#000" />
-                        </div>
-                      ) : (
-                        alreadyOwned && (
-                          <>
+                    {nameEntryData.isFetching ? (
+                      <div className="mb-2 h-8 min-w-full animate-pulse rounded-lg bg-gray-200"></div>
+                    ) : (
+                      alreadyOwned && (
+                        <>
+                          <Alert
+                            style={{
+                              marginBottom: '10px',
+                              height: 'auto',
+                              wordBreak: 'break-word',
+                            }}
+                            message={
+                              <>
+                                <div>
+                                  Owned by{' '}
+                                  {formatShortAddress(
+                                    nameEntryData?.data?.owner
+                                  )}
+                                </div>
+                              </>
+                            }
+                            type="warning"
+                            showIcon
+                          />
+                          {nameEntryData?.data?.owner?.toString() ===
+                          wallet?.publicKey?.toString() ? (
+                            <>
+                              <div>
+                                You already own this handle! If you want to set
+                                it as your default, visit the{' '}
+                                <span
+                                  className="cursor-pointer text-blue-500"
+                                  onClick={() => setShowManage(true)}
+                                >
+                                  manage
+                                </span>{' '}
+                                tab.
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div>
+                                If you wish to continue, you will revoke this
+                                handle from them.
+                              </div>
+                              <ButtonWrapper>
+                                <ButtonLight
+                                  onClick={() =>
+                                    handleRevoke.mutate(
+                                      { tweetId, handle },
+                                      {
+                                        onSuccess: () => {
+                                          notify &&
+                                            notify({
+                                              message: 'Revoke successful',
+                                            })
+                                          setClaimed(true)
+                                          onComplete && onComplete(handle)
+                                        },
+                                      }
+                                    )
+                                  }
+                                >
+                                  Revoke
+                                </ButtonLight>
+                              </ButtonWrapper>
+                            </>
+                          )}
+                          {handleRevoke.error && (
                             <Alert
                               style={{
-                                marginBottom: '10px',
+                                marginTop: '10px',
                                 height: 'auto',
                                 wordBreak: 'break-word',
                               }}
                               message={
                                 <>
-                                  <div>
-                                    Owned by{' '}
-                                    {formatShortAddress(nameEntryData?.owner)}
-                                  </div>
+                                  <div>{`${handleRevoke.error}`}</div>
                                 </>
                               }
-                              type="warning"
+                              type="error"
                               showIcon
                             />
-                            {nameEntryData?.owner?.toString() ===
-                            wallet?.publicKey?.toString() ? (
-                              <>
-                                <div>
-                                  You already own this handle! If you want to
-                                  set it as your default, click below.
-                                </div>
-                                <ButtonWrapper>
-                                  <ButtonLight onClick={() => setDefault()}>
-                                    Set Default
-                                  </ButtonLight>
-                                </ButtonWrapper>
-                              </>
-                            ) : (
-                              <>
-                                <div>
-                                  If you wish to continue, you will revoke this
-                                  handle from them.
-                                </div>
-                                <ButtonWrapper>
-                                  <ButtonLight onClick={() => revokeHandle()}>
-                                    Revoke
-                                  </ButtonLight>
-                                </ButtonWrapper>
-                              </>
-                            )}
-                            {ownedError && (
-                              <Alert
-                                style={{
-                                  marginTop: '10px',
-                                  height: 'auto',
-                                  wordBreak: 'break-word',
-                                }}
-                                message={
-                                  <>
-                                    <div>{ownedError}</div>
-                                  </>
-                                }
-                                type="error"
-                                showIcon
-                              />
-                            )}
-                          </>
-                        )
-                      ))}
-                    {claimError && (
-                      <Alert
-                        style={{ marginTop: '10px', height: 'auto' }}
-                        message={
-                          <>
-                            <div>{claimError}</div>
-                          </>
-                        }
-                        type="error"
-                        showIcon
-                      />
+                          )}
+                        </>
+                      )
                     )}
                   </div>
                 </div>
@@ -445,17 +300,41 @@ export const NameEntryClaim = ({
             </>
           }
         />
+        {handleClaimTransaction.error && (
+          <Alert
+            style={{
+              height: 'auto',
+              wordBreak: 'break-word',
+            }}
+            message={
+              <>
+                <div>{`${handleClaimTransaction.error}`}</div>
+              </>
+            }
+            type="error"
+            showIcon
+          />
+        )}
       </DetailsWrapper>
       <ButtonWithFooter
-        loading={loadingClaim}
+        loading={handleClaimTransaction.isLoading}
         complete={claimed}
-        disabled={
-          !claimRequest ||
-          !claimRequest.parsed.isApproved ||
-          loadingNameEntry ||
-          alreadyOwned
+        disabled={!handleVerify.isSuccess || alreadyOwned}
+        onClick={() =>
+          handleClaimTransaction.mutate(
+            {
+              tweetId,
+              handle,
+            },
+            {
+              onSuccess: () => {
+                nameEntryData.remove()
+                reverseEntry.remove()
+                onComplete && onComplete(handle || '')
+              },
+            }
+          )
         }
-        onClick={handleClaim}
       >
         Claim {handle && `@${handle}`}
       </ButtonWithFooter>
