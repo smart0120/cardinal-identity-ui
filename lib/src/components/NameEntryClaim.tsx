@@ -55,9 +55,6 @@ export const NameEntryClaim = ({
   notify?: (arg: { message?: string; txid?: string }) => void
   onComplete?: (arg0: string) => void
 }) => {
-  const [ownedError, setOwnedError] = useState<React.ReactNode | undefined>(
-    undefined
-  )
   const [tweetSent, setTweetSent] = useState(false)
   const [tweetUrl, setTweetUrl] = useState<string | undefined>(undefined)
   const handle = handleFromTweetUrl(tweetUrl)
@@ -269,10 +266,6 @@ export const NameEntryClaim = ({
                                           setClaimed(true)
                                           onComplete && onComplete(handle)
                                         },
-                                        onError: (e) =>
-                                          setOwnedError(
-                                            `Failed to set default handle: ${e}`
-                                          ),
                                       }
                                     )
                                   }
@@ -282,7 +275,7 @@ export const NameEntryClaim = ({
                               </ButtonWrapper>
                             </>
                           )}
-                          {ownedError && (
+                          {handleRevoke.error && (
                             <Alert
                               style={{
                                 marginTop: '10px',
@@ -291,7 +284,7 @@ export const NameEntryClaim = ({
                               }}
                               message={
                                 <>
-                                  <div>{ownedError}</div>
+                                  <div>{`${handleRevoke.error}`}</div>
                                 </>
                               }
                               type="error"
@@ -301,123 +294,6 @@ export const NameEntryClaim = ({
                         </>
                       )
                     )}
-                    {/* {claimRequest &&
-                      claimRequest.data?.parsed.isApproved &&
-                      !claimed &&
-                      (nameEntryData.isFetching || handleRevoke.isLoading ? (
-                        <div style={{ padding: '10px' }}>
-                          <LoadingSpinner fill="#000" />
-                        </div>
-                      ) : (
-                        alreadyOwned && (
-                          <>
-                            <Alert
-                              style={{
-                                marginBottom: '10px',
-                                height: 'auto',
-                                wordBreak: 'break-word',
-                              }}
-                              message={
-                                <>
-                                  <div>
-                                    Owned by{' '}
-                                    {formatShortAddress(
-                                      nameEntryData?.data?.owner
-                                    )}
-                                  </div>
-                                </>
-                              }
-                              type="warning"
-                              showIcon
-                            />
-                            {nameEntryData?.data?.owner?.toString() ===
-                            wallet?.publicKey?.toString() ? (
-                              <>
-                                <div>
-                                  You already own this handle! If you want to
-                                  set it as your default, click below.
-                                </div>
-                                <ButtonWrapper>
-                                  <ButtonLight
-                                    onClick={() =>
-                                      handleSetDefault.mutate(
-                                        {
-                                          tokenData: nameEntryData.data,
-                                        },
-                                        {
-                                          onSuccess: (txid) => {
-                                            notify &&
-                                              notify({
-                                                message:
-                                                  'Set default successful',
-                                                txid,
-                                              })
-                                            nameEntryData.remove()
-                                          },
-                                          onError: (e) =>
-                                            setOwnedError(
-                                              `Failed to revoke tweet url: ${e}`
-                                            ),
-                                        }
-                                      )
-                                    }
-                                  >
-                                    Set Default
-                                  </ButtonLight>
-                                </ButtonWrapper>
-                              </>
-                            ) : (
-                              <>
-                                <div>
-                                  If you wish to continue, you will revoke this
-                                  handle from them.
-                                </div>
-                                <ButtonWrapper>
-                                  <ButtonLight
-                                    onClick={() =>
-                                      handleRevoke.mutate(
-                                        { tweetId, handle },
-                                        {
-                                          onSuccess: () => {
-                                            notify &&
-                                              notify({
-                                                message: 'Revoke successful',
-                                              })
-                                            setClaimed(true)
-                                            onComplete && onComplete(handle)
-                                          },
-                                          onError: (e) =>
-                                            setOwnedError(
-                                              `Failed to set default handle: ${e}`
-                                            ),
-                                        }
-                                      )
-                                    }
-                                  >
-                                    Revoke
-                                  </ButtonLight>
-                                </ButtonWrapper>
-                              </>
-                            )}
-                            {ownedError && (
-                              <Alert
-                                style={{
-                                  marginTop: '10px',
-                                  height: 'auto',
-                                  wordBreak: 'break-word',
-                                }}
-                                message={
-                                  <>
-                                    <div>{ownedError}</div>
-                                  </>
-                                }
-                                type="error"
-                                showIcon
-                              />
-                            )}
-                          </>
-                        )
-                      ))} */}
                   </div>
                 </div>
               )}
@@ -444,36 +320,20 @@ export const NameEntryClaim = ({
         loading={handleClaimTransaction.isLoading}
         complete={claimed}
         disabled={!handleVerify.isSuccess || alreadyOwned}
-        onClick={
-          () =>
-            handleClaimTransaction.mutate(
-              {
-                tweetId,
-                handle,
+        onClick={() =>
+          handleClaimTransaction.mutate(
+            {
+              tweetId,
+              handle,
+            },
+            {
+              onSuccess: () => {
+                nameEntryData.remove()
+                reverseEntry.remove()
+                onComplete && onComplete(handle || '')
               },
-              {
-                onSuccess: () => {
-                  nameEntryData.remove()
-                  reverseEntry.remove()
-                  onComplete && onComplete(handle || '')
-                },
-              }
-            )
-          // handleClaim.mutate(
-          //   {
-          //     handle,
-          //     claimRequest: claimRequest.data,
-          //     nameEntryData: nameEntryData.data,
-          //   },
-          //   {
-          //     onError: (e) => setClaimError(`${e}`),
-          //     onSuccess: () => {
-          //       nameEntryData.remove()
-          //       reverseEntry.remove()
-          //       onComplete && onComplete(handle || '')
-          //     },
-          //   }
-          // )
+            }
+          )
         }
       >
         Claim {handle && `@${handle}`}
