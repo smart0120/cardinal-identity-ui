@@ -327,6 +327,7 @@ export const NameEntryClaim = ({
         complete={claimed}
         disabled={
           !handleVerify.isSuccess ||
+          tweetUrl?.length === 0 ||
           (alreadyOwned && !claimRequest.data?.parsed.isApproved)
         }
         onClick={() =>
