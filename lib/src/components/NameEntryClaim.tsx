@@ -19,17 +19,8 @@ import { Link, Megaphone, Verified } from './icons'
 import { LabeledInput } from './LabeledInput'
 import { PostTweet } from './PostTweet'
 import { StepDetail } from './StepDetail'
-import { TwitterHandleNFT } from './TwitterHandleNFT'
-
-const handleFromTweetUrl = (raw: string | undefined): string | undefined => {
-  if (!raw) return undefined
-  return raw.split('/')[3]
-}
-
-const tweetIdFromTweetUrl = (raw: string | undefined): string | undefined => {
-  if (!raw) return undefined
-  return raw.split('/')[5]?.split('?')[0]
-}
+import { HandleNFT } from './HandleNFT'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
 export const NameEntryClaim = ({
   dev = false,
@@ -56,11 +47,13 @@ export const NameEntryClaim = ({
   notify?: (arg: { message?: string; txid?: string }) => void
   onComplete?: (arg0: string) => void
 }) => {
-  const [tweetSent, setTweetSent] = useState(false)
-  const [tweetUrl, setTweetUrl] = useState<string | undefined>(undefined)
-  const handle = handleFromTweetUrl(tweetUrl)
-  const tweetId = tweetIdFromTweetUrl(tweetUrl)
+  const { linkingFlow } = useWalletIdentity()
+  const [verificationUrl, setVerificationUrl] = useState<string | undefined>(
+    undefined
+  )
+  const [handle, setHandle] = useState('')
   const [claimed, setClaimed] = useState(false)
+  const [verificationInitiated, setVerificationInitiated] = useState(false)
 
   const reverseEntry = useReverseEntry(
     connection,
@@ -79,19 +72,24 @@ export const NameEntryClaim = ({
     wallet?.publicKey
   )
 
-  const handleVerify = useHandleVerify(wallet, cluster, dev)
-  const handleRevoke = useHandleRevoke(wallet, cluster, dev)
+  const handleVerify = useHandleVerify(wallet, cluster, dev, setHandle)
+  const handleRevoke = useHandleRevoke(wallet, cluster, dev, setHandle)
   const handleClaimTransaction = useHandleClaimTransaction(
     connection,
     wallet,
     cluster,
-    dev
+    dev,
+    setHandle
   )
 
   useMemo(() => {
-    if (tweetUrl && tweetSent && !claimRequest?.data?.parsed?.isApproved) {
+    if (
+      verificationUrl &&
+      verificationInitiated &&
+      !claimRequest?.data?.parsed?.isApproved
+    ) {
       handleVerify.mutate(
-        { tweetId, handle },
+        { verificationUrl: verificationUrl },
         {
           onSuccess: () => claimRequest?.refetch(),
         }
@@ -99,10 +97,9 @@ export const NameEntryClaim = ({
     }
   }, [
     wallet.publicKey.toString(),
-    tweetUrl,
+    verificationUrl,
     handle,
-    tweetSent,
-    tweetId,
+    verificationInitiated,
     claimRequest.data?.pubkey.toString(),
   ])
 
@@ -117,32 +114,34 @@ export const NameEntryClaim = ({
         <StepDetail
           disabled={!wallet?.publicKey || !connection}
           icon={<Megaphone />}
-          title="Tweet!"
+          title={linkingFlow?.description.header || 'Verify'}
           description={
             <>
-              <div>Tweet your public key</div>
+              <div>{linkingFlow?.description.text}</div>
               <PostTweet
                 wallet={wallet}
                 appName={appName}
                 appTwitter={appTwitter}
                 disabled={false}
-                callback={() => setTweetSent(true)}
+                callback={() => setVerificationInitiated(true)}
                 cluster={cluster}
               />
             </>
           }
         />
         <StepDetail
-          disabled={!tweetSent}
+          disabled={!verificationInitiated}
           icon={<Link />}
-          title="Paste the URL of the tweet"
+          title={`Paste the URL of the ${
+            linkingFlow.verification?.toLocaleLowerCase() || 'verification'
+          }`}
           description={
             <div>
               <LabeledInput
-                disabled={!tweetSent}
-                label="Tweet"
-                name="tweet"
-                onChange={(e) => setTweetUrl(e.target.value)}
+                disabled={!verificationInitiated}
+                label={linkingFlow.verification || 'Verification'}
+                name={linkingFlow.verification || 'Verification'}
+                onChange={(e) => setVerificationUrl(e.target.value)}
               />
             </div>
           }
@@ -166,11 +165,7 @@ export const NameEntryClaim = ({
                     paddingTop: '20px',
                   }}
                 >
-                  <TwitterHandleNFT
-                    handle={handle}
-                    cluster={cluster}
-                    dev={dev}
-                  />
+                  <HandleNFT handle={handle} cluster={cluster} dev={dev} />
                   <div
                     style={{
                       padding: '10px',
@@ -196,11 +191,17 @@ export const NameEntryClaim = ({
                           margin: '10px 0px',
                           height: 'auto',
                           wordBreak: 'break-word',
+                          justifyContent: 'center',
                         }}
                         message={
                           <>
                             <div>
-                              Verified ownership of {formatTwitterLink(handle)}
+                              Verified ownership of{' '}
+                              <span className="font-semibold">
+                                {linkingFlow.name === 'twitter'
+                                  ? formatTwitterLink(handle)
+                                  : handle}
+                              </span>
                             </div>
                           </>
                         }
@@ -258,7 +259,7 @@ export const NameEntryClaim = ({
                                 <ButtonLight
                                   onClick={() =>
                                     handleRevoke.mutate(
-                                      { tweetId, handle },
+                                      { verificationUrl },
                                       {
                                         onSuccess: () => {
                                           notify &&
@@ -332,8 +333,7 @@ export const NameEntryClaim = ({
         onClick={() =>
           handleClaimTransaction.mutate(
             {
-              tweetId,
-              handle,
+              verificationUrl,
             },
             {
               onSuccess: () => {

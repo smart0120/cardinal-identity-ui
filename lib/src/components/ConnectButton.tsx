@@ -1,5 +1,5 @@
 import { Button } from '../common/Button'
-import { TwitterIcon } from '../common/TwitterIcon'
+import { LinkingFlow } from '../common/LinkingFlows'
 import type { ShowParams } from '../providers/WalletIdentityProvider'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
@@ -16,7 +16,7 @@ interface Props
   variant?: 'primary' | 'secondary'
 }
 
-export const ConnectTwitterButton: React.FC<Props> = ({
+export const ConnectButton: React.FC<Props> = ({
   variant = 'primary',
   dev,
   cluster,
@@ -28,9 +28,10 @@ export const ConnectTwitterButton: React.FC<Props> = ({
   showManage,
   ...buttonProps
 }: Props) => {
-  const { show } = useWalletIdentity()
+  const { show, linkingFlow } = useWalletIdentity()
   return (
     <Button
+      bgColor={linkingFlow?.colors.primary}
       variant={variant}
       disabled={disabled}
       {...buttonProps}
@@ -47,8 +48,12 @@ export const ConnectTwitterButton: React.FC<Props> = ({
         })
       }
     >
-      <div style={{ height: '14px', width: '20px' }}>
-        <TwitterIcon disabled={disabled} height={14} width={20} />
+      <div style={{ width: '14px' }} className="align-middle">
+        <img
+          className="text-white "
+          alt={`${linkingFlow?.name}-icon`}
+          src={linkingFlow?.icon}
+        />
       </div>
       <span>Link Profile</span>
     </Button>

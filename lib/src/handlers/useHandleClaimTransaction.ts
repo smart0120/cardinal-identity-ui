@@ -8,6 +8,7 @@ import { sendAndConfirmRawTransaction, Transaction } from '@solana/web3.js'
 import { useMutation } from 'react-query'
 
 import { apiBase } from '../utils/constants'
+import { handleFromTweetUrl, tweetIdFromUrl } from '../utils/verification'
 
 export interface HandleSetParam {
   metaplexData?: {
@@ -22,32 +23,34 @@ export const useHandleClaimTransaction = (
   connection: Connection,
   wallet: Wallet,
   cluster: Cluster,
-  dev: boolean
+  dev: boolean,
+  setHandle: (handle: string) => void
 ) => {
   return useMutation(
     [wallet.publicKey.toString()],
     async ({
-      tweetId,
-      handle,
+      verificationUrl,
     }: {
-      tweetId?: string
-      handle?: string
+      verificationUrl?: string
     }): Promise<string> => {
-      if (!handle || !tweetId) return ''
-      const response = await fetch(
-        `${apiBase(
+      if (!verificationUrl) throw new Error('No verification url provided')
+      let requestURL = ''
+
+      if (verificationUrl.includes('twitter')) {
+        const handle = handleFromTweetUrl(verificationUrl)?.toString()
+        setHandle(handle || '')
+        const tweetId = tweetIdFromUrl(verificationUrl)
+        requestURL = `${apiBase(
           dev
-        )}/namespaces/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
+        )}/namespaces/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
           cluster && `&cluster=${cluster}`
-        }`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            account: wallet.publicKey.toString(),
-          }),
-        }
-      )
+        }`
+      } else if (verificationUrl.includes('discord')) {
+      } else {
+        throw new Error('Invalid verification URL provided')
+      }
+
+      const response = await fetch(requestURL)
       const json = await response.json()
       if (response.status !== 200 || json.error) throw new Error(json.error)
       const { transaction } = json

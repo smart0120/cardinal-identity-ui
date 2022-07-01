@@ -2,10 +2,9 @@ import styled from '@emotion/styled'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { Header } from 'common/Header'
 import { PlaceholderProfile } from 'components/Profile'
+import { useWalletIdentity } from 'lib/src'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-
-import { useLinkingFlow } from './providers/LinkingFlowProvider'
 
 export const TwitterBackground = styled.div`
   z-index: -1;
@@ -19,7 +18,7 @@ export const TwitterBackground = styled.div`
 const TwitterHome = () => {
   const wallet = useWallet()
   const router = useRouter()
-  const { linkingFlow } = useLinkingFlow()
+  const { linkingFlow } = useWalletIdentity()
 
   useEffect(() => {
     if (wallet.connected) {
@@ -30,7 +29,10 @@ const TwitterHome = () => {
   }, [wallet.connected, wallet.publicKey, router])
 
   return (
-    <>
+    <div
+      className={`fixed h-full w-full`}
+      style={{ background: linkingFlow.colors.primary }}
+    >
       <Header />
       <div style={{ marginTop: '10vh' }}>
         <div
@@ -42,8 +44,7 @@ const TwitterHome = () => {
           <PlaceholderProfile />
         </div>
       </div>
-      <TwitterBackground />
-    </>
+    </div>
   )
 }
 

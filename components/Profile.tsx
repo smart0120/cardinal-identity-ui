@@ -5,7 +5,7 @@ import type { PublicKey } from '@solana/web3.js'
 import { Connection } from '@solana/web3.js'
 import { notify } from 'common/Notification'
 import {
-  ConnectTwitterButton,
+  ConnectButton,
   formatShortAddress,
   formatTwitterLink,
   useAddressImage,
@@ -36,6 +36,7 @@ const ShareIcon = styled.div`
 export const Profile: React.FC<Props> = ({ address }: Props) => {
   const { query } = useRouter()
   const { show } = useWalletIdentity()
+  const { linkingFlow } = useWalletIdentity()
   const wallet = useWallet()
   const { connection, environment } = useEnvironmentCtx()
   const dev = query['dev'] === 'true'
@@ -58,14 +59,17 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
         borderRadius: '1rem',
         // boxShadow: '0 0 80px 50px rgba(255, 255, 255, 0.3)',
         boxShadow: '0 4px 34px rgb(0 0 0 / 30%)',
-        background: '#FFF',
+        background: linkingFlow.colors.secondary,
       }}
     >
       <div style={{ marginBottom: '30px' }}>
         {loadingName ? (
           <Alert message={'Loading'} type="warning" />
         ) : displayName ? (
-          <Alert message={'Succesfully linked Twitter'} type="success" />
+          <Alert
+            message={`Succesfully linked ${linkingFlow.displayName || ''}`}
+            type="success"
+          />
         ) : (
           <Alert message={'Twitter not linked'} type="warning" />
         )}
@@ -79,11 +83,15 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
         }}
       >
         {loadingImage ? (
-          <div style={{ height: '150px', width: '150px', borderRadius: '50%' }}>
-            <ContentLoader>
-              <rect x="0" y="0" rx="5" ry="5" width="150" height="150" />
-            </ContentLoader>
-          </div>
+          <div
+            style={{
+              height: '150px',
+              width: '150px',
+              borderRadius: '50%',
+              background: linkingFlow.colors.buttonColor,
+            }}
+            className="animate-pulse"
+          ></div>
         ) : addressImage ? (
           <div
             style={{
@@ -91,8 +99,8 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
               height: '156px',
               width: '156px',
               borderRadius: '50%',
-              background: '#fff',
-              backgroundImage: 'linear-gradient(84.06deg, #23a6d5, #1da1f2)',
+              background: linkingFlow.colors.primary,
+              backgroundImage: linkingFlow.colors.primary,
               boxShadow: '0 5px 10px 0 rgb(97 83 202 / 30%)',
               padding: '5px',
               display: 'flex',
@@ -164,12 +172,13 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           <span style={{ fontSize: '16px' }}>
             {loadingName ? (
               <div
-                style={{ height: '16px', width: '140px', borderRadius: '50%' }}
-              >
-                <ContentLoader>
-                  <rect x="0" y="0" rx="5" ry="5" width="140" height="13" />
-                </ContentLoader>
-              </div>
+                className="animate-pulse rounded-md"
+                style={{
+                  height: '16px',
+                  width: '140px',
+                  background: linkingFlow.colors.buttonColor,
+                }}
+              ></div>
             ) : (
               <div style={{ display: 'flex', gap: '5px' }}>
                 {formatTwitterLink(displayName) || formatShortAddress(address)}
@@ -179,7 +188,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           <AddressLink address={address} />
         </div>
         <div className="mt-5">
-          <ConnectTwitterButton
+          <ConnectButton
             disabled={address?.toString() !== wallet?.publicKey?.toString()}
             dev={dev}
             wallet={wallet as Wallet}
@@ -210,8 +219,8 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           }
           style={{
             borderColor: '#657786',
-            background: '#64748b20',
-            color: '#657786',
+            background: linkingFlow.colors.buttonColor,
+            color: linkingFlow.colors.secondaryFontColor,
             opacity:
               address?.toString() !== wallet?.publicKey?.toString() ? 0.5 : 1,
           }}

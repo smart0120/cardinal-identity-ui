@@ -5,6 +5,17 @@ import type { NextPageContext } from 'next'
 import { useRouter } from 'next/router'
 import React, { useContext, useMemo, useState } from 'react'
 
+export const getInitialProps = async ({
+  ctx,
+}: {
+  ctx: NextPageContext
+}): Promise<{ linkingFlowKey: string }> => {
+  const host = ctx.query.linkingFlow || ctx.req?.headers.host
+  return {
+    linkingFlowKey: host?.toString() || 'default',
+  }
+}
+
 export interface Environment {
   label: Cluster
   primary: string
@@ -36,18 +47,6 @@ export const ENVIRONMENTS: Environment[] = [
 
 const EnvironmentContext: React.Context<null | EnvironmentContextValues> =
   React.createContext<null | EnvironmentContextValues>(null)
-
-export const getInitialProps = async ({
-  ctx,
-}: {
-  ctx: NextPageContext
-}): Promise<{ linkingFlow: string }> => {
-  const host = ctx.req?.headers.host || ctx.query.host
-  const linkingFlow = host?.includes('discord') ? 'discord' : 'twitter'
-  return {
-    linkingFlow: linkingFlow,
-  }
-}
 
 export function EnvironmentProvider({
   children,

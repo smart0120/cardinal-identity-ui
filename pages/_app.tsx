@@ -11,26 +11,18 @@ import {
   getInitialProps,
 } from 'providers/EnvironmentProvider'
 
-import type {
-  LinkingFlow} from './providers/LinkingFlowProvider';
-import {
-  LinkingFlowProvider,
-} from './providers/LinkingFlowProvider'
-
 require('@solana/wallet-adapter-react-ui/styles.css')
 
 const App = ({
   Component,
   pageProps,
-  linkingFlow,
-}: AppProps & { linkingFlow: LinkingFlow }) => (
+  linkingFlowKey,
+}: AppProps & { linkingFlowKey: string }) => (
   <EnvironmentProvider>
     <WalletProvider wallets={getWalletAdapters()}>
       <WalletModalProvider>
-        <WalletIdentityProvider>
-          <LinkingFlowProvider defaultLinkingFlow={linkingFlow}>
-            <Component {...pageProps} />
-          </LinkingFlowProvider>
+        <WalletIdentityProvider linkingFlowKey={linkingFlowKey}>
+          <Component {...pageProps} />
         </WalletIdentityProvider>
       </WalletModalProvider>
     </WalletProvider>

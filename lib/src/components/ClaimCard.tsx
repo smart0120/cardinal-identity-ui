@@ -5,7 +5,9 @@ import { useState } from 'react'
 
 import { Alert } from '../common/Alert'
 import { ButtonLight } from '../common/Button'
+import { LinkingFlow } from '../common/LinkingFlows'
 import { useReverseEntry } from '../hooks/useReverseEntry'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { TWITTER_NAMESPACE_NAME } from '../utils/constants'
 import { formatTwitterLink } from '../utils/format'
 import { NameEntryClaim } from './NameEntryClaim'
@@ -39,6 +41,7 @@ export const ClaimCard = ({
   showManage: showManageDefault,
   namespaceName = TWITTER_NAMESPACE_NAME,
 }: ClaimCardProps) => {
+  const { linkingFlow } = useWalletIdentity()
   const [showManage, setShowManage] = useState(showManageDefault)
   const reverseEntry = useReverseEntry(
     connection,
@@ -47,11 +50,12 @@ export const ClaimCard = ({
   )
   return (
     <>
-      <ClaimCardOuter>
+      <div>
         <div className="relative px-2 pb-8 md:px-8 md:pt-2">
           <Instruction>
-            {appName ? `${appName} uses` : 'Use'} Cardinal to link your Twitter
-            identity to your <strong>Solana</strong> address.
+            {appName ? `${appName} uses` : 'Use'} Cardinal to link your{' '}
+            {linkingFlow.displayName} identity to your <strong>Solana</strong>{' '}
+            address.
           </Instruction>
           {(!wallet?.publicKey || !connection) && (
             <Alert
@@ -114,19 +118,10 @@ export const ClaimCard = ({
             ))}
           <PoweredByFooter />
         </div>
-      </ClaimCardOuter>
+      </div>
     </>
   )
 }
-
-export const ClaimCardOuter = styled.div`
-  width 100%;
-  height: 100%;
-  position: relative;
-  margin: 0px auto;
-  min-height: 200px;
-  padding: 0px 20px;
-`
 
 const Instruction = styled.h2`
   margin-top: 0px;
