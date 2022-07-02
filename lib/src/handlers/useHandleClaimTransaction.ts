@@ -37,7 +37,7 @@ export const useHandleClaimTransaction = (
       const response = await fetch(
         `${apiBase(
           dev
-        )}/namespaces/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
+        )}/namespaces/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=twitter${
           cluster && `&cluster=${cluster}`
         }`,
         {
