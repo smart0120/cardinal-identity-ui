@@ -41,7 +41,6 @@ export const useHandleClaimTransaction = (
         const handle = handleFromTweetUrl(verificationUrl)?.toString()
         setHandle(handle || '')
         const tweetId = tweetIdFromUrl(verificationUrl)
-        console.log(tweetId, handle)
         requestURL = `${apiBase(
           dev
         )}/namespaces/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${

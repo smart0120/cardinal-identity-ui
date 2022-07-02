@@ -165,7 +165,7 @@ export const NameEntryClaim = ({
                 You will receive a non-tradeable NFT to prove you own your
                 Twitter handle.
               </div>
-              {handle && (
+              {handle && verificationUrl?.length !== 0 && (
                 <div
                   style={{
                     display: 'flex',

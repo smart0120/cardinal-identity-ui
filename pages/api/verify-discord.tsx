@@ -3,6 +3,7 @@ import type { NextApiHandler } from 'next'
 interface GetResponse {
   message?: string
   username?: string
+  imageURI?: string
   accessToken?: string
   error?: string
 }
@@ -80,9 +81,15 @@ const get: NextApiHandler<GetResponse> = async (req, res) => {
     })
   }
 
+  const imageURI = `https://cdn.discordapp.com/avatars/${parsedUserResponse?.id}/${parsedUserResponse?.avatar}.png`
+  console.log(
+    `Verified username ${parsedUserResponse?.username} with image ${imageURI}`
+  )
+
   res.status(200).send({
     message: `Successfully verified handle ${parsedUserResponse?.username}`,
     username: parsedUserResponse?.username,
+    imageURI: imageURI,
     accessToken: accessToken?.toString(),
     error: '',
   })
