@@ -24,6 +24,7 @@ export const useHandleClaimTransaction = (
   wallet: Wallet,
   cluster: Cluster,
   dev: boolean,
+  accessToken: string,
   setHandle: (handle: string) => void
 ) => {
   return useMutation(
@@ -40,17 +41,27 @@ export const useHandleClaimTransaction = (
         const handle = handleFromTweetUrl(verificationUrl)?.toString()
         setHandle(handle || '')
         const tweetId = tweetIdFromUrl(verificationUrl)
+        console.log(tweetId, handle)
         requestURL = `${apiBase(
           dev
-        )}/namespaces/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
+        )}/namespaces/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
           cluster && `&cluster=${cluster}`
         }`
       } else if (verificationUrl.includes('discord')) {
+        requestURL = `http://localhost:3000/api/claim-discord?accessToken=${accessToken}`
+        const response = await fetch(requestURL)
+        const json = await response.json()
+        if (response.status !== 200) throw new Error(json.message)
       } else {
         throw new Error('Invalid verification URL provided')
       }
-
-      const response = await fetch(requestURL)
+      const response = await fetch(requestURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          account: wallet.publicKey.toString(),
+        }),
+      })
       const json = await response.json()
       if (response.status !== 200 || json.error) throw new Error(json.error)
       const { transaction } = json

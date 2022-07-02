@@ -110,6 +110,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
             connection={connection}
             secondaryConnection={secondaryConnection}
             appName={appName}
+            namespaceName={linkingFlow.name}
             appTwitter={appTwitter}
             showManage={showManageDefault}
             onComplete={(handle: string) => {

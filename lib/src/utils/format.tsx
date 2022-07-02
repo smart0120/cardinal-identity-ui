@@ -1,7 +1,6 @@
 import { shortenAddress } from '@cardinal/namespaces'
 import { PublicKey } from '@solana/web3.js'
-
-import { apiBase, TWITTER_NAMESPACE_NAME } from './constants'
+import { apiBase } from './constants'
 
 export const formatTwitterLink = (handle: string | undefined) => {
   if (!handle) return <></>
@@ -55,7 +54,7 @@ export async function tryGetImageUrl(
   dev?: boolean
 ): Promise<string | undefined> {
   try {
-    if (namespace === TWITTER_NAMESPACE_NAME) {
+    if (namespace === 'twitter') {
       const response = await fetch(
         `${apiBase(
           dev

@@ -3,6 +3,7 @@ import ContentLoader from 'react-content-loader'
 import { HiUserCircle } from 'react-icons/hi'
 
 import { useAddressImage } from '../hooks/useAddressImage'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
 export const AddressImage = ({
   connection,
@@ -21,7 +22,12 @@ export const AddressImage = ({
   placeholder?: React.ReactNode
   style?: React.CSSProperties
 }) => {
-  const { addressImage, loadingImage } = useAddressImage(connection, address)
+  const { linkingFlow } = useWalletIdentity()
+  const { addressImage, loadingImage } = useAddressImage(
+    connection,
+    address,
+    linkingFlow.name
+  )
 
   if (!address) return <></>
   return loadingImage ? (

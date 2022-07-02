@@ -5,10 +5,8 @@ import { useState } from 'react'
 
 import { Alert } from '../common/Alert'
 import { ButtonLight } from '../common/Button'
-import { LinkingFlow } from '../common/LinkingFlows'
 import { useReverseEntry } from '../hooks/useReverseEntry'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
-import { TWITTER_NAMESPACE_NAME } from '../utils/constants'
 import { formatTwitterLink } from '../utils/format'
 import { NameEntryClaim } from './NameEntryClaim'
 import { NameManager } from './NameManager'
@@ -22,7 +20,7 @@ export type ClaimCardProps = {
   secondaryConnection?: Connection
   appName?: string
   appTwitter?: string
-  namespaceName?: string
+  namespaceName: string
   showManage?: boolean
   notify?: (arg: { message?: string; txid?: string }) => void
   onComplete?: (arg: string) => void
@@ -39,7 +37,7 @@ export const ClaimCard = ({
   notify,
   onComplete,
   showManage: showManageDefault,
-  namespaceName = TWITTER_NAMESPACE_NAME,
+  namespaceName,
 }: ClaimCardProps) => {
   const { linkingFlow } = useWalletIdentity()
   const [showManage, setShowManage] = useState(showManageDefault)
@@ -77,7 +75,7 @@ export const ClaimCard = ({
                   <div>
                     Your address is linked to{' '}
                     {formatTwitterLink(reverseEntry.data?.parsed.entryName)}.
-                    Link a new Twitter handle below.
+                    Link a new {linkingFlow.displayName} handle below.
                   </div>
                 </>
               }
@@ -108,6 +106,7 @@ export const ClaimCard = ({
                 cluster={cluster}
                 wallet={wallet}
                 connection={connection}
+                namespaceName={linkingFlow.name}
                 secondaryConnection={secondaryConnection}
                 appName={appName}
                 appTwitter={appTwitter}

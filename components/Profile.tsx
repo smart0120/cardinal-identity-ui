@@ -12,7 +12,6 @@ import {
   useAddressName,
   useWalletIdentity,
 } from 'lib/src'
-import { TWITTER_NAMESPACE_NAME } from 'lib/src/utils/constants'
 import { useRouter } from 'next/router'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
 import ContentLoader from 'react-content-loader'
@@ -35,20 +34,20 @@ const ShareIcon = styled.div`
 
 export const Profile: React.FC<Props> = ({ address }: Props) => {
   const { query } = useRouter()
-  const { show } = useWalletIdentity()
-  const { linkingFlow } = useWalletIdentity()
+  const { linkingFlow, show } = useWalletIdentity()
   const wallet = useWallet()
   const { connection, environment } = useEnvironmentCtx()
   const dev = query['dev'] === 'true'
   const addressStr = address.toString()
   const { displayName, loadingName, refreshName } = useAddressName(
     connection,
-    address
+    address,
+    linkingFlow.name
   )
   const { addressImage, loadingImage } = useAddressImage(
     connection,
     address,
-    TWITTER_NAMESPACE_NAME,
+    linkingFlow.name,
     dev
   )
 
@@ -71,7 +70,10 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
             type="success"
           />
         ) : (
-          <Alert message={'Twitter not linked'} type="warning" />
+          <Alert
+            message={`${linkingFlow.displayName} not linked`}
+            type="warning"
+          />
         )}
       </div>
       <div
@@ -158,7 +160,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
               alignItems: 'center',
             }}
           >
-            <FaUserAlt style={{ fontSize: '120px', color: '#FFF' }} />
+            <FaUserAlt style={{ fontSize: '100px', color: '#FFF' }} />
           </div>
         )}
         <div

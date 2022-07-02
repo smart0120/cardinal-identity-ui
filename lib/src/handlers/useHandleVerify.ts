@@ -5,7 +5,6 @@ import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, PublicKey } from '@solana/web3.js'
 import { useMutation } from 'react-query'
-import { LinkingFlow } from '../common/LinkingFlows'
 
 import { apiBase } from '../utils/constants'
 import {
@@ -27,10 +26,11 @@ export const useHandleVerify = (
   wallet: Wallet,
   cluster: Cluster,
   dev: boolean,
+  accessToken: string,
+  setAccessToken: (handle: string) => void,
   setHandle: (handle: string) => void
 ) => {
   return useMutation(
-    [wallet.publicKey.toString()],
     async ({
       verificationUrl,
     }: {
@@ -53,13 +53,15 @@ export const useHandleVerify = (
         if (response.status !== 200) throw new Error(json.message)
         console.log('Twiiter verification response: ', json)
       } else if (verificationUrl.includes('discord')) {
+        console.log('heyyy')
         const code = discordCodeFromUrl(verificationUrl)
         if (!code) throw new Error('No code found in url')
-        requestURL = `http://localhost:3000/api/verify-discord?code=${code}`
+        requestURL = `http://localhost:3000/api/verify-discord?code=${code}&accessToken=${accessToken}`
         const response = await fetch(requestURL)
         const json = await response.json()
         if (response.status !== 200) throw new Error(json.message)
         setHandle(json.username || '')
+        setAccessToken(json.accessToken || '')
         console.log('Discord verification response: ', json)
       } else {
         throw new Error('Invalid verification URL provided')

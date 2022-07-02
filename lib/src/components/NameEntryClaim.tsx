@@ -12,7 +12,6 @@ import { useHandleVerify } from '../handlers/useHandleVerify'
 import { useClaimRequest } from '../hooks/useClaimRequest'
 import { useNameEntryData } from '../hooks/useNameEntryData'
 import { useReverseEntry } from '../hooks/useReverseEntry'
-import { TWITTER_NAMESPACE_NAME } from '../utils/constants'
 import { formatShortAddress, formatTwitterLink } from '../utils/format'
 import { ButtonWithFooter } from './ButtonWithFooter'
 import { Link, Megaphone, Verified } from './icons'
@@ -23,24 +22,24 @@ import { HandleNFT } from './HandleNFT'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
 export const NameEntryClaim = ({
+  namespaceName,
   dev = false,
   cluster = 'mainnet-beta',
   wallet,
   connection,
   secondaryConnection,
-  namespaceName = TWITTER_NAMESPACE_NAME,
   appName,
   appTwitter,
   setShowManage,
   notify,
   onComplete,
 }: {
+  namespaceName: string
   dev?: boolean
   cluster?: Cluster
   wallet: Wallet
   connection: Connection
   secondaryConnection?: Connection
-  namespaceName?: string
   appName?: string
   appTwitter?: string
   setShowManage: (m: boolean) => void
@@ -54,6 +53,7 @@ export const NameEntryClaim = ({
   const [handle, setHandle] = useState('')
   const [claimed, setClaimed] = useState(false)
   const [verificationInitiated, setVerificationInitiated] = useState(false)
+  const [accessToken, setAccessToken] = useState('')
 
   const reverseEntry = useReverseEntry(
     connection,
@@ -72,13 +72,21 @@ export const NameEntryClaim = ({
     wallet?.publicKey
   )
 
-  const handleVerify = useHandleVerify(wallet, cluster, dev, setHandle)
+  const handleVerify = useHandleVerify(
+    wallet,
+    cluster,
+    dev,
+    accessToken,
+    setAccessToken,
+    setHandle
+  )
   const handleRevoke = useHandleRevoke(wallet, cluster, dev, setHandle)
   const handleClaimTransaction = useHandleClaimTransaction(
     connection,
     wallet,
     cluster,
     dev,
+    accessToken,
     setHandle
   )
 
@@ -94,11 +102,12 @@ export const NameEntryClaim = ({
           onSuccess: () => claimRequest?.refetch(),
         }
       )
+    } else if (verificationUrl?.length === 0) {
+      setAccessToken('')
     }
   }, [
     wallet.publicKey.toString(),
     verificationUrl,
-    handle,
     verificationInitiated,
     claimRequest.data?.pubkey.toString(),
   ])
@@ -220,6 +229,7 @@ export const NameEntryClaim = ({
                               marginBottom: '10px',
                               height: 'auto',
                               wordBreak: 'break-word',
+                              justifyContent: 'center',
                             }}
                             message={
                               <>
@@ -288,6 +298,7 @@ export const NameEntryClaim = ({
                                 marginTop: '10px',
                                 height: 'auto',
                                 wordBreak: 'break-word',
+                                justifyContent: 'center',
                               }}
                               message={
                                 <>
@@ -312,6 +323,7 @@ export const NameEntryClaim = ({
             style={{
               height: 'auto',
               wordBreak: 'break-word',
+              justifyContent: 'center',
             }}
             message={
               <>

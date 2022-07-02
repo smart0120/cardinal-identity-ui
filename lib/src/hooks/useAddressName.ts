@@ -3,12 +3,11 @@ import type { Connection, PublicKey } from '@solana/web3.js'
 import { useMemo, useState } from 'react'
 
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
-import { TWITTER_NAMESPACE_NAME } from '../utils/constants'
 
 export const useAddressName = (
   connection: Connection,
   address: PublicKey | undefined,
-  namespaceName = TWITTER_NAMESPACE_NAME
+  namespaceName: string
 ): {
   displayName: string | undefined
   loadingName: boolean
@@ -22,8 +21,8 @@ export const useAddressName = (
     try {
       setLoadingName(true)
       if (address) {
-        const [namespaceId] = await findNamespaceId(namespaceName)
-        const n = await tryGetName(connection, address, namespaceId)
+        // const [namespaceId] = await findNamespaceId(namespaceName)
+        const n = await tryGetName(connection, address)
         setDisplayName(n)
       }
     } finally {

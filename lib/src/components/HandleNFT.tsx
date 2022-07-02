@@ -14,11 +14,13 @@ export const HandleNFT: React.FC<Props> = ({ handle, dev, cluster }: Props) => {
     <Outer>
       <StyledImg
         alt={formatName('twitter', handle)}
-        src={`https://${
-          dev ? 'dev-nft' : 'nft'
-        }.cardinal.so/img/?text=${handle}.${linkingFlow.name}${
-          cluster && `&cluster=${cluster}`
-        }`}
+        src={encodeURI(
+          `https://${
+            dev ? 'dev-nft' : 'nft'
+          }.cardinal.so/img/?text=@${handle}:${linkingFlow.name}${
+            cluster && `&cluster=${cluster}`
+          }`
+        )}
       />
     </Outer>
   )

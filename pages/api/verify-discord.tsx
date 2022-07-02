@@ -3,6 +3,7 @@ import type { NextApiHandler } from 'next'
 interface GetResponse {
   message?: string
   username?: string
+  accessToken?: string
   error?: string
 }
 
@@ -21,7 +22,7 @@ type UserInfoParams = {
 }
 
 const get: NextApiHandler<GetResponse> = async (req, res) => {
-  const { code: code } = req.query
+  let { code: code, accessToken: accessToken } = req.query
   if (!code) {
     res.status(404).send({
       message: `No code found in request URL`,
@@ -41,28 +42,31 @@ const get: NextApiHandler<GetResponse> = async (req, res) => {
   )
   params.append('scope', 'identify')
 
-  const response = await fetch('https://discord.com/api/v10//oauth2/token', {
-    method: 'POST',
-    body: params,
-    headers: {
-      'Content-type': 'application/x-www-form-urlencoded',
-    },
-  })
-  const json = await response.json()
-  let parsedResponse: ResponseParams | undefined
-  try {
-    parsedResponse = json as ResponseParams
-  } catch (e) {
-    res.status(500).send({
-      message: `Error parsing server response`,
-      error: 'Parse Error',
+  if (!accessToken) {
+    const response = await fetch('https://discord.com/api/v10//oauth2/token', {
+      method: 'POST',
+      body: params,
+      headers: {
+        'Content-type': 'application/x-www-form-urlencoded',
+      },
     })
+    const json = await response.json()
+    let parsedResponse: ResponseParams | undefined
+    try {
+      parsedResponse = json as ResponseParams
+      accessToken = parsedResponse?.access_token
+    } catch (e) {
+      res.status(500).send({
+        message: `Error parsing server response`,
+        error: 'Parse Error',
+      })
+    }
   }
 
   // get user information
   const userResponse = await fetch('http://discordapp.com/api/users/@me', {
     headers: {
-      Authorization: `Bearer ${'oSZyF6HyxGxyS3pdYCsSnBZts5hL9X'}`,
+      Authorization: `Bearer ${accessToken}`,
     },
   })
   const userJson = await userResponse.json()
@@ -79,6 +83,7 @@ const get: NextApiHandler<GetResponse> = async (req, res) => {
   res.status(200).send({
     message: `Successfully verified handle ${parsedUserResponse?.username}`,
     username: parsedUserResponse?.username,
+    accessToken: accessToken?.toString(),
     error: '',
   })
 }
