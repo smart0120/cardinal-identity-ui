@@ -77,6 +77,7 @@ export const NameEntryClaim = ({
     cluster,
     dev,
     accessToken,
+    namespaceName,
     setAccessToken,
     setHandle
   )
@@ -341,6 +342,8 @@ export const NameEntryClaim = ({
         complete={claimed}
         disabled={
           !handleVerify.isSuccess ||
+          verificationUrl?.length === 0 ||
+          !nameEntryData.isFetched ||
           (alreadyOwned && !claimRequest.data?.parsed.isApproved)
         }
         onClick={() =>

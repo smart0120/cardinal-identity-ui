@@ -40,7 +40,7 @@ export const useHandleRevoke = (
         const tweetId = tweetIdFromUrl(verificationUrl)
         requestURL = `${apiBase(
           dev
-        )}/namespaces/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
+        )}/namespaces/twitter/revoke?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
           cluster && `&cluster=${cluster}`
         }`
       } else if (verificationUrl.includes('discord')) {

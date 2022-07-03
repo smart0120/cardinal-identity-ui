@@ -27,6 +27,7 @@ export const useHandleVerify = (
   cluster: Cluster,
   dev: boolean,
   accessToken: string,
+  namespace: string,
   setAccessToken: (handle: string) => void,
   setHandle: (handle: string) => void
 ) => {
@@ -45,7 +46,7 @@ export const useHandleVerify = (
         const tweetId = tweetIdFromUrl(verificationUrl)
         requestURL = `${apiBase(
           dev
-        )}/namespaces/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
+        )}/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
           cluster && `&cluster=${cluster}`
         }`
         const response = await fetch(requestURL)
@@ -55,12 +56,16 @@ export const useHandleVerify = (
       } else if (verificationUrl.includes('discord')) {
         const code = discordCodeFromUrl(verificationUrl)
         if (!code) throw new Error('No code found in url')
-        requestURL = `http://localhost:3000/api/verify-discord?code=${code}&accessToken=${accessToken}`
+        requestURL = `${apiBase(
+          dev
+        )}/twitter/verify?publicKey=${wallet?.publicKey.toString()}&namespace=${namespace}&code=${code}&accessToken=${accessToken}${
+          cluster && `&cluster=${cluster}`
+        }`
         const response = await fetch(requestURL)
         const json = await response.json()
         if (response.status !== 200) throw new Error(json.message)
-        setHandle(json.username || '')
-        setAccessToken(json.accessToken || '')
+        setHandle(json.info.username || '')
+        setAccessToken(json.info.accessToken || '')
         console.log('Discord verification response: ', json)
       } else {
         throw new Error('Invalid verification URL provided')

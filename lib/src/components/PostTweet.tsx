@@ -3,7 +3,6 @@ import { Button } from '../common/Button'
 import { LinkingFlow } from '../common/LinkingFlows'
 
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
-import { ConnectButton } from './ConnectButton'
 
 export const PostTweet = ({
   wallet,
