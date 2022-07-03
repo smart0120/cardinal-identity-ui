@@ -25,7 +25,8 @@ export const useHandleClaimTransaction = (
   cluster: Cluster,
   dev: boolean,
   accessToken: string,
-  setHandle: (handle: string) => void
+  handle: string,
+  namespace: string
 ) => {
   return useMutation(
     [wallet.publicKey.toString()],
@@ -37,17 +38,19 @@ export const useHandleClaimTransaction = (
       if (!verificationUrl) throw new Error('No verification url provided')
       let requestURL = ''
 
-      if (verificationUrl.includes('twitter')) {
-        const handle = handleFromTweetUrl(verificationUrl)?.toString()
-        setHandle(handle || '')
+      if (namespace === 'twitter') {
         const tweetId = tweetIdFromUrl(verificationUrl)
         requestURL = `${apiBase(
           dev
-        )}/namespaces/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
+        )}/namespaces/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
           cluster && `&cluster=${cluster}`
         }`
-      } else if (verificationUrl.includes('discord')) {
-        requestURL = `http://localhost:3000/api/claim-discord?accessToken=${accessToken}`
+      } else if (namespace === 'discord') {
+        requestURL = `${apiBase(
+          dev
+        )}/namespaces/twitter/claim?&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}&accessToken=${accessToken}${
+          cluster && `&cluster=${cluster}`
+        }`
         const response = await fetch(requestURL)
         const json = await response.json()
         if (response.status !== 200) throw new Error(json.message)
@@ -56,7 +59,10 @@ export const useHandleClaimTransaction = (
       }
       const response = await fetch(requestURL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
         body: JSON.stringify({
           account: wallet.publicKey.toString(),
         }),

@@ -87,7 +87,8 @@ export const NameEntryClaim = ({
     cluster,
     dev,
     accessToken,
-    setHandle
+    handle,
+    namespaceName
   )
 
   useMemo(() => {
