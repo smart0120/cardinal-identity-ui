@@ -36,7 +36,6 @@ export const useUserNamesForNamespace = (
     async () => {
       if (!walletId) return []
       const [namespaceId] = await findNamespaceId(namespaceName)
-      console.log(namespaceName)
 
       const allTokenAccounts = await connection.getParsedTokenAccountsByOwner(
         new PublicKey(walletId),

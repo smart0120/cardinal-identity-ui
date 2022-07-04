@@ -23,7 +23,9 @@ export const useHandleRevoke = (
   wallet: Wallet,
   cluster: Cluster,
   dev: boolean,
-  setHandle: (handle: string) => void
+  accessToken: string,
+  handle: string,
+  namespace: string
 ) => {
   return useMutation(
     async ({
@@ -34,16 +36,19 @@ export const useHandleRevoke = (
       if (!verificationUrl) return
       let requestURL = ''
 
-      if (verificationUrl.includes('twitter')) {
-        const handle = handleFromTweetUrl(verificationUrl)?.toString()
-        setHandle(handle || '')
+      if (namespace === 'twitter') {
         const tweetId = tweetIdFromUrl(verificationUrl)
         requestURL = `${apiBase(
           dev
-        )}/namespaces/twitter/revoke?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
+        )}/twitter/revoke?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
           cluster && `&cluster=${cluster}`
         }`
-      } else if (verificationUrl.includes('discord')) {
+      } else if (namespace === 'discord') {
+        requestURL = `${apiBase(
+          dev
+        )}/twitter/revoke?publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}&accessToken=${accessToken}${
+          cluster && `&cluster=${cluster}`
+        }`
       } else {
         throw new Error('Invalid verification URL provided')
       }

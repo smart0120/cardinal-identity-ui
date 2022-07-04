@@ -21,7 +21,7 @@ import { StepDetail } from './StepDetail'
 
 export const nameFromMint = (name: string, uri: string): [string, string] => {
   if (uri.includes('name')) {
-    return [name, getQueryParam(uri, 'name') || '']
+    return [name, decodeURIComponent(getQueryParam(uri, 'name') || '')]
   }
   return [breakName(name || '')[0], breakName(name || '')[1]]
 }
@@ -273,6 +273,7 @@ export const NameManager = ({
                 marginTop: '10px',
                 height: 'auto',
                 wordBreak: 'break-word',
+                justifyContent: 'center',
               }}
               message={
                 <>
@@ -289,6 +290,7 @@ export const NameManager = ({
                 marginTop: '10px',
                 height: 'auto',
                 wordBreak: 'break-word',
+                justifyContent: 'center',
               }}
               message={
                 <>
@@ -305,6 +307,7 @@ export const NameManager = ({
                 marginTop: '10px',
                 height: 'auto',
                 wordBreak: 'break-word',
+                justifyContent: 'center',
               }}
               message={success}
               type="success"

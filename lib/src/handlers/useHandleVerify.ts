@@ -44,11 +44,13 @@ export const useHandleVerify = (
         setHandle(handle || '')
         const tweetId = tweetIdFromUrl(verificationUrl)
         const response = await fetch(
-          `${apiBase(
-            dev
-          )}/namespaces/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
-            cluster && `&cluster=${cluster}`
-          }`
+          encodeURI(
+            `${apiBase(
+              dev
+            )}/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
+              cluster && `&cluster=${cluster}`
+            }`
+          )
         )
         const json = await response.json()
         if (response.status !== 200) throw new Error(json.message)
@@ -57,11 +59,13 @@ export const useHandleVerify = (
         const code = discordCodeFromUrl(verificationUrl)
         if (!code) throw new Error('No code found in url')
         const response = await fetch(
-          `${apiBase(
-            dev
-          )}/namespaces/twitter/verify?publicKey=${wallet?.publicKey.toString()}&namespace=${namespace}&code=${code}&accessToken=${accessToken}${
-            cluster && `&cluster=${cluster}`
-          }`
+          encodeURI(
+            `${apiBase(
+              dev
+            )}/twitter/verify?publicKey=${wallet?.publicKey.toString()}&namespace=${namespace}&code=${code}&accessToken=${accessToken}${
+              cluster && `&cluster=${cluster}`
+            }`
+          )
         )
         const json = await response.json()
         if (response.status !== 200) throw new Error(json.message)

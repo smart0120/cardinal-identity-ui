@@ -81,7 +81,14 @@ export const NameEntryClaim = ({
     setAccessToken,
     setHandle
   )
-  const handleRevoke = useHandleRevoke(wallet, cluster, dev, setHandle)
+  const handleRevoke = useHandleRevoke(
+    wallet,
+    cluster,
+    dev,
+    accessToken,
+    handle,
+    namespaceName
+  )
   const handleClaimTransaction = useHandleClaimTransaction(
     connection,
     wallet,

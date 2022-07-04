@@ -40,17 +40,21 @@ export const useHandleClaimTransaction = (
 
       if (namespace === 'twitter') {
         const tweetId = tweetIdFromUrl(verificationUrl)
-        requestURL = `${apiBase(
-          dev
-        )}/namespaces/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
-          cluster && `&cluster=${cluster}`
-        }`
+        requestURL = encodeURI(
+          `${apiBase(
+            dev
+          )}/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
+            cluster && `&cluster=${cluster}`
+          }`
+        )
       } else if (namespace === 'discord') {
-        requestURL = `${apiBase(
-          dev
-        )}/namespaces/twitter/claim?publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}&accessToken=${accessToken}${
-          cluster && `&cluster=${cluster}`
-        }`
+        requestURL = encodeURI(
+          `${apiBase(
+            dev
+          )}/twitter/claim?publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}&accessToken=${accessToken}${
+            cluster && `&cluster=${cluster}`
+          }`
+        )
       } else {
         throw new Error('Invalid verification URL provided')
       }
