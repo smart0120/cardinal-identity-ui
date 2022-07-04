@@ -28,7 +28,10 @@ export const PostTweet = ({
   return (
     <TwitterButtonWrapper
       href={link}
-      onClick={() => callback && callback()}
+      onClick={() => {
+        window.open(link, '_blank')
+        callback && callback()
+      }}
       target="_blank"
       rel="noreferrer noopener"
     >
