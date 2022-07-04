@@ -15,7 +15,6 @@ import {
 import { TWITTER_NAMESPACE_NAME } from 'lib/src/utils/constants'
 import { useRouter } from 'next/router'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
-import ContentLoader from 'react-content-loader'
 import { FaShare, FaUserAlt } from 'react-icons/fa'
 
 import { AddressLink } from './AddressLink'
@@ -79,11 +78,10 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
         }}
       >
         {loadingImage ? (
-          <div style={{ height: '150px', width: '150px', borderRadius: '50%' }}>
-            <ContentLoader>
-              <rect x="0" y="0" rx="5" ry="5" width="150" height="150" />
-            </ContentLoader>
-          </div>
+          <div
+            className="animate-pulse bg-gray-200"
+            style={{ height: '156px', width: '156px', borderRadius: '50%' }}
+          />
         ) : addressImage ? (
           <div
             style={{
@@ -150,7 +148,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
               alignItems: 'center',
             }}
           >
-            <FaUserAlt style={{ fontSize: '120px', color: '#FFF' }} />
+            <FaUserAlt style={{ fontSize: '100px', color: '#FFF' }} />
           </div>
         )}
         <div
@@ -164,12 +162,9 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           <span style={{ fontSize: '16px' }}>
             {loadingName ? (
               <div
-                style={{ height: '16px', width: '140px', borderRadius: '50%' }}
-              >
-                <ContentLoader>
-                  <rect x="0" y="0" rx="5" ry="5" width="140" height="13" />
-                </ContentLoader>
-              </div>
+                style={{ height: '24px', width: '120px' }}
+                className="animate-pulse rounded-md bg-gray-200"
+              />
             ) : (
               <div style={{ display: 'flex', gap: '5px' }}>
                 {formatTwitterLink(displayName) || formatShortAddress(address)}
@@ -236,11 +231,25 @@ export const PlaceholderProfile: React.FC = () => {
       <div style={{ marginBottom: '40px' }}>
         <Alert message={'Connect wallet to continue'} type="warning" />
       </div>
-      <ContentLoader viewBox="0 0 320 280">
-        <rect x="80" y="0" rx="5" ry="5" width="160" height="160" />
-        <rect x="90" y="180" rx="4" ry="4" width="140" height="13" />
-        <rect x="100" y="200" rx="3" ry="3" width="120" height="10" />
-      </ContentLoader>
+      <div className="flex flex-col items-center justify-center">
+        <div
+          className="animate-pulse bg-gray-200"
+          style={{
+            height: '156px',
+            width: '156px',
+            borderRadius: '50%',
+            marginBottom: '15px',
+          }}
+        />
+        <div
+          style={{ height: '24px', width: '120px', marginBottom: '5px' }}
+          className="animate-pulse rounded-md bg-gray-200"
+        />
+        <div
+          style={{ height: '24px', width: '100px', marginBottom: '50px' }}
+          className="animate-pulse rounded-md bg-gray-200"
+        />
+      </div>
     </div>
   )
 }
