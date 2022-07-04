@@ -38,30 +38,31 @@ export const useHandleVerify = (
       verificationUrl?: string
     }): Promise<void> => {
       if (!verificationUrl) return
-      let requestURL = ''
 
       if (verificationUrl.includes('twitter')) {
         const handle = handleFromTweetUrl(verificationUrl)?.toString()
         setHandle(handle || '')
         const tweetId = tweetIdFromUrl(verificationUrl)
-        requestURL = `${apiBase(
-          dev
-        )}/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
-          cluster && `&cluster=${cluster}`
-        }`
-        const response = await fetch(requestURL)
+        const response = await fetch(
+          `${apiBase(
+            dev
+          )}/namespaces/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
+            cluster && `&cluster=${cluster}`
+          }`
+        )
         const json = await response.json()
         if (response.status !== 200) throw new Error(json.message)
         console.log('Twiiter verification response: ', json)
       } else if (verificationUrl.includes('discord')) {
         const code = discordCodeFromUrl(verificationUrl)
         if (!code) throw new Error('No code found in url')
-        requestURL = `${apiBase(
-          dev
-        )}/twitter/verify?publicKey=${wallet?.publicKey.toString()}&namespace=${namespace}&code=${code}&accessToken=${accessToken}${
-          cluster && `&cluster=${cluster}`
-        }`
-        const response = await fetch(requestURL)
+        const response = await fetch(
+          `${apiBase(
+            dev
+          )}/namespaces/twitter/verify?publicKey=${wallet?.publicKey.toString()}&namespace=${namespace}&code=${code}&accessToken=${accessToken}${
+            cluster && `&cluster=${cluster}`
+          }`
+        )
         const json = await response.json()
         if (response.status !== 200) throw new Error(json.message)
         setHandle(json.info.username || '')

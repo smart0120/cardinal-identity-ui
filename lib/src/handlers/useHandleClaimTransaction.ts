@@ -48,12 +48,9 @@ export const useHandleClaimTransaction = (
       } else if (namespace === 'discord') {
         requestURL = `${apiBase(
           dev
-        )}/namespaces/twitter/claim?&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}&accessToken=${accessToken}${
+        )}/namespaces/twitter/claim?publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}&accessToken=${accessToken}${
           cluster && `&cluster=${cluster}`
         }`
-        const response = await fetch(requestURL)
-        const json = await response.json()
-        if (response.status !== 200) throw new Error(json.message)
       } else {
         throw new Error('Invalid verification URL provided')
       }

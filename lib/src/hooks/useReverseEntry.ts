@@ -13,7 +13,6 @@ export const useReverseEntry = (
     ['useReverseEntry', namespaceName, pubkey?.toString()],
     async () => {
       if (!pubkey || !connection) return
-      console.log('herreeee', namespaceName)
       const [namespaceId] = await findNamespaceId(namespaceName)
       const reverseEntry = await tryGetReverseEntry(
         connection,
