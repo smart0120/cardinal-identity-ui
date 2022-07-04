@@ -78,8 +78,9 @@ const TopArea = styled.div`
   justify-content: space-between;
 `
 
-const ButtonIcon = styled.a`
+const ButtonIcon = styled.div`
   flex: 0 0 24px;
+  cursor: pointer;
   color: #ccd2e3;
   &:hover {
     color: ${darken(0.1, '#ccd2e3')};
