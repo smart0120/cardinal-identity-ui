@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, Connection } from '@solana/web3.js'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { Alert } from '../common/Alert'
 import { ButtonLight } from '../common/Button'

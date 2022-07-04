@@ -1,7 +1,6 @@
 import styled from '@emotion/styled'
-import { animated, useTransition } from '@react-spring/web'
 import darken from 'polished/lib/color/darken'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { CloseIcon } from './icons'
 
@@ -20,56 +19,51 @@ export const Modal: React.FC<ModalProps> = ({
   darkenOverlay = true,
   hideCloseButton = false,
 }: ModalProps) => {
-  const fadeTransition = useTransition(isOpen, {
-    config: { duration: 50 },
-    from: { opacity: 0 },
-    enter: { opacity: 1 },
-    leave: { opacity: 0 },
-  })
+  const [mounted, setMounted] = useState(true)
+  useEffect(() => {
+    !isOpen
+      ? setTimeout(() => {
+          setMounted(false)
+        }, 200)
+      : setMounted(true)
+  }, [isOpen])
+
   return (
     <>
-      {fadeTransition(
-        (style, item) =>
-          item && (
-            <StyledDialogOverlay
-              style={style}
-              isOpen={isOpen}
-              darkenOverlay={darkenOverlay}
-              onClick={(e) => {
-                e.stopPropagation()
-                e.preventDefault()
-                onDismiss()
-              }}
-            >
-              <ModalWrapper
-                // style={style}
+      <StyledDialogOverlay
+        isOpen={isOpen}
+        darkenOverlay={darkenOverlay}
+        onClick={(e) => {
+          e.stopPropagation()
+          e.preventDefault()
+          onDismiss()
+        }}
+      >
+        <ModalWrapper
+          onClick={(e) => {
+            e.stopPropagation()
+            e.preventDefault()
+          }}
+        >
+          <TopArea>
+            <div />
+            {hideCloseButton ? (
+              <div />
+            ) : (
+              <ButtonIcon
                 onClick={(e) => {
                   e.stopPropagation()
                   e.preventDefault()
+                  onDismiss()
                 }}
               >
-                <TopArea>
-                  <div />
-                  {hideCloseButton ? (
-                    <div />
-                  ) : (
-                    <ButtonIcon
-                      href="#"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        e.preventDefault()
-                        onDismiss()
-                      }}
-                    >
-                      <CloseIcon />
-                    </ButtonIcon>
-                  )}
-                </TopArea>
-                {children}
-              </ModalWrapper>
-            </StyledDialogOverlay>
-          )
-      )}
+                <CloseIcon />
+              </ButtonIcon>
+            )}
+          </TopArea>
+          {mounted && children}
+        </ModalWrapper>
+      </StyledDialogOverlay>
     </>
   )
 }
@@ -93,9 +87,7 @@ const ButtonIcon = styled.a`
   transition: 0.1s ease;
 `
 
-const StyledDiv = styled.div``
-
-const ModalWrapper = styled(animated(StyledDiv))`
+const ModalWrapper = styled.div`
   * {
     box-sizing: border-box;
   }
@@ -117,15 +109,16 @@ const ModalWrapper = styled(animated(StyledDiv))`
   margin: 10vh auto;
 `
 
-const StyledDialogOverlay = styled(animated(StyledDiv))<{
+const StyledDialogOverlay = styled.div<{
   darkenOverlay?: boolean
   isOpen?: boolean
 }>`
-  transition: 0.15s all;
+  transition: 0.2s all;
   width: 100vw;
   height: 100vh;
   position: absolute;
   visibility: ${({ isOpen }) => (isOpen ? 'visible' : 'collapse')};
+  opacity: ${({ isOpen }) => (isOpen ? '1' : '0')};
   background: ${({ darkenOverlay }) =>
     darkenOverlay ? 'rgba(0, 0, 0, 0.55)' : 'none'};
   z-index: 1000;
