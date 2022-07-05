@@ -1,3 +1,4 @@
+import { shortenAddress } from '@cardinal/namespaces'
 import styled from '@emotion/styled'
 import type { PublicKey } from '@solana/web3.js'
 import { notify } from 'common/Notification'
@@ -28,7 +29,7 @@ export const AddressLink: React.FC<Props> = ({
   const { environment } = useEnvironmentCtx()
   return (
     <Wrapper>
-      <StyledA
+      <a
         className={className}
         href={`https://explorer.solana.com/address/${address.toString()}?cluster=${
           environment.label === 'devnet' ? 'devnet' : ''
@@ -39,10 +40,10 @@ export const AddressLink: React.FC<Props> = ({
         {children ??
           (showRaw
             ? shorten
-              ? formatShortAddress(address)
+              ? shortenAddress(address.toString())
               : address.toString()
-            : formatShortAddress(address))}
-      </StyledA>
+            : shortenAddress(address.toString()))}
+      </a>
       {showCopy && (
         <CopyIcon
           onClick={(e) => {
@@ -56,8 +57,6 @@ export const AddressLink: React.FC<Props> = ({
     </Wrapper>
   )
 }
-
-const StyledA = styled.a``
 
 const Wrapper = styled.div`
   ${tw`inline-flex items-center`}
