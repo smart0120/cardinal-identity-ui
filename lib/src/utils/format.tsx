@@ -53,20 +53,25 @@ export async function tryGetImageUrl(
   name: string,
   dev?: boolean
 ): Promise<string | undefined> {
-  try {
-    if (namespace === 'twitter') {
-      const response = await fetch(
-        `${apiBase(
-          dev
-        )}/namespaces/twitter/proxy?url=https://api.twitter.com/2/users/by&usernames=${name}&user.fields=profile_image_url`
-      )
-      const json = (await response.json()) as {
-        data: { profile_image_url: string }[]
-      }
-      return json?.data[0]?.profile_image_url.replace('_normal', '') as string
+  if (namespace === 'twitter') {
+    const response = await fetch(
+      `${apiBase(
+        dev
+      )}/namespaces/twitter/proxy?url=https://api.twitter.com/2/users/by&usernames=${name}&user.fields=profile_image_url&namespace=${namespace}`
+    )
+    const json = (await response.json()) as {
+      data: { profile_image_url: string }[]
     }
-  } catch (e) {
-    console.log(e)
+    return json?.data[0]?.profile_image_url.replace('_normal', '') as string
+  } else if (namespace === 'discord') {
+    return encodeURI(
+      `https://${
+        dev ? 'dev-nft' : 'nft'
+      }.cardinal.so/img/?text=@${encodeURIComponent(
+        name
+      )}:${namespace}&proxy=true${dev ? `&cluster=devnet` : ''}`
+    )
+  } else {
     return undefined
   }
 }

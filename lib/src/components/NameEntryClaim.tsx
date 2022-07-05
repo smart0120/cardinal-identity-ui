@@ -213,7 +213,13 @@ export const NameEntryClaim = ({
                         }}
                         message={
                           <>
-                            <div>
+                            <div
+                              style={{
+                                overflow: 'hidden',
+                                whiteSpace: 'nowrap',
+                                textOverflow: 'ellipsis',
+                              }}
+                            >
                               Verified ownership of{' '}
                               <span className="font-semibold">
                                 {linkingFlow.name === 'twitter'

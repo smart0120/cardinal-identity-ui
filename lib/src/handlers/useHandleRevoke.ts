@@ -40,13 +40,13 @@ export const useHandleRevoke = (
         const tweetId = tweetIdFromUrl(verificationUrl)
         requestURL = `${apiBase(
           dev
-        )}/twitter/revoke?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
+        )}/namespaces/twitter/revoke?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
           cluster && `&cluster=${cluster}`
         }`
       } else if (namespace === 'discord') {
         requestURL = `${apiBase(
           dev
-        )}/twitter/revoke?publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}&accessToken=${accessToken}${
+        )}/namespaces/twitter/revoke?publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}&accessToken=${accessToken}${
           cluster && `&cluster=${cluster}`
         }`
       } else {

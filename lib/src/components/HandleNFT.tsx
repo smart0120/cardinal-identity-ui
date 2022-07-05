@@ -1,5 +1,6 @@
 import { formatName } from '@cardinal/namespaces'
 import styled from '@emotion/styled'
+import { useEffect, useState } from 'react'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
 interface Props {
@@ -17,9 +18,9 @@ export const HandleNFT: React.FC<Props> = ({ handle, dev, cluster }: Props) => {
         src={encodeURI(
           `https://${
             dev ? 'dev-nft' : 'nft'
-          }.cardinal.so/img/?text=@${handle}:${linkingFlow.name}${
-            cluster && `&cluster=${cluster}`
-          }`
+          }.cardinal.so/img/?text=@${encodeURIComponent(handle)}:${
+            linkingFlow.name
+          }${cluster && `&cluster=${cluster}`}`
         )}
       />
     </Outer>

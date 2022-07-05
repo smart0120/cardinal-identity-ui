@@ -8,7 +8,7 @@ import { sendAndConfirmRawTransaction, Transaction } from '@solana/web3.js'
 import { useMutation } from 'react-query'
 
 import { apiBase } from '../utils/constants'
-import { handleFromTweetUrl, tweetIdFromUrl } from '../utils/verification'
+import { tweetIdFromUrl } from '../utils/verification'
 
 export interface HandleSetParam {
   metaplexData?: {
@@ -43,15 +43,18 @@ export const useHandleClaimTransaction = (
         requestURL = encodeURI(
           `${apiBase(
             dev
-          )}/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
+          )}/namespaces/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
             cluster && `&cluster=${cluster}`
           }`
         )
       } else if (namespace === 'discord') {
+        let formattedHandle: string | string[] = handle.split('#')
+        formattedHandle =
+          formattedHandle.slice(0, -1).join() + '>' + formattedHandle.pop()
         requestURL = encodeURI(
           `${apiBase(
             dev
-          )}/twitter/claim?publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}&accessToken=${accessToken}${
+          )}/namespaces/twitter/claim?publicKey=${wallet?.publicKey.toString()}&handle=${formattedHandle}&namespace=${namespace}&accessToken=${accessToken}${
             cluster && `&cluster=${cluster}`
           }`
         )
