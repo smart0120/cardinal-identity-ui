@@ -47,7 +47,7 @@ export const useHandleVerify = (
           encodeURI(
             `${apiBase(
               dev
-            )}/namespaces/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
+            )}/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
               cluster && `&cluster=${cluster}`
             }`
           )
@@ -62,7 +62,7 @@ export const useHandleVerify = (
           encodeURI(
             `${apiBase(
               dev
-            )}/namespaces/twitter/verify?publicKey=${wallet?.publicKey.toString()}&namespace=${namespace}&code=${code}&accessToken=${accessToken}${
+            )}/twitter/verify?publicKey=${wallet?.publicKey.toString()}&namespace=${namespace}&code=${code}&accessToken=${accessToken}${
               cluster && `&cluster=${cluster}`
             }`
           )

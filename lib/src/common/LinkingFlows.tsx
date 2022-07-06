@@ -19,14 +19,17 @@ export type LinkingFlow = {
 export const linkingFlows: { [key: string]: LinkingFlow } = {
   default: {
     name: 'default',
-    displayName: 'Social Media',
+    displayName: 'default',
     description: {
       header: 'Verify your social media accounts',
       text: 'Link your social media',
     },
     colors: {
       primary: '#1a1b20',
-      secondary: '#26272b',
+      secondary: '#ffffff',
+      buttonColor: '#f0f1f3',
+      primaryFontColor: '#ffffff',
+      secondaryFontColor: '#697b89',
     },
   },
   twitter: {

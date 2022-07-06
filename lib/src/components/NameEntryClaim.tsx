@@ -12,7 +12,7 @@ import { useHandleVerify } from '../handlers/useHandleVerify'
 import { useClaimRequest } from '../hooks/useClaimRequest'
 import { useNameEntryData } from '../hooks/useNameEntryData'
 import { useReverseEntry } from '../hooks/useReverseEntry'
-import { formatShortAddress, formatTwitterLink } from '../utils/format'
+import { formatShortAddress, formatIdentityLink } from '../utils/format'
 import { ButtonWithFooter } from './ButtonWithFooter'
 import { Link, Megaphone, Verified } from './icons'
 import { LabeledInput } from './LabeledInput'
@@ -197,6 +197,7 @@ export const NameEntryClaim = ({
                         style={{
                           margin: '10px 0px',
                           height: 'auto',
+                          justifyContent: 'center',
                           wordBreak: 'break-word',
                         }}
                         message={<>{`${handleVerify.error}`}</>}
@@ -223,7 +224,7 @@ export const NameEntryClaim = ({
                               Verified ownership of{' '}
                               <span className="font-semibold">
                                 {linkingFlow.name === 'twitter'
-                                  ? formatTwitterLink(handle)
+                                  ? formatIdentityLink(handle, linkingFlow.name)
                                   : handle}
                               </span>
                             </div>

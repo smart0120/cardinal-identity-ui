@@ -15,7 +15,7 @@ import { useHandleUnlink } from '../handlers/useHandleUnlink'
 import { useReverseEntry } from '../hooks/useReverseEntry'
 import type { UserTokenData } from '../hooks/useUserNamesForNamespace'
 import { useUserNamesForNamespace } from '../hooks/useUserNamesForNamespace'
-import { formatTwitterLink } from '../utils/format'
+import { formatIdentityLink } from '../utils/format'
 import { BoltIcon } from './icons'
 import { StepDetail } from './StepDetail'
 
@@ -75,11 +75,15 @@ export const NameEntryRow = ({
         className="cursor-point flex cursor-pointer items-center gap-1"
         style={{ fontSize: '14px' }}
       >
-        {formatTwitterLink(
+        {formatIdentityLink(
           nameFromMint(
             userTokenData.metaplexData?.parsed.data.name || '',
             userTokenData.metaplexData?.parsed.data.uri || ''
-          )[1]
+          )[1],
+          nameFromMint(
+            userTokenData.metaplexData?.parsed.data.name || '',
+            userTokenData.metaplexData?.parsed.data.uri || ''
+          )[0]
         )}
         {reverseEntry.data &&
           formatName(namespaceName, reverseEntry.data.parsed.entryName) ===
@@ -163,11 +167,15 @@ export const NameEntryRow = ({
                   setSuccess(
                     <div>
                       Succesfully unlinked{' '}
-                      {formatTwitterLink(
+                      {formatIdentityLink(
                         nameFromMint(
                           userTokenData.metaplexData?.parsed.data.name || '',
                           userTokenData.metaplexData?.parsed.data.uri || ''
-                        )[1]
+                        )[1],
+                        nameFromMint(
+                          userTokenData.metaplexData?.parsed.data.name || '',
+                          userTokenData.metaplexData?.parsed.data.uri || ''
+                        )[0]
                       )}
                       . Changes will be reflected shortly.{' '}
                       <a

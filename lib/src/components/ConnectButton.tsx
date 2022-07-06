@@ -14,6 +14,7 @@ interface Props
     ShowParams {
   disabled?: boolean
   variant?: 'primary' | 'secondary'
+  forceFlow?: LinkingFlow
 }
 
 export const ConnectButton: React.FC<Props> = ({
@@ -26,36 +27,50 @@ export const ConnectButton: React.FC<Props> = ({
   onClose,
   disabled,
   showManage,
+  forceFlow,
   ...buttonProps
 }: Props) => {
-  const { show, linkingFlow } = useWalletIdentity()
+  const { show, linkingFlow, setLinkingFlow } = useWalletIdentity()
   return (
     <Button
-      bgColor={linkingFlow?.colors.primary}
+      bgColor={forceFlow?.colors.primary || linkingFlow?.colors.primary}
       variant={variant}
       disabled={disabled}
       {...buttonProps}
-      onClick={() =>
-        !disabled &&
-        show({
-          wallet,
-          connection,
-          cluster,
-          secondaryConnection,
-          dev,
-          onClose,
-          showManage,
-        })
-      }
+      onClick={() => {
+        if (!forceFlow) {
+          !disabled &&
+            show({
+              wallet,
+              connection,
+              cluster,
+              secondaryConnection,
+              dev,
+              onClose,
+              showManage,
+            })
+        } else {
+          setLinkingFlow(forceFlow)
+        }
+      }}
     >
-      <div style={{ width: '14px' }} className="align-middle">
-        <img
-          className="text-white "
-          alt={`${linkingFlow?.name}-icon`}
-          src={linkingFlow?.icon}
-        />
-      </div>
-      <span>Link Profile</span>
+      {(forceFlow && forceFlow.name !== 'default') ||
+      linkingFlow.name !== 'default' ? (
+        <>
+          <div style={{ width: '14px' }} className="align-middle">
+            <img
+              className="text-white "
+              alt={`${forceFlow?.name || linkingFlow?.name}-icon`}
+              src={forceFlow?.icon || linkingFlow?.icon}
+            />
+          </div>
+          <span className="ml-2">
+            Link {forceFlow?.displayName || 'Profile'}
+          </span>
+        </>
+      ) : (
+        <>Link your identities</>
+      )}
     </Button>
   )
 }

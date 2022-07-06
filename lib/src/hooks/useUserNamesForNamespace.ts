@@ -32,7 +32,7 @@ export const useUserNamesForNamespace = (
   namespaceName: string
 ) => {
   return useQuery<UserTokenData[]>(
-    ['useUserNamesForNamespace', walletId?.toString()],
+    ['useUserNamesForNamespace', walletId?.toString(), namespaceName],
     async () => {
       if (!walletId) return []
       const [namespaceId] = await findNamespaceId(namespaceName)

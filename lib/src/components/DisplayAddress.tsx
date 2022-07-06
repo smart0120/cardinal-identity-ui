@@ -2,8 +2,7 @@ import type { Connection, PublicKey } from '@solana/web3.js'
 import ContentLoader from 'react-content-loader'
 
 import { useAddressName } from '../hooks/useAddressName'
-import { useWalletIdentity } from '../providers/WalletIdentityProvider'
-import { formatShortAddress, formatTwitterLink } from '../utils/format'
+import { formatShortAddress, formatIdentityLink } from '../utils/format'
 
 export const DisplayAddress = ({
   connection,
@@ -20,11 +19,9 @@ export const DisplayAddress = ({
   dark?: boolean
   style?: React.CSSProperties
 }) => {
-  const { linkingFlow } = useWalletIdentity()
-  const { displayName, loadingName } = useAddressName(
+  const { displayName, loadingName, addressNamespaceName } = useAddressName(
     connection,
-    address,
-    linkingFlow.name
+    address
   )
 
   if (!address) return <></>
@@ -47,7 +44,7 @@ export const DisplayAddress = ({
   ) : (
     <div style={{ display: 'flex', gap: '5px', ...style }}>
       {displayName?.includes('@')
-        ? formatTwitterLink(displayName)
+        ? formatIdentityLink(displayName, addressNamespaceName)
         : displayName || formatShortAddress(address)}
     </div>
   )

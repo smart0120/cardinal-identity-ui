@@ -2,18 +2,36 @@ import { shortenAddress } from '@cardinal/namespaces'
 import { PublicKey } from '@solana/web3.js'
 import { apiBase } from './constants'
 
-export const formatTwitterLink = (handle: string | undefined) => {
-  if (!handle) return <></>
-  return (
-    <a
-      href={`https://twitter.com/${handle}`}
-      style={{ color: '#177ddc' }}
-      target="_blank"
-      rel="noreferrer"
-    >
-      {handle}
-    </a>
-  )
+export const formatIdentityLink = (
+  handle: string | undefined,
+  namespace: string | undefined
+) => {
+  if (!handle || !namespace) return <></>
+  if (namespace === 'twitter') {
+    return (
+      <a
+        href={`https://twitter.com/${handle}`}
+        onClick={() => window.open(`https://twitter.com/${handle}`)}
+        style={{ color: '#177ddc' }}
+        target="_blank"
+        rel="noreferrer"
+      >
+        {handle}
+      </a>
+    )
+  } else if (namespace === 'discord') {
+    return (
+      <a
+        href={`https://discord.com/channels/@me`}
+        onClick={() => window.open('https://discord.com/channels/@me')}
+        style={{ color: '#177ddc' }}
+        target="_blank"
+        rel="noreferrer"
+      >
+        {handle}
+      </a>
+    )
+  }
 }
 
 export function shortPubKey(pubkey: PublicKey | string | null | undefined) {
@@ -57,7 +75,7 @@ export async function tryGetImageUrl(
     const response = await fetch(
       `${apiBase(
         dev
-      )}/namespaces/twitter/proxy?url=https://api.twitter.com/2/users/by&usernames=${name}&user.fields=profile_image_url&namespace=${namespace}`
+      )}/twitter/proxy?url=https://api.twitter.com/2/users/by&usernames=${name}&user.fields=profile_image_url&namespace=${namespace}`
     )
     const json = (await response.json()) as {
       data: { profile_image_url: string }[]

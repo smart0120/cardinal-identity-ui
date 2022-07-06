@@ -7,7 +7,7 @@ import { notify } from 'common/Notification'
 import {
   ConnectButton,
   formatShortAddress,
-  formatTwitterLink,
+  formatIdentityLink,
   useAddressImage,
   useAddressName,
   useWalletIdentity,
@@ -40,13 +40,11 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
   const addressStr = address.toString()
   const { displayName, loadingName, refreshName } = useAddressName(
     connection,
-    address,
-    linkingFlow.name
+    address
   )
-  const { addressImage, loadingImage } = useAddressImage(
+  const { addressImage, loadingImage, addressNamespaceName } = useAddressImage(
     connection,
     address,
-    linkingFlow.name,
     dev
   )
 
@@ -65,12 +63,20 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           <Alert message={'Loading'} type="warning" />
         ) : displayName ? (
           <Alert
-            message={`Succesfully linked ${linkingFlow.displayName || ''}`}
+            message={
+              linkingFlow.name === 'default'
+                ? 'Default identity set'
+                : `Succesfully linked ${linkingFlow.displayName || ''}`
+            }
             type="success"
           />
         ) : (
           <Alert
-            message={`${linkingFlow.displayName} not linked`}
+            message={
+              linkingFlow.name === 'default'
+                ? 'No global identity set'
+                : `${linkingFlow.displayName} not linked`
+            }
             type="warning"
           />
         )}
@@ -182,7 +188,8 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
               ></div>
             ) : (
               <div style={{ display: 'flex', gap: '5px' }}>
-                {formatTwitterLink(displayName) || formatShortAddress(address)}
+                {formatIdentityLink(displayName, addressNamespaceName) ||
+                  formatShortAddress(address)}
               </div>
             )}
           </span>
@@ -203,31 +210,33 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
             cluster={environment.label}
           />
         </div>
-        <button
-          disabled={address?.toString() !== wallet?.publicKey?.toString()}
-          className="rounded-md px-3 py-1 text-xs text-white"
-          onClick={() =>
-            show({
-              wallet: wallet as Wallet,
-              connection: connection,
-              cluster: environment.label,
-              secondaryConnection: environment.secondary
-                ? new Connection(environment.secondary)
-                : connection,
-              dev,
-              showManage: true,
-            })
-          }
-          style={{
-            borderColor: '#657786',
-            background: linkingFlow.colors.buttonColor,
-            color: linkingFlow.colors.secondaryFontColor,
-            opacity:
-              address?.toString() !== wallet?.publicKey?.toString() ? 0.5 : 1,
-          }}
-        >
-          Manage Profiles
-        </button>
+        {linkingFlow.name !== 'default' && (
+          <button
+            disabled={address?.toString() !== wallet?.publicKey?.toString()}
+            className="rounded-md px-3 py-1 text-xs text-white"
+            onClick={() =>
+              show({
+                wallet: wallet as Wallet,
+                connection: connection,
+                cluster: environment.label,
+                secondaryConnection: environment.secondary
+                  ? new Connection(environment.secondary)
+                  : connection,
+                dev,
+                showManage: true,
+              })
+            }
+            style={{
+              borderColor: '#657786',
+              background: linkingFlow.colors.buttonColor,
+              color: linkingFlow.colors.secondaryFontColor,
+              opacity:
+                address?.toString() !== wallet?.publicKey?.toString() ? 0.5 : 1,
+            }}
+          >
+            Manage Profiles
+          </button>
+        )}
       </div>
     </div>
   )

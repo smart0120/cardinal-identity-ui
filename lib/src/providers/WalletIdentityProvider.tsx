@@ -1,6 +1,6 @@
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, Connection } from '@solana/web3.js'
-import React, { useContext, useState } from 'react'
+import React, { Dispatch, SetStateAction, useContext, useState } from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
 
@@ -24,6 +24,7 @@ export type ShowParams = {
 export interface WalletIdentity {
   show: (arg: ShowParams) => void
   linkingFlow: LinkingFlow
+  setLinkingFlow: Dispatch<SetStateAction<LinkingFlow>>
   handle?: string
   wallet?: Wallet
   connection?: Connection
@@ -92,6 +93,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
         dev,
         showIdentityModal,
         linkingFlow,
+        setLinkingFlow,
       }}
     >
       <QueryClientProvider client={new QueryClient()}>

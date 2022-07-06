@@ -21,12 +21,11 @@ export const AccountPopover = ({
   dark?: boolean
   style?: React.CSSProperties
 }) => {
-  const { linkingFlow, show } = useWalletIdentity()
+  const { show } = useWalletIdentity()
 
   const { displayName, loadingName } = useAddressName(
     connection,
-    wallet?.publicKey ?? undefined,
-    linkingFlow.name
+    wallet?.publicKey ?? undefined
   )
   if (!wallet.publicKey) return <></>
   return (

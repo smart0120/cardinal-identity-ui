@@ -43,7 +43,7 @@ export const useHandleClaimTransaction = (
         requestURL = encodeURI(
           `${apiBase(
             dev
-          )}/namespaces/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
+          )}/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
             cluster && `&cluster=${cluster}`
           }`
         )
@@ -54,7 +54,7 @@ export const useHandleClaimTransaction = (
         requestURL = encodeURI(
           `${apiBase(
             dev
-          )}/namespaces/twitter/claim?publicKey=${wallet?.publicKey.toString()}&handle=${formattedHandle}&namespace=${namespace}&accessToken=${accessToken}${
+          )}/twitter/claim?publicKey=${wallet?.publicKey.toString()}&handle=${formattedHandle}&namespace=${namespace}&accessToken=${accessToken}${
             cluster && `&cluster=${cluster}`
           }`
         )
