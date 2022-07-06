@@ -1,6 +1,6 @@
 {
   "name": "@cardinal/namespaces-components",
-  "version": "4.0.4",
+  "version": "4.0.5",
   "description": "Solana namespaces react components library",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -31,9 +31,9 @@
     "@types/react-dom": "17.0.2"
   },
   "dependencies": {
-    "@cardinal/certificates": "^2.0.0",
-    "@cardinal/namespaces": "^4.1.11",
+    "@cardinal/certificates": "^2.0.1",
     "@cardinal/common": "^2.0.4",
+    "@cardinal/namespaces": "^4.1.23",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
     "@headlessui/react": "^1.6.1",
