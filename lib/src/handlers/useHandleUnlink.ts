@@ -51,7 +51,7 @@ export const useHandleUnlink = (
           connection,
           wallet,
           {
-            namespaceName: namespaceName,
+            namespaceName,
             mintId: entryMint,
             entryName: reverseNameEntryData.parsed.entryName,
             reverseEntryId: reverseNameEntryData.pubkey,
@@ -59,7 +59,7 @@ export const useHandleUnlink = (
         )
       }
       await withInvalidateExpiredNameEntry(transaction, connection, wallet, {
-        namespaceName: namespaceName,
+        namespaceName,
         mintId: entryMint,
         entryName: entryName,
       })

@@ -1,5 +1,6 @@
 import styled from '@emotion/styled'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
+import { lighten } from 'polished'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
 
 const WalletButton = styled(WalletMultiButton)`
@@ -29,29 +30,25 @@ export const Header = ({ title }: { title?: string }) => {
             alt="Cardinal logo"
           />
         </div>
-        <div className="flex flex-col justify-end text-[10px] italic text-white">
+        <div className="absolute top-[70px] left-[220px] text-[10px] italic text-white">
           <span
-            className="rounded-md px-[7px] py-1"
-            style={{ background: '#FFFFFF30', transform: 'translateY(20%)' }}
+            className="mr-2 rounded-md px-[7px] py-1"
+            style={{ background: '#FFFFFF30', transform: 'translateY(90%)' }}
           >
             alpha
           </span>
+          {environment.label !== 'mainnet-beta' && (
+            <span
+              className="rounded-md px-[7px] py-1"
+              style={{ background: '#FFFFFF30', transform: 'translateY(20%)' }}
+            >
+              {environment.label}
+            </span>
+          )}
         </div>
       </div>
       {/* {title && <div className="center">{title}</div>} */}
       <div className="flex flex-row">
-        {environment.label !== 'mainnet-beta' && (
-          <div
-            style={{
-              color: 'rgb(101,119,134,1)',
-              padding: '4px 6px',
-              background: '#DDD',
-              borderRadius: '5px',
-            }}
-          >
-            {environment.label}
-          </div>
-        )}
         <WalletButton />
       </div>
     </div>
