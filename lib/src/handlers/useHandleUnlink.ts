@@ -50,20 +50,19 @@ export const useHandleUnlink = (
           transaction,
           connection,
           wallet,
-          namespaceName,
-          entryMint,
-          reverseNameEntryData.parsed.entryName,
-          reverseNameEntryData.pubkey
+          {
+            namespaceName,
+            mintId: entryMint,
+            entryName: reverseNameEntryData.parsed.entryName,
+            reverseEntryId: reverseNameEntryData.pubkey,
+          }
         )
       }
-      await withInvalidateExpiredNameEntry(
-        transaction,
-        connection,
-        wallet,
+      await withInvalidateExpiredNameEntry(transaction, connection, wallet, {
         namespaceName,
-        entryMint,
-        entryName
-      )
+        mintId: entryMint,
+        entryName,
+      })
       transaction.feePayer = wallet.publicKey
       transaction.recentBlockhash = (
         await connection.getRecentBlockhash('max')
