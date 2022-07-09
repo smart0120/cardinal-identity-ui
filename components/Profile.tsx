@@ -65,7 +65,13 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           <Alert
             message={
               linkingFlow.name === 'default'
-                ? 'Default identity set'
+                ? `Default identity set ${
+                    addressNamespaceName
+                      ? 'to ' +
+                        addressNamespaceName[0]!.toUpperCase() +
+                        addressNamespaceName.substring(1)
+                      : ''
+                  }`
                 : `Succesfully linked ${linkingFlow.displayName || ''}`
             }
             type="success"
@@ -194,6 +200,15 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
             )}
           </span>
           <AddressLink address={address} />
+          {linkingFlow.name === 'default' && addressNamespaceName && (
+            <span
+              className="rounded-md border-2 text-sm"
+              style={{ color: '#717174' }}
+            >
+              {addressNamespaceName[0]!.toUpperCase() +
+                addressNamespaceName.substring(1)}
+            </span>
+          )}
         </div>
         <div className="mt-5">
           <ConnectButton

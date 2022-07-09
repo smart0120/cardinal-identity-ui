@@ -43,7 +43,7 @@ export const ClaimCard = ({
   showManage: showManageDefault,
   namespaceName,
 }: ClaimCardProps) => {
-  const { linkingFlow, setLinkingFlow } = useWalletIdentity()
+  const { linkingFlow } = useWalletIdentity()
   const [showManage, setShowManage] = useState(showManageDefault)
   const reverseEntry = useReverseEntry(
     connection,
@@ -160,14 +160,6 @@ export const ClaimCard = ({
           )}
           {connection && wallet?.publicKey && (
             <ButtonLight
-              className="absolute right-48 z-10"
-              onClick={() => setLinkingFlow(linkingFlows['default']!)}
-            >
-              Link other
-            </ButtonLight>
-          )}
-          {connection && wallet?.publicKey && (
-            <ButtonLight
               className="absolute right-8 z-10"
               onClick={() => setShowManage((m) => !m)}
             >
@@ -223,7 +215,7 @@ const LinkedHandles = ({
     <>
       {userNamesForNamespace?.data && userNamesForNamespace?.data.length > 0 ? (
         <div className="mt-auto">
-          {userNamesForNamespace.data.map((userTokenData, index) => (
+          {userNamesForNamespace.data.map((userTokenData) => (
             <div className="text-sm">
               {formatIdentityLink(
                 nameFromMint(
@@ -232,7 +224,6 @@ const LinkedHandles = ({
                 )[1],
                 linkingFlow.name
               )}
-              {index !== userNamesForNamespace.data.length - 1 && ','}
             </div>
           ))}
         </div>
