@@ -1,8 +1,10 @@
+export type LinkingFlowName = 'twitter' | 'discord' | 'default'
+
 export type LinkingFlow = {
-  name: string
+  name: LinkingFlowName
   icon?: string
   displayName?: string
-  verification?: string
+  verification?: 'Verification' | 'Tweet'
   description: {
     text: string
     header?: string

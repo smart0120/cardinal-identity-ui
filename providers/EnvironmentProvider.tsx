@@ -9,9 +9,15 @@ export const getInitialProps = async ({
   ctx,
 }: {
   ctx: NextPageContext
-}): Promise<{ linkingFlowKey: string }> => {
+}): Promise<{ cluster: string; linkingFlowKey: string }> => {
   const host = ctx.query.linkingFlow || ctx.req?.headers.host
+  const cluster = host?.includes('dev')
+    ? 'devnet'
+    : (ctx.query.project || ctx.query.host)?.includes('test')
+    ? 'testnet'
+    : ctx.query.cluster || process.env.BASE_CLUSTER
   return {
+    cluster: firstParam(cluster),
     linkingFlowKey: host?.toString() || 'default',
   }
 }
@@ -50,15 +56,17 @@ const EnvironmentContext: React.Context<null | EnvironmentContextValues> =
 
 export function EnvironmentProvider({
   children,
+  defaultCluster,
 }: {
   children: React.ReactChild
+  defaultCluster: string
 }) {
   const { query } = useRouter()
   const cluster = (query.project || query.host)?.includes('dev')
     ? 'devnet'
     : query.host?.includes('test')
     ? 'testnet'
-    : query.cluster || process.env.BASE_CLUSTER || 'mainnet-beta'
+    : query.cluster || defaultCluster || process.env.BASE_CLUSTER
   const foundEnvironment = ENVIRONMENTS.find((e) => e.label === cluster)
   const [environment, setEnvironment] = useState<Environment>(
     foundEnvironment ?? ENVIRONMENTS[0]!

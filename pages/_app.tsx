@@ -17,8 +17,9 @@ const App = ({
   Component,
   pageProps,
   linkingFlowKey,
-}: AppProps & { linkingFlowKey: string }) => (
-  <EnvironmentProvider>
+  cluster,
+}: AppProps & { linkingFlowKey: string; cluster: string }) => (
+  <EnvironmentProvider defaultCluster={cluster}>
     <WalletProvider wallets={getWalletAdapters()}>
       <WalletModalProvider>
         <WalletIdentityProvider linkingFlowKey={linkingFlowKey}>
