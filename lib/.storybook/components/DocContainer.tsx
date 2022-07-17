@@ -5,6 +5,7 @@ import { themes } from '@storybook/theming'
 
 export const DocsContainer = ({ children, context }) => {
   const dark = useDarkMode()
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
   return (
     <BaseContainer
       context={{

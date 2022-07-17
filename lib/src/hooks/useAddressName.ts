@@ -24,7 +24,7 @@ export const useAddressName = (
       if (address) {
         const [namespaceId] = await findNamespaceId(namespaceName)
         const n = await tryGetName(connection, address, namespaceId)
-        setDisplayName(n)
+        setDisplayName(n ? n[0] : undefined)
       }
     } finally {
       setLoadingName(false)
