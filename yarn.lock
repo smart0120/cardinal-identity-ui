@@ -1213,10 +1213,10 @@
     tiny-invariant "^1.2.0"
     tslib "^2.3.1"
 
-"@cardinal/namespaces@^4.1.26":
-  version "4.1.26"
-  resolved "https://registry.yarnpkg.com/@cardinal/namespaces/-/namespaces-4.1.26.tgz#0d64e2a0dc9e09ffb60f78e99cdb6d8f3ddef77a"
-  integrity sha512-sKg8jBlL/aKKG1EmWM38Q9NgeNgt8otSeZA27pnqkm2Igjq1lq/DlfJAX7ADzsTVoUJT1txe60T87Nw6WedLUg==
+"@cardinal/namespaces@^4.1.29":
+  version "4.1.29"
+  resolved "https://registry.yarnpkg.com/@cardinal/namespaces/-/namespaces-4.1.29.tgz#e63abf807d1452e13f6bfb2eeaeeccaf070bff1b"
+  integrity sha512-xeZ9pGlryHWeeRkqKaIsZMLSGLWnVrfUhItzW3PnRyMg5RkQb/+7+V45OL5iZ7ZvNiSRF4I31PXDbovwtnSeZw==
   dependencies:
     "@cardinal/certificates" "^2.0.0"
     "@cardinal/common" "^2.0.1"
