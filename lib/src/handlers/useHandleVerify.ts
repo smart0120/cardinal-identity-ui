@@ -35,7 +35,7 @@ export const useHandleVerify = (
       const response = await fetch(
         `${apiBase(
           dev
-        )}/namespaces/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
+        )}/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
           cluster && `&cluster=${cluster}`
         }`
       )

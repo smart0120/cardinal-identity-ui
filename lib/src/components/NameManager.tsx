@@ -12,7 +12,8 @@ import { ButtonLight } from '../common/Button'
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import { useHandleSetDefault } from '../handlers/useHandleSetDefault'
 import { useHandleUnlink } from '../handlers/useHandleUnlink'
-import { useReverseEntry } from '../hooks/useReverseEntry'
+import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
+import { useNamespaceReverseEntry } from '../hooks/useNamespaceReverseEntry'
 import type { UserTokenData } from '../hooks/useUserNamesForNamespace'
 import { useUserNamesForNamespace } from '../hooks/useUserNamesForNamespace'
 import { formatTwitterLink } from '../utils/format'
@@ -48,7 +49,12 @@ export const NameEntryRow = ({
     wallet.publicKey,
     namespaceName
   )
-  const reverseEntry = useReverseEntry(
+  const globalReverseEntry = useGlobalReverseEntry(
+    connection,
+    namespaceName,
+    wallet.publicKey
+  )
+  const namespaceReverseEntry = useNamespaceReverseEntry(
     connection,
     namespaceName,
     wallet.publicKey
@@ -81,8 +87,11 @@ export const NameEntryRow = ({
             userTokenData.metaplexData?.parsed.data.uri || ''
           )[1]
         )}
-        {reverseEntry.data &&
-          formatName(namespaceName, reverseEntry.data.parsed.entryName) ===
+        {globalReverseEntry.data &&
+          formatName(
+            namespaceName,
+            globalReverseEntry.data.parsed.entryName
+          ) ===
             formatName(
               ...nameFromMint(
                 userTokenData.metaplexData?.parsed.data.name || '',
@@ -91,9 +100,12 @@ export const NameEntryRow = ({
             ) && <AiFillStar />}
       </div>
       <div className="flex items-center gap-2">
-        {(!reverseEntry.data ||
-          (reverseEntry.data &&
-            formatName(namespaceName, reverseEntry.data.parsed.entryName) !==
+        {(!globalReverseEntry.data ||
+          (globalReverseEntry.data &&
+            formatName(
+              namespaceName,
+              globalReverseEntry.data.parsed.entryName
+            ) !==
               formatName(
                 ...nameFromMint(
                   userTokenData.metaplexData?.parsed.data.name || '',
@@ -109,7 +121,7 @@ export const NameEntryRow = ({
                 {
                   onSuccess: (txid) => {
                     userNamesForNamespace.remove()
-                    reverseEntry.refetch()
+                    globalReverseEntry.refetch()
                     setSuccess(
                       <div>
                         Succesfully set default with{' '}
@@ -141,11 +153,11 @@ export const NameEntryRow = ({
           onClick={async () =>
             handleUnlink.mutate(
               {
-                reverseNameEntryData:
-                  reverseEntry.data &&
+                globalReverseNameEntryData:
+                  globalReverseEntry.data &&
                   formatName(
                     namespaceName,
-                    reverseEntry.data.parsed.entryName
+                    globalReverseEntry.data.parsed.entryName
                   ) ===
                     formatName(
                       ...nameFromMint(
@@ -153,13 +165,27 @@ export const NameEntryRow = ({
                         userTokenData.metaplexData?.parsed.data.uri || ''
                       )
                     )
-                    ? reverseEntry.data
+                    ? globalReverseEntry.data
+                    : undefined,
+                namespaceReverseEntry:
+                  namespaceReverseEntry.data &&
+                  formatName(
+                    namespaceName,
+                    namespaceReverseEntry.data.parsed.entryName
+                  ) ===
+                    formatName(
+                      ...nameFromMint(
+                        userTokenData.metaplexData?.parsed.data.name || '',
+                        userTokenData.metaplexData?.parsed.data.uri || ''
+                      )
+                    )
+                    ? namespaceReverseEntry.data
                     : undefined,
               },
               {
                 onSuccess: (txid) => {
                   userNamesForNamespace.remove()
-                  reverseEntry.refetch()
+                  globalReverseEntry.refetch()
                   setSuccess(
                     <div>
                       Succesfully unlinked{' '}
@@ -221,7 +247,7 @@ export const NameManager = ({
     wallet.publicKey,
     namespaceName
   )
-  const reverseEntry = useReverseEntry(
+  const reverseEntry = useGlobalReverseEntry(
     connection,
     namespaceName,
     wallet.publicKey

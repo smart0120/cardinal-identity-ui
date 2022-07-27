@@ -1,12 +1,6 @@
 import { withRevokeCertificateV2 } from '@cardinal/certificates'
-import { AccountData, findAta, tryGetAccount } from '@cardinal/common'
+import { AccountData } from '@cardinal/common'
 import {
-  findNameEntryId,
-  findNamespaceId,
-  getNameEntry,
-  NAMESPACES_IDL,
-  NAMESPACES_PROGRAM,
-  NAMESPACES_PROGRAM_ID,
   ReverseEntryData,
   withInvalidateExpiredNameEntry,
 } from '@cardinal/namespaces'
@@ -23,7 +17,7 @@ import { useMutation } from 'react-query'
 
 import { nameFromMint } from '../components/NameManager'
 import type { UserTokenData } from '../hooks/useUserNamesForNamespace'
-import { AnchorProvider, Program } from '@project-serum/anchor'
+import { withInvalidate } from '@cardinal/token-manager'
 
 export const useHandleUnlink = (
   connection: Connection,
@@ -33,14 +27,17 @@ export const useHandleUnlink = (
 ) => {
   return useMutation(
     async ({
-      reverseNameEntryData,
+      globalReverseNameEntryData,
+      namespaceReverseEntry,
     }: {
-      reverseNameEntryData?: AccountData<ReverseEntryData>
+      globalReverseNameEntryData?: AccountData<ReverseEntryData>
+      namespaceReverseEntry?: AccountData<ReverseEntryData>
     }): Promise<string> => {
       return handleUnlink(connection, wallet, {
         namespaceName: namespaceName,
         userTokenData: userTokenData,
-        reverseNameEntryData: reverseNameEntryData
+        globalReverseNameEntryData: globalReverseNameEntryData,
+        namespaceReverseEntry: namespaceReverseEntry,
       })
     }
   )
@@ -50,18 +47,22 @@ export async function handleUnlink(
   connection: Connection,
   wallet: Wallet,
   params: {
-    namespaceName: string,
-    userTokenData: UserTokenData,
-    reverseNameEntryData?: AccountData<ReverseEntryData>
+    namespaceName: string
+    userTokenData: UserTokenData
+    globalReverseNameEntryData?: AccountData<ReverseEntryData>
+    namespaceReverseEntry?: AccountData<ReverseEntryData>
   }
 ): Promise<string> {
   const [namespaceId] = await namespaces.findNamespaceId(params.namespaceName)
   const transaction = new Transaction()
-  const entryMint = new PublicKey(params.userTokenData.metaplexData?.parsed.mint!)
+  const entryMint = new PublicKey(
+    params.userTokenData.metaplexData?.parsed.mint!
+  )
   const [, entryName] = nameFromMint(
     params.userTokenData.metaplexData?.parsed.data.name!,
     params.userTokenData.metaplexData?.parsed.data.uri!
   )
+  console.log(params.userTokenData)
   if (params.userTokenData.certificate) {
     await withRevokeCertificateV2(connection, wallet, transaction, {
       certificateMint: entryMint,
@@ -69,19 +70,23 @@ export async function handleUnlink(
     })
   } else if (params.userTokenData.tokenManager) {
     // invalidate token manager
+    await withInvalidate(transaction, connection, wallet, entryMint)
   }
-  if (params.reverseNameEntryData) {
-    await withInvalidateExpiredReverseEntry(
-      transaction,
-      connection,
-      wallet,
-      {
-        namespaceName: params.namespaceName,
-        mintId: entryMint,
-        entryName: params.reverseNameEntryData.parsed.entryName,
-        reverseEntryId: params.reverseNameEntryData.pubkey,
-      }
-    )
+  if (params.namespaceReverseEntry) {
+    await withInvalidateExpiredReverseEntry(transaction, connection, wallet, {
+      namespaceName: params.namespaceName,
+      mintId: entryMint,
+      entryName: params.namespaceReverseEntry.parsed.entryName,
+      reverseEntryId: params.namespaceReverseEntry.pubkey,
+    })
+  }
+  if (params.globalReverseNameEntryData) {
+    await withInvalidateExpiredReverseEntry(transaction, connection, wallet, {
+      namespaceName: params.namespaceName,
+      mintId: entryMint,
+      entryName: params.globalReverseNameEntryData.parsed.entryName,
+      reverseEntryId: params.globalReverseNameEntryData.pubkey,
+    })
   }
   await withInvalidateExpiredNameEntry(transaction, connection, wallet, {
     namespaceName: params.namespaceName,

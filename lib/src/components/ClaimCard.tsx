@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 import { Alert } from '../common/Alert'
 import { ButtonLight } from '../common/Button'
-import { useReverseEntry } from '../hooks/useReverseEntry'
+import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
 import { TWITTER_NAMESPACE_NAME } from '../utils/constants'
 import { formatTwitterLink } from '../utils/format'
 import { NameEntryClaim } from './NameEntryClaim'
@@ -40,7 +40,7 @@ export const ClaimCard = ({
   namespaceName = TWITTER_NAMESPACE_NAME,
 }: ClaimCardProps) => {
   const [showManage, setShowManage] = useState(showManageDefault)
-  const reverseEntry = useReverseEntry(
+  const reverseEntry = useGlobalReverseEntry(
     connection,
     namespaceName,
     wallet?.publicKey
