@@ -8,15 +8,12 @@ import {
 import * as namespaces from '@cardinal/namespaces'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Connection } from '@solana/web3.js'
-import {
-  PublicKey,
-  sendAndConfirmRawTransaction,
-  Transaction,
-} from '@solana/web3.js'
+import { PublicKey, Transaction } from '@solana/web3.js'
 import { useMutation } from 'react-query'
 
 import { nameFromMint } from '../components/NameManager'
 import type { UserTokenData } from '../hooks/useUserNamesForNamespace'
+import { executeTransaction } from '../utils/transactions'
 
 export const useHandleUnlink = (
   connection: Connection,
@@ -67,9 +64,13 @@ export const useHandleUnlink = (
       transaction.recentBlockhash = (
         await connection.getRecentBlockhash('max')
       ).blockhash
-      await wallet.signTransaction(transaction)
-      return sendAndConfirmRawTransaction(connection, transaction.serialize(), {
-        skipPreflight: true,
+      return executeTransaction(connection, wallet, transaction, {
+        confirmOptions: {
+          commitment: 'confirmed',
+          maxRetries: 3,
+          skipPreflight: true,
+        },
+        notificationConfig: { message: 'Unlinked handle successfully' },
       })
     }
   )

@@ -1175,10 +1175,10 @@
     tiny-invariant "^1.2.0"
     tslib "^2.3.1"
 
-"@cardinal/common@^2.0.4":
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/@cardinal/common/-/common-2.0.5.tgz#562634f3517cf03d7f462e7b7cf9f05fd4c28b22"
-  integrity sha512-SGW9czHaCVICz3P2qtn0JtW5uY+0LxkrutI2N27+FgRmfx84QdocRv5LtMWcSVYifVEMUFgayKMqgmbfbaUJcA==
+"@cardinal/common@^2.0.7":
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/@cardinal/common/-/common-2.0.7.tgz#d772e11dbb8f65b74d7a692f333459096f65fba4"
+  integrity sha512-GvEe4p23fKalC+sV1uv2npvRViQDXmYjJg0J+tx8NX3ZyjrqwyFl44YVUEF9y5cYCKm+ZuEDbXtgfeVe/AaGXQ==
   dependencies:
     "@metaplex-foundation/mpl-token-metadata" "^1.2.5"
     "@project-serum/anchor" "^0.24.2"
@@ -7808,6 +7808,11 @@ globby@^9.2.0:
     pify "^4.0.1"
     slash "^2.0.0"
 
+goober@^2.1.10:
+  version "2.1.10"
+  resolved "https://registry.yarnpkg.com/goober/-/goober-2.1.10.tgz#058def43ba1e3b06f973dbb372a4978aa42f1049"
+  integrity sha512-7PpuQMH10jaTWm33sQgBQvz45pHR8N4l3Cu3WMGEWmHShAcTuuP7I+5/DwKo39fwti5A80WAjvqgz6SSlgWmGA==
+
 good-listener@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/good-listener/-/good-listener-1.2.2.tgz#d53b30cdf9313dffb7dc9a0d477096aa6d145c50"
@@ -11262,6 +11267,13 @@ react-helmet-async@^1.0.2:
     prop-types "^15.7.2"
     react-fast-compare "^3.2.0"
     shallowequal "^1.1.0"
+
+react-hot-toast@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/react-hot-toast/-/react-hot-toast-2.3.0.tgz#70b3d183ac2a4afb6b17cda4a7f4cfe02e730415"
+  integrity sha512-/RxV+bfjld7tSJR1SCLzMAXgFuNW7fCpK6+vbYqfmbGSWcqTMz2rizrvfWKvtcPH5HK0NqxmBaC5SrAy1F42zA==
+  dependencies:
+    goober "^2.1.10"
 
 react-icons@^4.3.1:
   version "4.4.0"

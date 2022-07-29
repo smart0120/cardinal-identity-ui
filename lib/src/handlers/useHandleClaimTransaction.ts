@@ -4,10 +4,11 @@ import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs
 import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, Connection, PublicKey } from '@solana/web3.js'
-import { sendAndConfirmRawTransaction, Transaction } from '@solana/web3.js'
+import { Transaction } from '@solana/web3.js'
 import { useMutation } from 'react-query'
 
 import { apiBase } from '../utils/constants'
+import { executeTransaction } from '../utils/transactions'
 
 export interface HandleSetParam {
   metaplexData?: {
@@ -53,9 +54,13 @@ export const useHandleClaimTransaction = (
       const { transaction } = json
       const buffer = Buffer.from(decodeURIComponent(transaction), 'base64')
       const tx = Transaction.from(buffer)
-      await wallet.signTransaction!(tx)
-      return sendAndConfirmRawTransaction(connection, tx.serialize(), {
-        skipPreflight: true,
+      return executeTransaction(connection, wallet, tx, {
+        confirmOptions: {
+          commitment: 'confirmed',
+          maxRetries: 3,
+          skipPreflight: true,
+        },
+        notificationConfig: { message: 'Claimed handle successfully' },
       })
     }
   )
