@@ -5,12 +5,14 @@ import type { Connection } from '@solana/web3.js'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 import { AiFillStar } from 'react-icons/ai'
+import { BsGlobe } from 'react-icons/bs'
 import { BiUnlink } from 'react-icons/bi'
 
 import { Alert } from '../common/Alert'
 import { ButtonLight } from '../common/Button'
 import { LoadingSpinner } from '../common/LoadingSpinner'
-import { useHandleSetDefault } from '../handlers/useHandleSetDefault'
+import { useHandleSetNamespaceDefault } from '../handlers/useHandleSetNamespaceDefault'
+import { useHandleSetGlobalDefault } from '../handlers/useHandleSetGlobalDefault'
 import { useHandleUnlink } from '../handlers/useHandleUnlink'
 import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
 import { useNamespaceReverseEntry } from '../hooks/useNamespaceReverseEntry'
@@ -65,16 +67,22 @@ export const NameEntryRow = ({
     namespaceName,
     userTokenData
   )
-  const handleSetDefault = useHandleSetDefault(
+  const handleSetNamespacesDefault = useHandleSetNamespaceDefault(
     connection,
     wallet,
     namespaceName
   )
+  const handleSetGlobalDefault = useHandleSetGlobalDefault(
+    connection,
+    wallet,
+    namespaceName
+  )
+
   useEffect(() => {
-    if (handleUnlink.isLoading || handleSetDefault.isLoading) {
+    if (handleUnlink.isLoading || handleSetNamespacesDefault.isLoading) {
       setError(undefined)
     }
-  }, [handleUnlink.isLoading, handleSetDefault.isLoading])
+  }, [handleUnlink.isLoading, handleSetNamespacesDefault.isLoading])
   return (
     <div className="flex items-center justify-between gap-5 px-2">
       <div
@@ -91,6 +99,17 @@ export const NameEntryRow = ({
           formatName(
             namespaceName,
             globalReverseEntry.data.parsed.entryName
+          ) ===
+            formatName(
+              ...nameFromMint(
+                userTokenData.metaplexData?.parsed.data.name || '',
+                userTokenData.metaplexData?.parsed.data.uri || ''
+              )
+            ) && <BsGlobe />}
+        {namespaceReverseEntry.data &&
+          formatName(
+            namespaceName,
+            namespaceReverseEntry.data.parsed.entryName
           ) ===
             formatName(
               ...nameFromMint(
@@ -114,7 +133,7 @@ export const NameEntryRow = ({
               ))) && (
           <ButtonLight
             onClick={() =>
-              handleSetDefault.mutate(
+              handleSetGlobalDefault.mutate(
                 {
                   tokenData: userTokenData,
                 },
@@ -141,10 +160,58 @@ export const NameEntryRow = ({
               )
             }
           >
-            {handleSetDefault.isLoading ? (
+            {handleSetGlobalDefault.isLoading ? (
               <LoadingSpinner height="15px" fill="#000" />
             ) : (
-              <>Set Default</>
+              <>Set Global</>
+            )}
+          </ButtonLight>
+        )}
+        {(!namespaceReverseEntry.data ||
+          (namespaceReverseEntry.data &&
+            formatName(
+              namespaceName,
+              namespaceReverseEntry.data.parsed.entryName
+            ) !==
+              formatName(
+                ...nameFromMint(
+                  userTokenData.metaplexData?.parsed.data.name || '',
+                  userTokenData.metaplexData?.parsed.data.uri || ''
+                )
+              ))) && (
+          <ButtonLight
+            onClick={() =>
+              handleSetNamespacesDefault.mutate(
+                {
+                  tokenData: userTokenData,
+                },
+                {
+                  onSuccess: (txid) => {
+                    userNamesForNamespace.remove()
+                    namespaceReverseEntry.refetch()
+                    setSuccess(
+                      <div>
+                        Succesfully set default with{' '}
+                        <a
+                          className="cursor-pointer text-blue-500"
+                          target={`_blank`}
+                          href={`https://explorer.solana.com/tx/${txid}?cluster=${cluster}`}
+                        >
+                          transaction
+                        </a>
+                        . Changes will be reflected shortly.
+                      </div>
+                    )
+                  },
+                  onError: (e) => setError(e),
+                }
+              )
+            }
+          >
+            {handleSetNamespacesDefault.isLoading ? (
+              <LoadingSpinner height="15px" fill="#000" />
+            ) : (
+              <>Set Namespace</>
             )}
           </ButtonLight>
         )}
@@ -237,7 +304,12 @@ export const NameManager = ({
 }) => {
   const [error, setError] = useState<unknown>()
   const [success, setSuccess] = useState<ReactElement>()
-  const handleSetDefault = useHandleSetDefault(
+  const handleSetNamespacesDefault = useHandleSetNamespaceDefault(
+    connection,
+    wallet,
+    namespaceName
+  )
+  const handleSetGlobalDefault = useHandleSetGlobalDefault(
     connection,
     wallet,
     namespaceName
@@ -293,7 +365,7 @@ export const NameManager = ({
                 setSuccess={setSuccess}
               />
             ))}
-          {handleSetDefault.error && (
+          {handleSetNamespacesDefault.error && (
             <Alert
               style={{
                 marginTop: '10px',
@@ -302,7 +374,23 @@ export const NameManager = ({
               }}
               message={
                 <>
-                  <div>{`${handleSetDefault.error}`}</div>
+                  <div>{`${handleSetNamespacesDefault.error}`}</div>
+                </>
+              }
+              type="error"
+              showIcon
+            />
+          )}
+          {handleSetGlobalDefault.error && (
+            <Alert
+              style={{
+                marginTop: '10px',
+                height: 'auto',
+                wordBreak: 'break-word',
+              }}
+              message={
+                <>
+                  <div>{`${handleSetGlobalDefault.error}`}</div>
                 </>
               }
               type="error"

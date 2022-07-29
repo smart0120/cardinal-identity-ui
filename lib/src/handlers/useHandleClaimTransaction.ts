@@ -21,8 +21,7 @@ export interface HandleSetParam {
 export const useHandleClaimTransaction = (
   connection: Connection,
   wallet: Wallet,
-  cluster: Cluster,
-  dev: boolean
+  cluster: Cluster
 ) => {
   return useMutation(
     [wallet.publicKey.toString()],
@@ -33,30 +32,40 @@ export const useHandleClaimTransaction = (
       tweetId?: string
       handle?: string
     }): Promise<string> => {
-      if (!handle || !tweetId) return ''
-      const response = await fetch(
-        `${apiBase(
-          dev
-        )}/twitter/claim-v2?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=twitter${
-          cluster && `&cluster=${cluster}`
-        }`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            account: wallet.publicKey.toString(),
-          }),
-        }
-      )
-      const json = await response.json()
-      if (response.status !== 200 || json.error) throw new Error(json.error)
-      const { transaction } = json
-      const buffer = Buffer.from(decodeURIComponent(transaction), 'base64')
-      const tx = Transaction.from(buffer)
+      const tx = await handleClaim(wallet, cluster, handle, tweetId)
+      if (!tx) return ''
       await wallet.signTransaction!(tx)
       return sendAndConfirmRawTransaction(connection, tx.serialize(), {
         skipPreflight: true,
       })
     }
   )
+}
+
+export async function handleClaim(
+  wallet: Wallet,
+  cluster: Cluster,
+  handle: string | undefined,
+  tweetId: string | undefined
+): Promise<Transaction | null> {
+  if (!handle || !tweetId) return null
+  const response = await fetch(
+    `${apiBase(
+      cluster === 'devnet'
+    )}/twitter/claim-v2?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=twitter${
+      cluster === 'devnet' ? `&cluster=${cluster}` : ''
+    }`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        account: wallet.publicKey.toString(),
+      }),
+    }
+  )
+  const json = await response.json()
+  if (response.status !== 200 || json.error) throw new Error(json.error)
+  const { transaction } = json
+  const buffer = Buffer.from(decodeURIComponent(transaction), 'base64')
+  return Transaction.from(buffer)
 }

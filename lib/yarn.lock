@@ -1191,10 +1191,10 @@
     tiny-invariant "^1.2.0"
     tslib "^2.3.1"
 
-"@cardinal/namespaces@^4.1.30":
-  version "4.1.30"
-  resolved "https://registry.yarnpkg.com/@cardinal/namespaces/-/namespaces-4.1.30.tgz#9adbdbb2acf7b43cdf5497d2e1f5fe4d0eec8501"
-  integrity sha512-AuM9xvtJDGmjijKHGqXZv7OOQSOrwYmW6jTWcSKbM1/avKPEPe/I8PaAk/EO+MzRzlJVaa7hgCFPOWOpRDKz3Q==
+"@cardinal/namespaces@^4.1.3":
+  version "4.1.31"
+  resolved "https://registry.yarnpkg.com/@cardinal/namespaces/-/namespaces-4.1.31.tgz#70794697f55401f5199aa614270fa2295105801f"
+  integrity sha512-8aBGldkD6nkj8qiJDJ97Ro8irkf80+5xmySnddhUPi7vN0asobzlADXBjbhGBjxCM9u/jHOB1xiHILFlERRFmg==
   dependencies:
     "@cardinal/certificates" "^2.0.0"
     "@cardinal/common" "^2.0.1"

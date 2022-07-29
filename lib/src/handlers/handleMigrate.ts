@@ -1,34 +1,50 @@
 import { AccountData } from '@cardinal/common'
 import { ReverseEntryData } from '@cardinal/namespaces'
 import type { Wallet } from '@saberhq/solana-contrib'
-import { Connection } from '@solana/web3.js'
+import { Cluster, Connection, Transaction } from '@solana/web3.js'
+import { nameFromMint } from '../components/NameManager'
 import { UserTokenData } from '../hooks/useUserNamesForNamespace'
+import { handleClaim } from './useHandleClaimTransaction'
 
 import { handleUnlink } from './useHandleUnlink'
 
 export const handleMigrate = async (
   wallet: Wallet,
   connection: Connection,
+  cluster: Cluster,
   namespaceName: string,
   userTokenData: UserTokenData,
-  reverseNameEntryData?: AccountData<ReverseEntryData>
-): Promise<string | undefined> => {
+  globalReverseNameEntryData?: AccountData<ReverseEntryData>,
+  namespaceReverseEntry?: AccountData<ReverseEntryData>
+): Promise<Transaction> => {
   if (userTokenData.certificate) {
     // unlink
     console.log(`Initiate unlinking`)
-
-    const unlinkTxid = await handleUnlink(connection, wallet, {
+    const tx = await handleUnlink(connection, wallet, {
       namespaceName: namespaceName,
       userTokenData: userTokenData,
-      reverseNameEntryData: reverseNameEntryData,
+      globalReverseNameEntryData: globalReverseNameEntryData,
+      namespaceReverseEntry: namespaceReverseEntry,
     })
-
-    console.log(`Unlinking txId ${unlinkTxid}`)
+    console.log(`Unlinking txId ${''}`)
 
     // claim
     console.log(`Initiate claiming`)
-    // claim v2 endpoint
+    const [, entryName] = nameFromMint(
+      userTokenData.metaplexData?.parsed.data.name || '',
+      userTokenData.metaplexData?.parsed.data.uri || ''
+    )
+    const claimTx = await handleClaim(
+      wallet,
+      cluster || 'devnet',
+      entryName,
+      'random'
+    )
+    if (claimTx) {
+      tx.instructions = [...tx.instructions, ...claimTx.instructions]
+    }
     console.log(`Claiming txId ${''}`)
-    return unlinkTxid
+    return tx
   }
+  return new Transaction()
 }

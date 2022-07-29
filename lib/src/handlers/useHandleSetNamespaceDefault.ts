@@ -4,7 +4,7 @@ import { deprecated, withSetNamespaceReverseEntry } from '@cardinal/namespaces'
 import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
 import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
-import type { Connection } from '@solana/web3.js'
+import type { Cluster, Connection } from '@solana/web3.js'
 import {
   PublicKey,
   sendAndConfirmRawTransaction,
@@ -13,49 +13,69 @@ import {
 import { useMutation } from 'react-query'
 
 import { nameFromMint } from '../components/NameManager'
+import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
+import { useNamespaceReverseEntry } from '../hooks/useNamespaceReverseEntry'
+import { UserTokenData } from '../hooks/useUserNamesForNamespace'
+import { handleMigrate } from './handleMigrate'
 
 export interface HandleSetParam {
-  metaplexData?: {
-    pubkey: PublicKey
-    parsed: metaplex.MetadataData
-  } | null
+  metaplexData?: AccountData<metaplex.MetadataData>
   tokenManager?: AccountData<TokenManagerData>
   certificate?: AccountData<CertificateData> | null
 }
 
-export const useHandleSetDefault = (
+export const useHandleSetNamespaceDefault = (
   connection: Connection,
   wallet: Wallet,
-  namespaceName: string
+  namespaceName: string,
+  cluster: Cluster
 ) => {
+  const globalReverseEntry = useGlobalReverseEntry(
+    connection,
+    namespaceName,
+    wallet?.publicKey
+  )
+
+  const namespaceReverseEntry = useNamespaceReverseEntry(
+    connection,
+    namespaceName,
+    wallet?.publicKey
+  )
+
   return useMutation(
     async ({ tokenData }: { tokenData?: HandleSetParam }): Promise<string> => {
       if (!tokenData) return ''
-      const transaction = new Transaction()
+      let transaction = new Transaction()
       const entryMint = new PublicKey(tokenData.metaplexData?.parsed.mint!)
       const [, entryName] = nameFromMint(
         tokenData.metaplexData?.parsed.data.name || '',
         tokenData.metaplexData?.parsed.data.uri || ''
       )
+
       if (tokenData.certificate) {
-        await deprecated.withSetReverseEntry(
-          connection,
+        console.log('Type certificate, migrating ...')
+        transaction = await handleMigrate(
           wallet,
-          namespaceName,
-          entryName,
-          entryMint,
-          transaction
-        )
-      } else if (tokenData.tokenManager) {
-        await withSetNamespaceReverseEntry(
-          transaction,
           connection,
-          wallet,
+          cluster,
           namespaceName,
-          entryName,
-          entryMint
+          tokenData as UserTokenData,
+          globalReverseEntry.data,
+          namespaceReverseEntry.data
         )
+
+        console.log('Migrated')
       }
+
+      await withSetNamespaceReverseEntry(
+        transaction,
+        connection,
+        wallet,
+        namespaceName,
+        entryName,
+        entryMint
+      )
+
       transaction.feePayer = wallet.publicKey
       transaction.recentBlockhash = (
         await connection.getRecentBlockhash('max')

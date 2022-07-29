@@ -33,11 +33,19 @@ export const useHandleUnlink = (
       globalReverseNameEntryData?: AccountData<ReverseEntryData>
       namespaceReverseEntry?: AccountData<ReverseEntryData>
     }): Promise<string> => {
-      return handleUnlink(connection, wallet, {
+      const transaction = await handleUnlink(connection, wallet, {
         namespaceName: namespaceName,
         userTokenData: userTokenData,
         globalReverseNameEntryData: globalReverseNameEntryData,
         namespaceReverseEntry: namespaceReverseEntry,
+      })
+      transaction.feePayer = wallet.publicKey
+      transaction.recentBlockhash = (
+        await connection.getRecentBlockhash('max')
+      ).blockhash
+      await wallet.signTransaction(transaction)
+      return sendAndConfirmRawTransaction(connection, transaction.serialize(), {
+        skipPreflight: true,
       })
     }
   )
@@ -52,7 +60,7 @@ export async function handleUnlink(
     globalReverseNameEntryData?: AccountData<ReverseEntryData>
     namespaceReverseEntry?: AccountData<ReverseEntryData>
   }
-): Promise<string> {
+): Promise<Transaction> {
   const [namespaceId] = await namespaces.findNamespaceId(params.namespaceName)
   const transaction = new Transaction()
   const entryMint = new PublicKey(
@@ -62,7 +70,11 @@ export async function handleUnlink(
     params.userTokenData.metaplexData?.parsed.data.name!,
     params.userTokenData.metaplexData?.parsed.data.uri!
   )
-  console.log(params.userTokenData)
+
+  console.log(
+    params.userTokenData.certificate,
+    params.userTokenData.tokenManager
+  )
   if (params.userTokenData.certificate) {
     await withRevokeCertificateV2(connection, wallet, transaction, {
       certificateMint: entryMint,
@@ -93,12 +105,5 @@ export async function handleUnlink(
     mintId: entryMint,
     entryName,
   })
-  transaction.feePayer = wallet.publicKey
-  transaction.recentBlockhash = (
-    await connection.getRecentBlockhash('max')
-  ).blockhash
-  await wallet.signTransaction(transaction)
-  return sendAndConfirmRawTransaction(connection, transaction.serialize(), {
-    skipPreflight: true,
-  })
+  return transaction
 }

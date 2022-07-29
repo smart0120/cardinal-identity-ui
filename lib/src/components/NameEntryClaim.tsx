@@ -84,8 +84,7 @@ export const NameEntryClaim = ({
   const handleClaimTransaction = useHandleClaimTransaction(
     connection,
     wallet,
-    cluster,
-    dev
+    cluster
   )
 
   useMemo(() => {
