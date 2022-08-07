@@ -19,10 +19,10 @@ export const DisplayAddress = ({
   dark?: boolean
   style?: React.CSSProperties
 }) => {
-  const { displayName, loadingName } = useAddressName(connection, address)
+  const addressName = useAddressName(connection, address)
 
   if (!address) return <></>
-  return loadingName ? (
+  return addressName.isLoading ? (
     <div
       style={{
         ...style,
@@ -40,9 +40,9 @@ export const DisplayAddress = ({
     </div>
   ) : (
     <div style={{ display: 'flex', gap: '5px', ...style }}>
-      {displayName?.includes('@')
-        ? formatTwitterLink(displayName)
-        : displayName || formatShortAddress(address)}
+      {addressName.data?.includes('@')
+        ? formatTwitterLink(addressName.data)
+        : addressName.data || formatShortAddress(address)}
     </div>
   )
 }

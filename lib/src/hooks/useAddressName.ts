@@ -1,6 +1,11 @@
-import { findNamespaceId, tryGetName } from '@cardinal/namespaces'
+import {
+  findNamespaceId,
+  formatName,
+  getReverseNameEntryForNamespace,
+  tryGetName,
+} from '@cardinal/namespaces'
 import type { Connection, PublicKey } from '@solana/web3.js'
-import { useMemo, useState } from 'react'
+import { useQuery } from 'react-query'
 
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { TWITTER_NAMESPACE_NAME } from '../utils/constants'
@@ -9,31 +14,40 @@ export const useAddressName = (
   connection: Connection,
   address: PublicKey | undefined,
   namespaceName = TWITTER_NAMESPACE_NAME
-): {
-  displayName: string | undefined
-  loadingName: boolean
-  refreshName: () => void
-} => {
+) => {
   const { handle } = useWalletIdentity()
-  const [displayName, setDisplayName] = useState<string | undefined>()
-  const [loadingName, setLoadingName] = useState<boolean>(true)
 
-  const refreshName = async () => {
-    try {
-      setLoadingName(true)
-      if (address) {
-        const [namespaceId] = await findNamespaceId(namespaceName)
-        const n = await tryGetName(connection, address, namespaceId)
-        setDisplayName(n ? n[0] : undefined)
-      }
-    } finally {
-      setLoadingName(false)
+  return useQuery<string | undefined>(
+    ['useAddressName', address, namespaceName, handle],
+    async () => {
+      if (!address || !connection) return
+      const [namespaceId] = await findNamespaceId(namespaceName)
+      const n = await tryGetNameForNamespace(connection, address, namespaceId)
+      return n ? n[0] : undefined
     }
+  )
+}
+
+export async function tryGetNameForNamespace(
+  connection: Connection,
+  pubkey: PublicKey,
+  namespaceId: PublicKey
+): Promise<string[] | undefined> {
+  try {
+    const reverseEntry = await getReverseNameEntryForNamespace(
+      connection,
+      pubkey,
+      namespaceId
+    )
+    return [
+      formatName(
+        reverseEntry.parsed.namespaceName,
+        reverseEntry.parsed.entryName
+      ),
+      reverseEntry.parsed.namespaceName,
+    ]
+  } catch (e) {
+    console.log(e)
   }
-
-  useMemo(() => {
-    void refreshName()
-  }, [connection, address?.toString(), namespaceName, handle])
-
-  return { displayName, loadingName, refreshName }
+  return undefined
 }

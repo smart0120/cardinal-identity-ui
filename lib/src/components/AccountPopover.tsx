@@ -23,10 +23,7 @@ export const AccountPopover = ({
 }) => {
   const { show } = useWalletIdentity()
 
-  const { displayName, loadingName } = useAddressName(
-    connection,
-    wallet?.publicKey ?? undefined
-  )
+  const addressName = useAddressName(connection, wallet?.publicKey ?? undefined)
   if (!wallet.publicKey) return <></>
   return (
     <div className="w-screen max-w-[300px] ">
@@ -45,6 +42,7 @@ export const AccountPopover = ({
                 dark={dark}
                 connection={connection}
                 address={wallet.publicKey}
+                dev={environment === 'devnet'}
               />
             </div>
           </div>
@@ -64,12 +62,12 @@ export const AccountPopover = ({
             >
               <FaTwitter />
               <span>
-                {loadingName ? (
+                {addressName.isLoading ? (
                   <div
                     className="animate h-4 w-24 animate-pulse"
                     style={{ background: rgba(0, 0, 0, 0.1) }}
                   />
-                ) : displayName ? (
+                ) : addressName.data ? (
                   'Edit Twitter'
                 ) : (
                   'Link Twitter'

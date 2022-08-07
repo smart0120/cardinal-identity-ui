@@ -6,9 +6,7 @@ import { useState } from 'react'
 import { Alert } from '../common/Alert'
 import { ButtonLight } from '../common/Button'
 import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
-import { useNamespaceReverseEntry } from '../hooks/useNamespaceReverseEntry'
 import { TWITTER_NAMESPACE_NAME } from '../utils/constants'
-import { formatTwitterLink } from '../utils/format'
 import { NameEntryClaim } from './NameEntryClaim'
 import { NameManager } from './NameManager'
 import { PoweredByFooter } from './PoweredByFooter'
@@ -41,7 +39,7 @@ export const ClaimCard = ({
   namespaceName = TWITTER_NAMESPACE_NAME,
 }: ClaimCardProps) => {
   const [showManage, setShowManage] = useState(showManageDefault)
-  const reverseEntry = useNamespaceReverseEntry(
+  const globalReverseEntry = useGlobalReverseEntry(
     connection,
     namespaceName,
     wallet?.publicKey
@@ -66,22 +64,24 @@ export const ClaimCard = ({
               showIcon
             />
           )}
-          {!reverseEntry.isFetching && reverseEntry.data?.parsed.entryName && (
-            <Alert
-              style={{ marginBottom: '20px', width: '100%' }}
-              message={
-                <>
-                  <div>
-                    Your address is linked to{' '}
-                    {formatTwitterLink(reverseEntry.data?.parsed.entryName)}.
-                    Link a new Twitter handle below.
+          {globalReverseEntry.data &&
+            globalReverseEntry.data.parsed.namespaceName === namespaceName && (
+              <Alert
+                style={{ marginBottom: '20px', width: '100%' }}
+                message={
+                  <div className="flex w-full flex-col text-center">
+                    <div>
+                      <span className="font-semibold">Twitter</span> is
+                      configured as your{' '}
+                      <span className="font-semibold">default</span> global
+                      identity
+                    </div>
                   </div>
-                </>
-              }
-              type="info"
-              showIcon
-            />
-          )}
+                }
+                type="info"
+                showIcon
+              />
+            )}
           {connection && wallet?.publicKey && (
             <ButtonLight
               className="absolute right-8 z-10"
@@ -94,10 +94,10 @@ export const ClaimCard = ({
             wallet &&
             (showManage ? (
               <NameManager
-                cluster={cluster}
                 connection={connection}
                 wallet={wallet}
                 namespaceName={namespaceName}
+                cluster={cluster}
               />
             ) : (
               <NameEntryClaim

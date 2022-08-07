@@ -13,6 +13,7 @@ import {
   useWalletIdentity,
 } from 'lib/src'
 import { TWITTER_NAMESPACE_NAME } from 'lib/src/utils/constants'
+import { add } from 'lodash'
 import { useRouter } from 'next/router'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
 import { FaShare, FaUserAlt } from 'react-icons/fa'
@@ -37,17 +38,14 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
   const { show } = useWalletIdentity()
   const wallet = useWallet()
   const { connection, environment } = useEnvironmentCtx()
-  const dev = query['dev'] === 'true'
+  const dev = query['cluster'] === 'devnet'
   const addressStr = address.toString()
-  const { displayName, loadingName, refreshName } = useAddressName(
-    connection,
-    address
-  )
-  const { addressImage, loadingImage } = useAddressImage(
+  const addressName = useAddressName(connection, address)
+  const addressImage = useAddressImage(
     connection,
     address,
-    TWITTER_NAMESPACE_NAME,
-    dev
+    dev,
+    TWITTER_NAMESPACE_NAME
   )
 
   return (
@@ -61,9 +59,9 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
       }}
     >
       <div style={{ marginBottom: '30px' }}>
-        {loadingName ? (
+        {addressName.isFetching ? (
           <Alert message={'Loading'} type="warning" />
-        ) : displayName ? (
+        ) : addressName.data ? (
           <Alert message={'Succesfully linked Twitter'} type="success" />
         ) : (
           <Alert message={'Twitter not linked'} type="warning" />
@@ -77,12 +75,12 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           alignItems: 'center',
         }}
       >
-        {loadingImage ? (
+        {addressImage.isFetching ? (
           <div
             className="animate-pulse bg-gray-200"
             style={{ height: '156px', width: '156px', borderRadius: '50%' }}
           />
-        ) : addressImage ? (
+        ) : addressImage.data ? (
           <div
             style={{
               position: 'relative',
@@ -106,7 +104,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
                 border: '4px solid white',
               }}
               alt={`profile-${addressStr}`}
-              src={addressImage}
+              src={addressImage.data}
             ></img>
             <ShareIcon
               onClick={() => {
@@ -160,14 +158,15 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           }}
         >
           <span style={{ fontSize: '16px' }}>
-            {loadingName ? (
+            {addressName.isFetching ? (
               <div
                 style={{ height: '24px', width: '120px' }}
                 className="animate-pulse rounded-md bg-gray-200"
               />
             ) : (
               <div style={{ display: 'flex', gap: '5px' }}>
-                {formatTwitterLink(displayName) || formatShortAddress(address)}
+                {formatTwitterLink(addressName.data) ||
+                  formatShortAddress(address)}
               </div>
             )}
           </span>
@@ -184,7 +183,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
                 ? new Connection(environment.secondary)
                 : connection
             }
-            onClose={refreshName}
+            onClose={addressName.refetch}
             cluster={environment.label}
           />
         </div>

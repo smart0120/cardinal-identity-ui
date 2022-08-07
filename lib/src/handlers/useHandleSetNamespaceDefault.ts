@@ -1,10 +1,14 @@
 import type { CertificateData } from '@cardinal/certificates'
 import type { AccountData } from '@cardinal/common'
-import { deprecated, withSetNamespaceReverseEntry } from '@cardinal/namespaces'
+import {
+  deprecated,
+  withSetGlobalReverseEntry,
+  withSetNamespaceReverseEntry,
+} from '@cardinal/namespaces'
 import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
 import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
-import type { Cluster, Connection } from '@solana/web3.js'
+import { Cluster, Connection, Keypair } from '@solana/web3.js'
 import {
   PublicKey,
   sendAndConfirmRawTransaction,
@@ -27,8 +31,7 @@ export interface HandleSetParam {
 export const useHandleSetNamespaceDefault = (
   connection: Connection,
   wallet: Wallet,
-  namespaceName: string,
-  cluster: Cluster
+  namespaceName: string
 ) => {
   const globalReverseEntry = useGlobalReverseEntry(
     connection,
@@ -45,50 +48,85 @@ export const useHandleSetNamespaceDefault = (
   return useMutation(
     async ({ tokenData }: { tokenData?: HandleSetParam }): Promise<string> => {
       if (!tokenData) return ''
-      let transaction = new Transaction()
+      let transactions: Transaction[] | undefined
       const entryMint = new PublicKey(tokenData.metaplexData?.parsed.mint!)
       const [, entryName] = nameFromMint(
         tokenData.metaplexData?.parsed.data.name || '',
         tokenData.metaplexData?.parsed.data.uri || ''
       )
 
+      let mintKeypair: Keypair | undefined
       if (tokenData.certificate) {
         console.log('Type certificate, migrating ...')
-        transaction = await handleMigrate(
+        mintKeypair = Keypair.generate()
+        transactions = await handleMigrate(
           wallet,
           connection,
-          cluster,
           namespaceName,
           tokenData as UserTokenData,
-          globalReverseEntry.data,
-          namespaceReverseEntry.data
+          mintKeypair,
+          globalReverseEntry.data &&
+            globalReverseEntry.data.parsed.entryName === entryName
+            ? globalReverseEntry.data
+            : undefined,
+          namespaceReverseEntry.data &&
+            namespaceReverseEntry.data.parsed.entryName === entryName
+            ? namespaceReverseEntry.data
+            : undefined
         )
 
-        console.log('Migrated')
+        console.log('Added migration instructino')
       }
 
+      if (!transactions) transactions = [new Transaction()]
       await withSetNamespaceReverseEntry(
-        transaction,
+        transactions[1] || transactions[0]!,
         connection,
         wallet,
         namespaceName,
         entryName,
-        entryMint
+        mintKeypair?.publicKey || entryMint
       )
 
-      transaction.feePayer = wallet.publicKey
-      transaction.recentBlockhash = (
-        await connection.getRecentBlockhash('max')
-      ).blockhash
-      await wallet.signTransaction(transaction)
-      const txid = await sendAndConfirmRawTransaction(
-        connection,
-        transaction.serialize(),
-        {
-          skipPreflight: true,
+      if (
+        globalReverseEntry.data &&
+        globalReverseEntry.data.parsed.namespaceName === namespaceName
+      ) {
+        await withSetGlobalReverseEntry(
+          transactions[1] || transactions[0]!,
+          connection,
+          wallet,
+          {
+            namespaceName: namespaceName,
+            entryName: entryName,
+            mintId: entryMint,
+          }
+        )
+      }
+
+      let txId = ''
+      for (const tx of transactions) {
+        tx.feePayer = wallet.publicKey
+        tx.recentBlockhash = (
+          await connection.getRecentBlockhash('max')
+        ).blockhash
+      }
+      await wallet.signAllTransactions(transactions)
+      for (let i = 0; i < transactions.length; i++) {
+        const tx = transactions[i]!
+        i == 1 && mintKeypair && tx.partialSign(mintKeypair)
+        const id = await sendAndConfirmRawTransaction(
+          connection,
+          tx.serialize(),
+          {
+            skipPreflight: true,
+          }
+        )
+        if (i === transactions.length - 1) {
+          txId = id
         }
-      )
-      return txid
+      }
+      return txId
     }
   )
 }

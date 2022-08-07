@@ -108,7 +108,6 @@ export const useUserNamesForNamespace = (
         tryPublicKey(tokenAccount.account.data.parsed.info.delegate)
       )
       const accountsById = await accountDataById(connection, delegateIds)
-      console.log(accountsById)
 
       return tokenAccounts.map((tokenAccount, i) => {
         const delegateData =
@@ -116,7 +115,6 @@ export const useUserNamesForNamespace = (
 
         let tokenManagerData: AccountData<TokenManagerData> | undefined
         let certificateData: AccountData<CertificateData> | undefined
-        console.log(delegateData?.type)
         if (delegateData?.type === 'tokenManager') {
           tokenManagerData = delegateData as AccountData<TokenManagerData>
         } else if (delegateData?.type === 'certificate') {
