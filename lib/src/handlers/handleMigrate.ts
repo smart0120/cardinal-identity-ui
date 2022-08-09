@@ -11,7 +11,7 @@ export const handleMigrate = async (
   const response = await fetch(
     `${apiBase(
       cluster === 'devnet'
-    )}/twitter/migrate?publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=twitter${
+    )}/namespaces/twitter/migrate?publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=twitter${
       cluster === 'devnet' ? `&cluster=${cluster}` : ''
     }`,
     {

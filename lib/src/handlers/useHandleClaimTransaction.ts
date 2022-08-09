@@ -52,7 +52,7 @@ export async function handleClaim(
   const response = await fetch(
     `${apiBase(
       cluster === 'devnet'
-    )}/namespaces/twitter/claim-v2?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=twitter${
+    )}/namespaces/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=twitter${
       cluster === 'devnet' ? `&cluster=${cluster}` : ''
     }`,
     {

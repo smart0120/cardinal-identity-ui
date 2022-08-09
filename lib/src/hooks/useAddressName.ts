@@ -1,6 +1,7 @@
 import {
   findNamespaceId,
   formatName,
+  getGlobalReverseNameEntry,
   getReverseNameEntryForNamespace,
   tryGetName,
 } from '@cardinal/namespaces'
@@ -21,8 +22,7 @@ export const useAddressName = (
     ['useAddressName', address, namespaceName, handle],
     async () => {
       if (!address || !connection) return
-      const [namespaceId] = await findNamespaceId(namespaceName)
-      const n = await tryGetNameForNamespace(connection, address, namespaceId)
+      const n = await tryGetNameForNamespace(connection, address, namespaceName)
       return n ? n[0] : undefined
     }
   )
@@ -31,23 +31,45 @@ export const useAddressName = (
 export async function tryGetNameForNamespace(
   connection: Connection,
   pubkey: PublicKey,
-  namespaceId: PublicKey
+  namespaceName: string
 ): Promise<string[] | undefined> {
   try {
-    const reverseEntry = await getReverseNameEntryForNamespace(
+    const [namespaceId] = await findNamespaceId(namespaceName)
+    const namespaceReverseEntry = await getReverseNameEntryForNamespace(
       connection,
       pubkey,
       namespaceId
     )
+      return [
+        formatName(
+          namespaceReverseEntry.parsed.namespaceName,
+          namespaceReverseEntry.parsed.entryName
+        ),
+        namespaceReverseEntry.parsed.namespaceName,
+      ]
+  } catch (e) {
+    'pass'
+  }
+
+  try {
+    const [namespaceId] = await findNamespaceId(namespaceName)
+    const globalReverseEntry = await getGlobalReverseNameEntry(
+      connection,
+      pubkey,
+    )
+      if (
+    globalReverseEntry.parsed &&
+    globalReverseEntry.parsed.namespaceName === namespaceName
+  ) {
     return [
       formatName(
-        reverseEntry.parsed.namespaceName,
-        reverseEntry.parsed.entryName
+        globalReverseEntry.parsed.namespaceName,
+        globalReverseEntry.parsed.entryName
       ),
-      reverseEntry.parsed.namespaceName,
+      globalReverseEntry.parsed.namespaceName,
     ]
-  } catch (e) {
-    console.log(e)
   }
+} catch(e){'pass'}
+
   return undefined
 }
