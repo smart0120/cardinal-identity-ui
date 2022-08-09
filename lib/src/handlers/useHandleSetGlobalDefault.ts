@@ -1,6 +1,10 @@
 import type { CertificateData } from '@cardinal/certificates'
 import type { AccountData } from '@cardinal/common'
-import { deprecated, withSetNamespaceReverseEntry } from '@cardinal/namespaces'
+import {
+  deprecated,
+  withSetGlobalReverseEntry,
+  withSetNamespaceReverseEntry,
+} from '@cardinal/namespaces'
 import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
 import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
@@ -20,7 +24,7 @@ export interface HandleSetParam {
   certificate?: AccountData<CertificateData> | null
 }
 
-export const useHandleSetDefault = (
+export const useHandleSetGlobalDefault = (
   connection: Connection,
   wallet: Wallet,
   namespaceName: string
@@ -34,25 +38,11 @@ export const useHandleSetDefault = (
         tokenData.metaplexData?.parsed.data.name || '',
         tokenData.metaplexData?.parsed.data.uri || ''
       )
-      if (tokenData.certificate) {
-        await deprecated.withSetReverseEntry(
-          connection,
-          wallet,
-          namespaceName,
-          entryName,
-          entryMint,
-          transaction
-        )
-      } else if (tokenData.tokenManager) {
-        await withSetNamespaceReverseEntry(
-          transaction,
-          connection,
-          wallet,
-          namespaceName,
-          entryName,
-          entryMint
-        )
-      }
+      await withSetGlobalReverseEntry(transaction, connection, wallet, {
+        namespaceName: namespaceName,
+        entryName: entryName,
+        mintId: entryMint,
+      })
       transaction.feePayer = wallet.publicKey
       transaction.recentBlockhash = (
         await connection.getRecentBlockhash('max')

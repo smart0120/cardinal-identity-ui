@@ -4,11 +4,10 @@ import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs
 import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, Connection, PublicKey } from '@solana/web3.js'
-import { Transaction } from '@solana/web3.js'
+import { sendAndConfirmRawTransaction, Transaction } from '@solana/web3.js'
 import { useMutation } from 'react-query'
 
 import { apiBase } from '../utils/constants'
-import { executeTransaction } from '../utils/transactions'
 
 export interface HandleSetParam {
   metaplexData?: {
@@ -22,8 +21,7 @@ export interface HandleSetParam {
 export const useHandleClaimTransaction = (
   connection: Connection,
   wallet: Wallet,
-  cluster: Cluster,
-  dev: boolean
+  cluster: Cluster
 ) => {
   return useMutation(
     [wallet.publicKey.toString()],
@@ -34,34 +32,40 @@ export const useHandleClaimTransaction = (
       tweetId?: string
       handle?: string
     }): Promise<string> => {
-      if (!handle || !tweetId) return ''
-      const response = await fetch(
-        `${apiBase(
-          dev
-        )}/namespaces/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=twitter${
-          cluster && `&cluster=${cluster}`
-        }`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            account: wallet.publicKey.toString(),
-          }),
-        }
-      )
-      const json = await response.json()
-      if (response.status !== 200 || json.error) throw new Error(json.error)
-      const { transaction } = json
-      const buffer = Buffer.from(decodeURIComponent(transaction), 'base64')
-      const tx = Transaction.from(buffer)
-      return executeTransaction(connection, wallet, tx, {
-        confirmOptions: {
-          commitment: 'confirmed',
-          maxRetries: 3,
-          skipPreflight: true,
-        },
-        notificationConfig: { message: 'Claimed handle successfully' },
+      const tx = await handleClaim(wallet, cluster, handle, tweetId)
+      if (!tx) return ''
+      await wallet.signTransaction!(tx)
+      return sendAndConfirmRawTransaction(connection, tx.serialize(), {
+        skipPreflight: true,
       })
     }
   )
+}
+
+export async function handleClaim(
+  wallet: Wallet,
+  cluster: Cluster,
+  handle: string | undefined,
+  tweetId: string | undefined
+): Promise<Transaction | null> {
+  if (!handle || !tweetId) return null
+  const response = await fetch(
+    `${apiBase(
+      cluster === 'devnet'
+    )}/namespaces/twitter/claim-v2?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=twitter${
+      cluster === 'devnet' ? `&cluster=${cluster}` : ''
+    }`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        account: wallet.publicKey.toString(),
+      }),
+    }
+  )
+  const json = await response.json()
+  if (response.status !== 200 || json.error) throw new Error(json.error)
+  const { transaction } = json
+  const buffer = Buffer.from(decodeURIComponent(transaction), 'base64')
+  return Transaction.from(buffer)
 }

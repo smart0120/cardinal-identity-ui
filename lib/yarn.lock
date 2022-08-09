@@ -1191,20 +1191,20 @@
     tiny-invariant "^1.2.0"
     tslib "^2.3.1"
 
-"@cardinal/namespaces@^4.1.35":
-  version "4.1.35"
-  resolved "https://registry.yarnpkg.com/@cardinal/namespaces/-/namespaces-4.1.35.tgz#10f6916d5236bf0fbaaac4dcca28e8f8f1d70ff0"
-  integrity sha512-CSPZKBiCFX5SeFusR//0wDt/qCPOxMGvSOp/uFZY4/5kL9Mu2yhbSGT9paly33ZU4JOuD+W5i5Aq5MnoNNlgyQ==
+"@cardinal/namespaces@^4.1.38":
+  version "4.1.38"
+  resolved "https://registry.yarnpkg.com/@cardinal/namespaces/-/namespaces-4.1.38.tgz#46e927727d8c43cf19f7d4e2a73839bd88281dd4"
+  integrity sha512-vaQWHQOCs6OQS3bQYCdWgGQQxLlGReSeYpex4FqQ40bJ0YmsK3KH24BAdzAkOl2qhT2rUcsGF6HGNBH2Q/pT3A==
   dependencies:
     "@cardinal/certificates" "^2.0.0"
     "@cardinal/common" "^2.0.1"
-    "@cardinal/token-manager" "^1.4.7"
+    "@cardinal/token-manager" "^1.5.6"
     "@metaplex-foundation/mpl-token-metadata" "^1.2.5"
 
-"@cardinal/token-manager@^1.4.7":
-  version "1.4.8"
-  resolved "https://registry.yarnpkg.com/@cardinal/token-manager/-/token-manager-1.4.8.tgz#dea6f47bfb55a105b519fa5a71b4d8337f5691b4"
-  integrity sha512-igOfTCd+kTYVAw69rEYGT9S4hUF8AEWzJuaFuOtLo1Nu1uSSVmtIxF331ch3XcqtiZaj9VTeey/NEQO92dQvGQ==
+"@cardinal/token-manager@^1.5.11", "@cardinal/token-manager@^1.5.6":
+  version "1.5.11"
+  resolved "https://registry.yarnpkg.com/@cardinal/token-manager/-/token-manager-1.5.11.tgz#1193b1e6e8e042502fb736697faa61c30ab09fba"
+  integrity sha512-7dtTBKukWqx+9TyLF5qcIK+o4QS8gxXwUbbk3M4TfCY55JKfBQsYSRAWKQjEPnvDps6VZrdmzVcNwszUmIDaig==
   dependencies:
     "@metaplex-foundation/mpl-token-metadata" "^1.2.3"
     "@solana/buffer-layout" "^4.0.0"
@@ -7808,11 +7808,6 @@ globby@^9.2.0:
     pify "^4.0.1"
     slash "^2.0.0"
 
-goober@^2.1.10:
-  version "2.1.10"
-  resolved "https://registry.yarnpkg.com/goober/-/goober-2.1.10.tgz#058def43ba1e3b06f973dbb372a4978aa42f1049"
-  integrity sha512-7PpuQMH10jaTWm33sQgBQvz45pHR8N4l3Cu3WMGEWmHShAcTuuP7I+5/DwKo39fwti5A80WAjvqgz6SSlgWmGA==
-
 good-listener@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/good-listener/-/good-listener-1.2.2.tgz#d53b30cdf9313dffb7dc9a0d477096aa6d145c50"
@@ -11267,13 +11262,6 @@ react-helmet-async@^1.0.2:
     prop-types "^15.7.2"
     react-fast-compare "^3.2.0"
     shallowequal "^1.1.0"
-
-react-hot-toast@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/react-hot-toast/-/react-hot-toast-2.3.0.tgz#70b3d183ac2a4afb6b17cda4a7f4cfe02e730415"
-  integrity sha512-/RxV+bfjld7tSJR1SCLzMAXgFuNW7fCpK6+vbYqfmbGSWcqTMz2rizrvfWKvtcPH5HK0NqxmBaC5SrAy1F42zA==
-  dependencies:
-    goober "^2.1.10"
 
 react-icons@^4.3.1:
   version "4.4.0"

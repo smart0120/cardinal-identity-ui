@@ -33,7 +33,8 @@
   "dependencies": {
     "@cardinal/certificates": "^2.0.1",
     "@cardinal/common": "^2.0.7",
-    "@cardinal/namespaces": "^4.1.35",
+    "@cardinal/namespaces": "^4.1.38",
+    "@cardinal/token-manager": "^1.5.11",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
     "@headlessui/react": "^1.6.1",
@@ -47,7 +48,6 @@
     "polished": "^4.1.3",
     "react-content-loader": "^6.1.0",
     "react-device-detect": "^2.1.2",
-    "react-hot-toast": "^2.3.0",
     "react-icons": "^4.3.1",
     "react-popper": "^2.3.0",
     "react-query": "^3.39.1",

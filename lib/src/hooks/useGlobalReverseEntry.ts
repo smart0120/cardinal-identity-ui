@@ -1,25 +1,22 @@
 import type { AccountData } from '@cardinal/common'
-import type { ReverseEntryData } from '@cardinal/namespaces'
-import { findNamespaceId, getReverseEntry } from '@cardinal/namespaces'
+import {
+  getGlobalReverseNameEntry,
+  ReverseEntryData,
+} from '@cardinal/namespaces'
 import type { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
 
-export const useReverseEntry = (
+export const useGlobalReverseEntry = (
   connection: Connection | undefined,
   namespaceName: string,
   pubkey: PublicKey | undefined
 ) => {
   return useQuery<AccountData<ReverseEntryData> | undefined>(
-    ['useReverseEntry', namespaceName, pubkey?.toString()],
+    ['useGlobalReverseEntry', namespaceName, pubkey?.toString()],
     async () => {
       if (!pubkey || !connection) return
-      const [namespaceId] = await findNamespaceId(namespaceName)
-      const reverseEntry = await getReverseEntry(
-        connection,
-        pubkey,
-        namespaceId
-      )
-      return reverseEntry || undefined
+      const reverseEntry = await getGlobalReverseNameEntry(connection, pubkey)
+    return reverseEntry || undefined
     },
     { refetchOnMount: false, refetchOnWindowFocus: false }
   )

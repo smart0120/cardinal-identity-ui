@@ -10,8 +10,8 @@ import { useHandleClaimTransaction } from '../handlers/useHandleClaimTransaction
 import { useHandleRevoke } from '../handlers/useHandleRevoke'
 import { useHandleVerify } from '../handlers/useHandleVerify'
 import { useClaimRequest } from '../hooks/useClaimRequest'
+import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
 import { useNameEntryData } from '../hooks/useNameEntryData'
-import { useReverseEntry } from '../hooks/useReverseEntry'
 import { TWITTER_NAMESPACE_NAME } from '../utils/constants'
 import { formatShortAddress, formatTwitterLink } from '../utils/format'
 import { ButtonWithFooter } from './ButtonWithFooter'
@@ -62,7 +62,7 @@ export const NameEntryClaim = ({
   const tweetId = tweetIdFromTweetUrl(tweetUrl)
   const [claimed, setClaimed] = useState(false)
 
-  const reverseEntry = useReverseEntry(
+  const reverseEntry = useGlobalReverseEntry(
     connection,
     namespaceName,
     wallet?.publicKey
@@ -84,8 +84,7 @@ export const NameEntryClaim = ({
   const handleClaimTransaction = useHandleClaimTransaction(
     connection,
     wallet,
-    cluster,
-    dev
+    cluster
   )
 
   useMemo(() => {

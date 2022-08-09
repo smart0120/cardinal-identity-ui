@@ -5,19 +5,23 @@ import type { Connection } from '@solana/web3.js'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 import { AiFillStar } from 'react-icons/ai'
+import { BsGlobe } from 'react-icons/bs'
 import { BiUnlink } from 'react-icons/bi'
 
 import { Alert } from '../common/Alert'
 import { ButtonLight } from '../common/Button'
 import { LoadingSpinner } from '../common/LoadingSpinner'
-import { useHandleSetDefault } from '../handlers/useHandleSetDefault'
+import { useHandleSetNamespaceDefault } from '../handlers/useHandleSetNamespaceDefault'
+import { useHandleSetGlobalDefault } from '../handlers/useHandleSetGlobalDefault'
 import { useHandleUnlink } from '../handlers/useHandleUnlink'
-import { useReverseEntry } from '../hooks/useReverseEntry'
+import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
+import { useNamespaceReverseEntry } from '../hooks/useNamespaceReverseEntry'
 import type { UserTokenData } from '../hooks/useUserNamesForNamespace'
 import { useUserNamesForNamespace } from '../hooks/useUserNamesForNamespace'
 import { formatTwitterLink } from '../utils/format'
 import { BoltIcon } from './icons'
 import { StepDetail } from './StepDetail'
+import { Tooltip } from '../common/Tooltip'
 
 export const nameFromMint = (name: string, uri: string): [string, string] => {
   if (uri.includes('name')) {
@@ -48,7 +52,12 @@ export const NameEntryRow = ({
     wallet.publicKey,
     namespaceName
   )
-  const reverseEntry = useReverseEntry(
+  const globalReverseEntry = useGlobalReverseEntry(
+    connection,
+    namespaceName,
+    wallet.publicKey
+  )
+  const namespaceReverseEntry = useNamespaceReverseEntry(
     connection,
     namespaceName,
     wallet.publicKey
@@ -59,16 +68,23 @@ export const NameEntryRow = ({
     namespaceName,
     userTokenData
   )
-  const handleSetDefault = useHandleSetDefault(
+  const handleSetNamespacesDefault = useHandleSetNamespaceDefault(
+    connection,
+    wallet,
+    namespaceName,
+    cluster
+  )
+  const handleSetGlobalDefault = useHandleSetGlobalDefault(
     connection,
     wallet,
     namespaceName
   )
+
   useEffect(() => {
-    if (handleUnlink.isLoading || handleSetDefault.isLoading) {
+    if (handleUnlink.isLoading || handleSetNamespacesDefault.isLoading) {
       setError(undefined)
     }
-  }, [handleUnlink.isLoading, handleSetDefault.isLoading])
+  }, [handleUnlink.isLoading, handleSetNamespacesDefault.isLoading])
   return (
     <div className="flex items-center justify-between gap-5 px-2">
       <div
@@ -81,8 +97,22 @@ export const NameEntryRow = ({
             userTokenData.metaplexData?.parsed.data.uri || ''
           )[1]
         )}
-        {reverseEntry.data &&
-          formatName(namespaceName, reverseEntry.data.parsed.entryName) ===
+        {globalReverseEntry.data &&
+          formatName(
+            namespaceName,
+            globalReverseEntry.data.parsed.entryName
+          ) ===
+            formatName(
+              ...nameFromMint(
+                userTokenData.metaplexData?.parsed.data.name || '',
+                userTokenData.metaplexData?.parsed.data.uri || ''
+              )
+            ) && <BsGlobe />}
+        {namespaceReverseEntry.data &&
+          formatName(
+            namespaceName,
+            namespaceReverseEntry.data.parsed.entryName
+          ) ===
             formatName(
               ...nameFromMint(
                 userTokenData.metaplexData?.parsed.data.name || '',
@@ -91,36 +121,184 @@ export const NameEntryRow = ({
             ) && <AiFillStar />}
       </div>
       <div className="flex items-center gap-2">
-        {(!reverseEntry.data ||
-          (reverseEntry.data &&
-            formatName(namespaceName, reverseEntry.data.parsed.entryName) !==
+        {!userTokenData.certificate &&
+          (!namespaceReverseEntry.data ||
+            (namespaceReverseEntry.data &&
               formatName(
-                ...nameFromMint(
-                  userTokenData.metaplexData?.parsed.data.name || '',
-                  userTokenData.metaplexData?.parsed.data.uri || ''
+                namespaceName,
+                namespaceReverseEntry.data.parsed.entryName
+              ) !==
+                formatName(
+                  ...nameFromMint(
+                    userTokenData.metaplexData?.parsed.data.name || '',
+                    userTokenData.metaplexData?.parsed.data.uri || ''
+                  )
+                ))) && (
+            <Tooltip title={'Set handle as you default twitter identity'}>
+              <ButtonLight
+                onClick={() => {
+                  // set default namespace reverse entry
+                  handleSetNamespacesDefault.mutate(
+                    {
+                      tokenData: userTokenData,
+                    },
+                    {
+                      onSuccess: (txid) => {
+                        userNamesForNamespace.remove()
+                        namespaceReverseEntry.refetch()
+                        globalReverseEntry.refetch()
+                        setSuccess(
+                          <div className="flex w-full flex-col text-center">
+                            <div>
+                              Succesfully set handle as default twitter
+                              identity.
+                            </div>
+                            <div>
+                              Changes will be reflected{' '}
+                              <a
+                                className="cursor-pointer text-blue-500"
+                                target={`_blank`}
+                                onClick={() =>
+                                  window.open(
+                                    `https://explorer.solana.com/tx/${txid}?cluster=${cluster}`
+                                  )
+                                }
+                                href={`https://explorer.solana.com/tx/${txid}?cluster=${cluster}`}
+                              >
+                                shortly.
+                              </a>
+                            </div>
+                          </div>
+                        )
+                      },
+                      onError: (e) => setError(e),
+                    }
+                  )
+                }}
+              >
+                {handleSetNamespacesDefault.isLoading ? (
+                  <LoadingSpinner height="15px" fill="#000" />
+                ) : (
+                  <AiFillStar />
+                )}
+              </ButtonLight>
+            </Tooltip>
+          )}
+        {userTokenData.certificate && (
+          <Tooltip title={'Set handle as you default twitter identity'}>
+            <ButtonLight
+              onClick={() =>
+                handleSetNamespacesDefault.mutate(
+                  {
+                    tokenData: userTokenData,
+                  },
+                  {
+                    onSuccess: (txid) => {
+                      userNamesForNamespace.remove()
+                      namespaceReverseEntry.refetch()
+                      setSuccess(
+                        <div className="flex w-full flex-col text-center">
+                          <div>
+                            Succesfully updated handle to new identity version.
+                          </div>
+                          <div>
+                            Changes will be reflected{' '}
+                            <a
+                              className="cursor-pointer text-blue-500"
+                              target={`_blank`}
+                              onClick={() =>
+                                window.open(
+                                  `https://explorer.solana.com/tx/${txid}?cluster=${cluster}`
+                                )
+                              }
+                              href={`https://explorer.solana.com/tx/${txid}?cluster=${cluster}`}
+                            >
+                              shortly.
+                            </a>
+                          </div>
+                        </div>
+                      )
+                    },
+                    onError: (e) => setError(e),
+                  }
                 )
-              ))) && (
+              }
+            >
+              {handleSetNamespacesDefault.isLoading ? (
+                <LoadingSpinner height="15px" fill="#000" />
+              ) : (
+                <AiFillStar />
+              )}
+            </ButtonLight>
+          </Tooltip>
+        )}
+        <Tooltip title={'Unlink Handle'}>
           <ButtonLight
-            onClick={() =>
-              handleSetDefault.mutate(
+            className="flex items-center gap-1"
+            onClick={async () =>
+              handleUnlink.mutate(
                 {
-                  tokenData: userTokenData,
+                  globalReverseNameEntryData:
+                    globalReverseEntry.data &&
+                    formatName(
+                      namespaceName,
+                      globalReverseEntry.data.parsed.entryName
+                    ) ===
+                      formatName(
+                        ...nameFromMint(
+                          userTokenData.metaplexData?.parsed.data.name || '',
+                          userTokenData.metaplexData?.parsed.data.uri || ''
+                        )
+                      )
+                      ? globalReverseEntry.data
+                      : undefined,
+                  namespaceReverseEntry:
+                    namespaceReverseEntry.data &&
+                    formatName(
+                      namespaceName,
+                      namespaceReverseEntry.data.parsed.entryName
+                    ) ===
+                      formatName(
+                        ...nameFromMint(
+                          userTokenData.metaplexData?.parsed.data.name || '',
+                          userTokenData.metaplexData?.parsed.data.uri || ''
+                        )
+                      )
+                      ? namespaceReverseEntry.data
+                      : undefined,
                 },
                 {
                   onSuccess: (txid) => {
                     userNamesForNamespace.remove()
-                    reverseEntry.refetch()
+                    globalReverseEntry.refetch()
                     setSuccess(
-                      <div>
-                        Succesfully set default with{' '}
-                        <a
-                          className="cursor-pointer text-blue-500"
-                          target={`_blank`}
-                          href={`https://explorer.solana.com/tx/${txid}?cluster=${cluster}`}
-                        >
-                          transaction
-                        </a>
-                        . Changes will be reflected shortly.
+                      <div className="flex w-full flex-col text-center">
+                        <div>
+                          Succesfully unlinked{' '}
+                          {formatTwitterLink(
+                            nameFromMint(
+                              userTokenData.metaplexData?.parsed.data.name ||
+                                '',
+                              userTokenData.metaplexData?.parsed.data.uri || ''
+                            )[1]
+                          )}
+                          .
+                        </div>
+                        <div>
+                          Changes will be reflected{' '}
+                          <a
+                            className="cursor-pointer text-blue-500"
+                            target={`_blank`}
+                            onClick={() =>
+                              window.open(
+                                `https://explorer.solana.com/tx/${txid}?cluster=${cluster}`
+                              )
+                            }
+                            href={`https://explorer.solana.com/tx/${txid}?cluster=${cluster}`}
+                          >
+                            shortly.
+                          </a>
+                        </div>
                       </div>
                     )
                   },
@@ -129,71 +307,15 @@ export const NameEntryRow = ({
               )
             }
           >
-            {handleSetDefault.isLoading ? (
+            {handleUnlink.isLoading ? (
               <LoadingSpinner height="15px" fill="#000" />
             ) : (
-              <>Set Default</>
+              <>
+                <BiUnlink />
+              </>
             )}
           </ButtonLight>
-        )}
-        <ButtonLight
-          className="flex items-center gap-1"
-          onClick={async () =>
-            handleUnlink.mutate(
-              {
-                reverseNameEntryData:
-                  reverseEntry.data &&
-                  formatName(
-                    namespaceName,
-                    reverseEntry.data.parsed.entryName
-                  ) ===
-                    formatName(
-                      ...nameFromMint(
-                        userTokenData.metaplexData?.parsed.data.name || '',
-                        userTokenData.metaplexData?.parsed.data.uri || ''
-                      )
-                    )
-                    ? reverseEntry.data
-                    : undefined,
-              },
-              {
-                onSuccess: (txid) => {
-                  userNamesForNamespace.remove()
-                  reverseEntry.refetch()
-                  setSuccess(
-                    <div>
-                      Succesfully unlinked{' '}
-                      {formatTwitterLink(
-                        nameFromMint(
-                          userTokenData.metaplexData?.parsed.data.name || '',
-                          userTokenData.metaplexData?.parsed.data.uri || ''
-                        )[1]
-                      )}
-                      . Changes will be reflected shortly.{' '}
-                      <a
-                        className="cursor-pointer text-blue-500"
-                        target={`_blank`}
-                        href={`https://explorer.solana.com/tx/${txid}?cluster=${cluster}`}
-                      >
-                        transaction
-                      </a>
-                    </div>
-                  )
-                },
-                onError: (e) => setError(e),
-              }
-            )
-          }
-        >
-          {handleUnlink.isLoading ? (
-            <LoadingSpinner height="15px" fill="#000" />
-          ) : (
-            <>
-              <BiUnlink />
-              Unlink
-            </>
-          )}
-        </ButtonLight>
+        </Tooltip>
       </div>
     </div>
   )
@@ -203,15 +325,22 @@ export const NameManager = ({
   connection,
   wallet,
   namespaceName,
+  cluster,
 }: {
-  cluster?: string
   connection: Connection
   wallet: Wallet
   namespaceName: string
+  cluster?: string
 }) => {
   const [error, setError] = useState<unknown>()
   const [success, setSuccess] = useState<ReactElement>()
-  const handleSetDefault = useHandleSetDefault(
+  const handleSetNamespacesDefault = useHandleSetNamespaceDefault(
+    connection,
+    wallet,
+    namespaceName,
+    cluster
+  )
+  const handleSetGlobalDefault = useHandleSetGlobalDefault(
     connection,
     wallet,
     namespaceName
@@ -221,11 +350,17 @@ export const NameManager = ({
     wallet.publicKey,
     namespaceName
   )
-  const reverseEntry = useReverseEntry(
+  const globalReverseEntry = useGlobalReverseEntry(
     connection,
     namespaceName,
     wallet.publicKey
   )
+  const namespcaeReverseEntry = useNamespaceReverseEntry(
+    connection,
+    namespaceName,
+    wallet.publicKey
+  )
+
   return (
     <div className="mb-10 flex flex-col gap-2">
       <StepDetail
@@ -234,7 +369,9 @@ export const NameManager = ({
         description={<></>}
       />
       <div className="my-1 h-[1px] bg-gray-200"></div>
-      {!userNamesForNamespace.isFetched || !reverseEntry.isFetched ? (
+      {!userNamesForNamespace.isFetched ||
+      !globalReverseEntry.isFetched ||
+      !namespcaeReverseEntry.isFetched ? (
         <>
           <div className="h-8 w-full animate-pulse rounded-lg bg-gray-200"></div>
           <div className="h-8 w-full animate-pulse rounded-lg bg-gray-200"></div>
@@ -245,14 +382,28 @@ export const NameManager = ({
         <>
           {userNamesForNamespace.data
             ?.sort((userTokenData) =>
-              reverseEntry.data &&
-              formatName(namespaceName, reverseEntry.data.parsed.entryName) ===
+              (globalReverseEntry.data &&
                 formatName(
-                  ...nameFromMint(
-                    userTokenData.metaplexData?.parsed.data.name || '',
-                    userTokenData.metaplexData?.parsed.data.uri || ''
-                  )
-                )
+                  namespaceName,
+                  globalReverseEntry.data.parsed.entryName
+                ) ===
+                  formatName(
+                    ...nameFromMint(
+                      userTokenData.metaplexData?.parsed.data.name || '',
+                      userTokenData.metaplexData?.parsed.data.uri || ''
+                    )
+                  )) ||
+              (namespcaeReverseEntry.data &&
+                formatName(
+                  namespaceName,
+                  namespcaeReverseEntry.data.parsed.entryName
+                ) ===
+                  formatName(
+                    ...nameFromMint(
+                      userTokenData.metaplexData?.parsed.data.name || '',
+                      userTokenData.metaplexData?.parsed.data.uri || ''
+                    )
+                  ))
                 ? -1
                 : 1
             )
@@ -265,9 +416,10 @@ export const NameManager = ({
                 userTokenData={userTokenData}
                 setError={setError}
                 setSuccess={setSuccess}
+                cluster={cluster}
               />
             ))}
-          {handleSetDefault.error && (
+          {handleSetNamespacesDefault.error && (
             <Alert
               style={{
                 marginTop: '10px',
@@ -276,7 +428,23 @@ export const NameManager = ({
               }}
               message={
                 <>
-                  <div>{`${handleSetDefault.error}`}</div>
+                  <div>{`${handleSetNamespacesDefault.error}`}</div>
+                </>
+              }
+              type="error"
+              showIcon
+            />
+          )}
+          {handleSetGlobalDefault.error && (
+            <Alert
+              style={{
+                marginTop: '10px',
+                height: 'auto',
+                wordBreak: 'break-word',
+              }}
+              message={
+                <>
+                  <div>{`${handleSetGlobalDefault.error}`}</div>
                 </>
               }
               type="error"
