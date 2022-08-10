@@ -7,7 +7,7 @@ import {
 import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
 import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
-import { Connection, Keypair } from '@solana/web3.js'
+import { Connection } from '@solana/web3.js'
 import {
   PublicKey,
   sendAndConfirmRawTransaction,

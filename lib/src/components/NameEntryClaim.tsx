@@ -6,6 +6,7 @@ import { useMemo, useState } from 'react'
 import { Alert } from '../common/Alert'
 import { ButtonLight } from '../common/Button'
 import { LoadingSpinner } from '../common/LoadingSpinner'
+import { useHandleMigrate } from '../handlers/handleMigrate'
 import { useHandleClaimTransaction } from '../handlers/useHandleClaimTransaction'
 import { useHandleRevoke } from '../handlers/useHandleRevoke'
 import { useHandleVerify } from '../handlers/useHandleVerify'
@@ -20,6 +21,7 @@ import { LabeledInput } from './LabeledInput'
 import { PostTweet } from './PostTweet'
 import { StepDetail } from './StepDetail'
 import { TwitterHandleNFT } from './TwitterHandleNFT'
+import { MasterEdition } from '@metaplex-foundation/mpl-token-metadata'
 
 const handleFromTweetUrl = (raw: string | undefined): string | undefined => {
   if (!raw) return undefined
@@ -86,6 +88,7 @@ export const NameEntryClaim = ({
     wallet,
     cluster
   )
+  const handleMigrate = useHandleMigrate(connection, wallet, cluster)
 
   useMemo(() => {
     if (tweetUrl && tweetSent && !claimRequest?.data?.parsed?.isApproved) {
@@ -320,9 +323,24 @@ export const NameEntryClaim = ({
             showIcon
           />
         )}
+        {handleMigrate.error && (
+          <Alert
+            style={{
+              height: 'auto',
+              wordBreak: 'break-word',
+            }}
+            message={
+              <>
+                <div>{`${handleMigrate.error}`}</div>
+              </>
+            }
+            type="error"
+            showIcon
+          />
+        )}
       </DetailsWrapper>
       <ButtonWithFooter
-        loading={handleClaimTransaction.isLoading}
+        loading={handleClaimTransaction.isLoading || handleMigrate.isLoading}
         complete={claimed}
         disabled={
           !handleVerify.isSuccess ||
@@ -330,21 +348,48 @@ export const NameEntryClaim = ({
           !nameEntryData.isFetched ||
           (alreadyOwned && !claimRequest.data?.parsed.isApproved)
         }
-        onClick={() =>
-          handleClaimTransaction.mutate(
-            {
-              tweetId,
-              handle,
-            },
-            {
-              onSuccess: () => {
-                nameEntryData.remove()
-                reverseEntry.remove()
-                onComplete && onComplete(handle || '')
-              },
+        onClick={async () => {
+          let isMasterEdition = true
+          if (nameEntryData.data?.nameEntry.parsed) {
+            const masterEditionId = await MasterEdition.getPDA(
+              nameEntryData.data?.nameEntry.parsed.mint
+            )
+            try {
+              await MasterEdition.getInfo(connection, masterEditionId)
+            } catch (e) {
+              isMasterEdition = false
             }
-          )
-        }
+          }
+          if (!isMasterEdition) {
+            console.log('Certificate found, migrating...')
+            handleMigrate.mutate(
+              {
+                handle,
+              },
+              {
+                onSuccess: () => {
+                  nameEntryData.remove()
+                  reverseEntry.remove()
+                  onComplete && onComplete(handle || '')
+                },
+              }
+            )
+          } else {
+            handleClaimTransaction.mutate(
+              {
+                tweetId,
+                handle,
+              },
+              {
+                onSuccess: () => {
+                  nameEntryData.remove()
+                  reverseEntry.remove()
+                  onComplete && onComplete(handle || '')
+                },
+              }
+            )
+          }
+        }}
       >
         Claim {handle && `@${handle}`}
       </ButtonWithFooter>

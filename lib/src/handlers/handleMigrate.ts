@@ -1,7 +1,53 @@
 import type { Wallet } from '@saberhq/solana-contrib'
-import { PublicKey, Transaction } from '@solana/web3.js'
+import {
+  Cluster,
+  Connection,
+  PublicKey,
+  sendAndConfirmRawTransaction,
+  Transaction,
+} from '@solana/web3.js'
+import { useMutation } from 'react-query'
 
 import { apiBase } from '../utils/constants'
+
+export const useHandleMigrate = (
+  connection: Connection,
+  wallet: Wallet,
+  cluster: Cluster
+) => {
+  return useMutation(
+    [wallet.publicKey.toString()],
+    async ({ handle }: { handle?: string }): Promise<string | undefined> => {
+      if (!handle) return undefined
+      const response = await handleMigrate(wallet, handle, cluster)
+      const transactions = response?.transactions
+      if (!transactions) return ''
+
+      for (const tx of transactions) {
+        tx.feePayer = wallet.publicKey
+        tx.recentBlockhash = (
+          await connection.getRecentBlockhash('max')
+        ).blockhash
+      }
+      await wallet.signAllTransactions(transactions)
+      let txId = ''
+      for (let i = 0; i < transactions.length; i++) {
+        const tx = transactions[i]!
+        const id = await sendAndConfirmRawTransaction(
+          connection,
+          tx.serialize(),
+          {
+            skipPreflight: true,
+          }
+        )
+        if (i === 0) {
+          txId = id
+        }
+      }
+      return txId
+    }
+  )
+}
 
 export const handleMigrate = async (
   wallet: Wallet,
