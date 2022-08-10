@@ -22,6 +22,8 @@ import { StepDetail } from './StepDetail'
 import { TwitterHandleNFT } from './TwitterHandleNFT'
 import { MasterEdition } from '@metaplex-foundation/mpl-token-metadata'
 import { useHandleSetNamespaceDefault } from '../handlers/useHandleSetNamespaceDefault'
+import { notify } from '../common/Notification'
+import { handleError } from '../utils/errors'
 
 const handleFromTweetUrl = (raw: string | undefined): string | undefined => {
   if (!raw) return undefined
@@ -43,7 +45,6 @@ export const NameEntryClaim = ({
   appName,
   appTwitter,
   setShowManage,
-  notify,
   onComplete,
 }: {
   dev?: boolean
@@ -55,7 +56,6 @@ export const NameEntryClaim = ({
   appName?: string
   appTwitter?: string
   setShowManage: (m: boolean) => void
-  notify?: (arg: { message?: string; txid?: string }) => void
   onComplete?: (arg0: string) => void
 }) => {
   const [tweetSent, setTweetSent] = useState(false)
@@ -102,6 +102,11 @@ export const NameEntryClaim = ({
         { tweetId, handle },
         {
           onSuccess: () => claimRequest?.refetch(),
+          onError: (e) =>
+            notify({
+              message: `Failed Transaction`,
+              description: e as string,
+            }),
         }
       )
     }
@@ -269,12 +274,18 @@ export const NameEntryClaim = ({
                                       { tweetId, handle },
                                       {
                                         onSuccess: () => {
-                                          notify &&
-                                            notify({
-                                              message: 'Revoke successful',
-                                            })
+                                          notify({
+                                            message: 'Revoke successful',
+                                          })
                                           nameEntryData.refetch()
                                           claimRequest.refetch()
+                                        },
+                                        onError: (e) => {
+                                          console.log('here', e)
+                                          notify({
+                                            message: `Failed Transaction`,
+                                            description: e as string,
+                                          })
                                         },
                                       }
                                     )
@@ -298,7 +309,9 @@ export const NameEntryClaim = ({
                               }}
                               message={
                                 <>
-                                  <div>{`${handleRevoke.error}`}</div>
+                                  <div>{`${handleError(
+                                    handleRevoke.error
+                                  )}`}</div>
                                 </>
                               }
                               type="error"
@@ -380,6 +393,11 @@ export const NameEntryClaim = ({
                   reverseEntry.remove()
                   onComplete && onComplete(handle || '')
                 },
+                onError: (e) =>
+                  notify({
+                    message: `Failed Transaction`,
+                    description: e as string,
+                  }),
               }
             )
           } else {
@@ -394,6 +412,11 @@ export const NameEntryClaim = ({
                   reverseEntry.remove()
                   onComplete && onComplete(handle || '')
                 },
+                onError: (e) =>
+                  notify({
+                    message: `Failed Transaction`,
+                    description: e as string,
+                  }),
               }
             )
           }

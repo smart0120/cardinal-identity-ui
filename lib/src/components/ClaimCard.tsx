@@ -21,7 +21,6 @@ export type ClaimCardProps = {
   appTwitter?: string
   namespaceName?: string
   showManage?: boolean
-  notify?: (arg: { message?: string; txid?: string }) => void
   onComplete?: (arg: string) => void
 }
 
@@ -33,7 +32,6 @@ export const ClaimCard = ({
   connection,
   secondaryConnection,
   wallet,
-  notify,
   onComplete,
   showManage: showManageDefault,
   namespaceName = TWITTER_NAMESPACE_NAME,
@@ -109,7 +107,6 @@ export const ClaimCard = ({
                 appName={appName}
                 appTwitter={appTwitter}
                 setShowManage={setShowManage}
-                notify={notify}
                 onComplete={onComplete}
               />
             ))}

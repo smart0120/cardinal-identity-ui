@@ -9,6 +9,7 @@ import {
 import { useMutation } from 'react-query'
 
 import { apiBase } from '../utils/constants'
+import { handleError } from '../utils/errors'
 
 export const useHandleMigrate = (
   connection: Connection,
@@ -33,15 +34,20 @@ export const useHandleMigrate = (
       let txId = ''
       for (let i = 0; i < transactions.length; i++) {
         const tx = transactions[i]!
-        const id = await sendAndConfirmRawTransaction(
-          connection,
-          tx.serialize(),
-          {
-            skipPreflight: true,
+        try {
+          const id = await sendAndConfirmRawTransaction(
+            connection,
+            tx.serialize(),
+            {
+              skipPreflight: true,
+            }
+          )
+          if (i === 0) {
+            txId = id
           }
-        )
-        if (i === 0) {
-          txId = id
+        } catch (e) {
+          const errorMessage = handleError(e, `${e}`)
+          throw new Error(errorMessage)
         }
       }
       return txId

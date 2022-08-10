@@ -23,6 +23,7 @@ import { BoltIcon } from './icons'
 import { StepDetail } from './StepDetail'
 import { Tooltip } from '../common/Tooltip'
 import { useAddressName } from '../hooks/useAddressName'
+import { notify } from '../common/Notification'
 
 export const nameFromMint = (name: string, uri: string): [string, string] => {
   if (uri.includes('name')) {
@@ -175,7 +176,11 @@ export const NameEntryRow = ({
                           </div>
                         )
                       },
-                      onError: (e) => setError(e),
+                      onError: (e) =>
+                        notify({
+                          message: `Failed Transaction`,
+                          description: e as string,
+                        }),
                     }
                   )
                 }}
@@ -223,7 +228,11 @@ export const NameEntryRow = ({
                         </div>
                       )
                     },
-                    onError: (e) => setError(e),
+                    onError: (e) =>
+                      notify({
+                        message: `Failed Transaction`,
+                        description: e as string,
+                      }),
                   }
                 )
               }
@@ -307,7 +316,11 @@ export const NameEntryRow = ({
                       </div>
                     )
                   },
-                  onError: (e) => setError(e),
+                  onError: (e) =>
+                    notify({
+                      message: `Failed Transaction`,
+                      description: e as string,
+                    }),
                 }
               )
             }

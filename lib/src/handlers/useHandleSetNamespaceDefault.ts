@@ -17,6 +17,7 @@ import { useMutation } from 'react-query'
 
 import { nameFromMint } from '../components/NameManager'
 import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
+import { handleError } from '../utils/errors'
 import { handleMigrate } from './handleMigrate'
 
 export interface HandleSetParam {
@@ -92,15 +93,21 @@ export const useHandleSetNamespaceDefault = (
       await wallet.signAllTransactions(transactions)
       for (let i = 0; i < transactions.length; i++) {
         const tx = transactions[i]!
-        const id = await sendAndConfirmRawTransaction(
-          connection,
-          tx.serialize(),
-          {
-            skipPreflight: true,
+        let txId = ''
+        try {
+          const id = await sendAndConfirmRawTransaction(
+            connection,
+            tx.serialize(),
+            {
+              skipPreflight: true,
+            }
+          )
+          if (i === transactions.length - 1) {
+            txId = id
           }
-        )
-        if (i === transactions.length - 1) {
-          txId = id
+        } catch (e) {
+          const errorMessage = handleError(e, `${e}`)
+          throw new Error(errorMessage)
         }
       }
       return txId
