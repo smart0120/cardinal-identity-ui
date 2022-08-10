@@ -22,6 +22,7 @@ import { PostTweet } from './PostTweet'
 import { StepDetail } from './StepDetail'
 import { TwitterHandleNFT } from './TwitterHandleNFT'
 import { MasterEdition } from '@metaplex-foundation/mpl-token-metadata'
+import { useHandleSetNamespaceDefault } from '../handlers/useHandleSetNamespaceDefault'
 
 const handleFromTweetUrl = (raw: string | undefined): string | undefined => {
   if (!raw) return undefined
@@ -88,7 +89,13 @@ export const NameEntryClaim = ({
     wallet,
     cluster
   )
-  const handleMigrate = useHandleMigrate(connection, wallet, cluster)
+
+  const hndleSetNamespaceDefault = useHandleSetNamespaceDefault(
+    connection,
+    wallet,
+    namespaceName,
+    cluster
+  )
 
   useMemo(() => {
     if (tweetUrl && tweetSent && !claimRequest?.data?.parsed?.isApproved) {
@@ -323,7 +330,7 @@ export const NameEntryClaim = ({
             showIcon
           />
         )}
-        {handleMigrate.error && (
+        {hndleSetNamespaceDefault.error && (
           <Alert
             style={{
               height: 'auto',
@@ -331,7 +338,7 @@ export const NameEntryClaim = ({
             }}
             message={
               <>
-                <div>{`${handleMigrate.error}`}</div>
+                <div>{`${hndleSetNamespaceDefault.error}`}</div>
               </>
             }
             type="error"
@@ -340,7 +347,9 @@ export const NameEntryClaim = ({
         )}
       </DetailsWrapper>
       <ButtonWithFooter
-        loading={handleClaimTransaction.isLoading || handleMigrate.isLoading}
+        loading={
+          handleClaimTransaction.isLoading || hndleSetNamespaceDefault.isLoading
+        }
         complete={claimed}
         disabled={
           !handleVerify.isSuccess ||
@@ -361,10 +370,10 @@ export const NameEntryClaim = ({
             }
           }
           if (!isMasterEdition) {
-            console.log('Certificate found, migrating...')
-            handleMigrate.mutate(
+            hndleSetNamespaceDefault.mutate(
               {
-                handle,
+                tokenData: { metaplexData: nameEntryData.data?.metaplexData },
+                forceMigrate: true,
               },
               {
                 onSuccess: () => {

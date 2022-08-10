@@ -38,7 +38,13 @@ export const useHandleSetNamespaceDefault = (
   )
 
   return useMutation(
-    async ({ tokenData }: { tokenData?: HandleSetParam }): Promise<string> => {
+    async ({
+      tokenData,
+      forceMigrate,
+    }: {
+      tokenData?: HandleSetParam
+      forceMigrate?: boolean
+    }): Promise<string> => {
       if (!tokenData) return ''
       let newMintId: PublicKey | undefined
       let transactions: Transaction[] = []
@@ -48,7 +54,7 @@ export const useHandleSetNamespaceDefault = (
         tokenData.metaplexData?.parsed.data.uri || ''
       )
 
-      if (tokenData.certificate) {
+      if (tokenData.certificate || forceMigrate) {
         console.log('Type certificate, migrating ...')
         const response = await handleMigrate(wallet, entryName, cluster)
         newMintId = response?.mintId

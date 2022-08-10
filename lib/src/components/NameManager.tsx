@@ -22,6 +22,7 @@ import { formatTwitterLink } from '../utils/format'
 import { BoltIcon } from './icons'
 import { StepDetail } from './StepDetail'
 import { Tooltip } from '../common/Tooltip'
+import { useAddressName } from '../hooks/useAddressName'
 
 export const nameFromMint = (name: string, uri: string): [string, string] => {
   if (uri.includes('name')) {
@@ -62,6 +63,13 @@ export const NameEntryRow = ({
     namespaceName,
     wallet.publicKey
   )
+
+  const addressName = useAddressName(
+    connection,
+    wallet.publicKey,
+    namespaceName
+  )
+
   const handleUnlink = useHandleUnlink(
     connection,
     wallet,
@@ -73,11 +81,6 @@ export const NameEntryRow = ({
     wallet,
     namespaceName,
     cluster
-  )
-  const handleSetGlobalDefault = useHandleSetGlobalDefault(
-    connection,
-    wallet,
-    namespaceName
   )
 
   useEffect(() => {
@@ -147,6 +150,7 @@ export const NameEntryRow = ({
                         userNamesForNamespace.remove()
                         namespaceReverseEntry.refetch()
                         globalReverseEntry.refetch()
+                        addressName.refetch()
                         setSuccess(
                           <div className="flex w-full flex-col text-center">
                             <div>
@@ -271,6 +275,7 @@ export const NameEntryRow = ({
                   onSuccess: (txid) => {
                     userNamesForNamespace.remove()
                     globalReverseEntry.refetch()
+                    addressName.refetch()
                     setSuccess(
                       <div className="flex w-full flex-col text-center">
                         <div>
