@@ -43,6 +43,7 @@ export const AccountConnect = ({
           dark={dark}
           connection={connection}
           address={wallet.publicKey}
+          dev={environment === 'devnet'}
         />
         <BiChevronDown className="h-10 text-[25px] hover:scale-105" />
       </div>

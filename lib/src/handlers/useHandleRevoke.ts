@@ -22,7 +22,6 @@ export interface HandleSetParam {
 export const useHandleRevoke = (
   wallet: Wallet,
   cluster: Cluster,
-  dev: boolean,
   accessToken: string,
   handle: string,
   namespace: string
@@ -39,13 +38,13 @@ export const useHandleRevoke = (
       if (namespace === 'twitter') {
         const tweetId = tweetIdFromUrl(verificationUrl)
         requestURL = `${apiBase(
-          dev
+          cluster === 'devnet'
         )}/namespaces/twitter/revoke?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
           cluster && `&cluster=${cluster}`
         }`
       } else if (namespace === 'discord') {
         requestURL = `${apiBase(
-          dev
+          cluster === 'devnet'
         )}/namespaces/twitter/revoke?publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}&accessToken=${accessToken}${
           cluster && `&cluster=${cluster}`
         }`

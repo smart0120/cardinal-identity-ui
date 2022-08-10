@@ -13,6 +13,7 @@ export const ProfileSmall = ({
   placeholder,
   className,
   style,
+  dev,
 }: {
   /** Solana RPC Connection to load this profile  */
   connection: Connection
@@ -28,6 +29,8 @@ export const ProfileSmall = ({
   className?: string
   /** Optional style prop to add to the profile div */
   style?: React.CSSProperties
+  /** Optional dev environemnt */
+  dev?: boolean
 }) => {
   return (
     <div
@@ -38,6 +41,7 @@ export const ProfileSmall = ({
       <AddressImage
         connection={connection}
         address={address || undefined}
+        dev={dev}
         height="40px"
         width="40px"
         dark={dark}

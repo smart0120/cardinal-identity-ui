@@ -8,6 +8,7 @@ export const AddressImage = ({
   connection,
   address,
   style,
+  dev = false,
   height = '150px',
   width = '150px',
   dark = false,
@@ -15,16 +16,17 @@ export const AddressImage = ({
 }: {
   connection: Connection
   address: PublicKey | undefined
+  dev?: boolean
   height?: string
   width?: string
   dark?: boolean
   placeholder?: React.ReactNode
   style?: React.CSSProperties
 }) => {
-  const { addressImage, loadingImage } = useAddressImage(connection, address)
+  const addressImage = useAddressImage(connection, address, dev)
 
   if (!address) return <></>
-  return loadingImage ? (
+  return addressImage.isLoading ? (
     <div
       style={{
         ...style,
@@ -48,7 +50,7 @@ export const AddressImage = ({
         />
       </ContentLoader>
     </div>
-  ) : addressImage ? (
+  ) : addressImage.data ? (
     <img
       style={{
         ...style,
@@ -57,7 +59,7 @@ export const AddressImage = ({
         borderRadius: '50%',
       }}
       alt={`profile-${address.toString()}`}
-      src={addressImage}
+      src={addressImage.data}
     ></img>
   ) : (
     <>{placeholder}</> || (

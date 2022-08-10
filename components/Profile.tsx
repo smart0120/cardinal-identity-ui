@@ -6,13 +6,12 @@ import { Connection } from '@solana/web3.js'
 import { notify } from 'common/Notification'
 import {
   ConnectButton,
-  formatShortAddress,
   formatIdentityLink,
+  formatShortAddress,
   useAddressImage,
   useAddressName,
   useWalletIdentity,
 } from 'lib/src'
-import { useRouter } from 'next/router'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
 import { FaShare, FaUserAlt } from 'react-icons/fa'
 
@@ -32,20 +31,16 @@ const ShareIcon = styled.div`
 `
 
 export const Profile: React.FC<Props> = ({ address }: Props) => {
-  const { query } = useRouter()
   const { linkingFlow, show } = useWalletIdentity()
   const wallet = useWallet()
   const { connection, environment } = useEnvironmentCtx()
-  const dev = query['dev'] === 'true'
   const addressStr = address.toString()
-  const { displayName, loadingName, refreshName } = useAddressName(
-    connection,
-    address
-  )
-  const { addressImage, loadingImage, addressNamespaceName } = useAddressImage(
+  const addressName = useAddressName(connection, address, linkingFlow.name)
+  const addressImage = useAddressImage(
     connection,
     address,
-    dev
+    linkingFlow.name,
+    environment.label === 'devnet'
   )
 
   return (
@@ -55,36 +50,16 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
         borderRadius: '1rem',
         // boxShadow: '0 0 80px 50px rgba(255, 255, 255, 0.3)',
         boxShadow: '0 4px 34px rgb(0 0 0 / 30%)',
-        background: linkingFlow.colors.secondary,
+        background: '#FFF',
       }}
     >
       <div style={{ marginBottom: '30px' }}>
-        {loadingName ? (
+        {addressName.isFetching ? (
           <Alert message={'Loading'} type="warning" />
-        ) : displayName ? (
-          <Alert
-            message={
-              linkingFlow.name === 'default'
-                ? `Default identity set ${
-                    addressNamespaceName
-                      ? 'to ' +
-                        addressNamespaceName[0]!.toUpperCase() +
-                        addressNamespaceName.substring(1)
-                      : ''
-                  }`
-                : `Succesfully linked ${linkingFlow.displayName || ''}`
-            }
-            type="success"
-          />
+        ) : addressName.data ? (
+          <Alert message={'Succesfully linked Twitter'} type="success" />
         ) : (
-          <Alert
-            message={
-              linkingFlow.name === 'default'
-                ? 'No global identity set'
-                : `${linkingFlow.displayName} not linked`
-            }
-            type="warning"
-          />
+          <Alert message={'Twitter not linked'} type="warning" />
         )}
       </div>
       <div
@@ -95,25 +70,20 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           alignItems: 'center',
         }}
       >
-        {loadingImage ? (
+        {addressImage.isFetching ? (
           <div
-            style={{
-              height: '156px',
-              width: '156px',
-              borderRadius: '50%',
-              background: linkingFlow.colors.buttonColor,
-            }}
-            className="animate-pulse"
-          ></div>
-        ) : addressImage ? (
+            className="animate-pulse bg-gray-200"
+            style={{ height: '156px', width: '156px', borderRadius: '50%' }}
+          />
+        ) : addressImage.data ? (
           <div
             style={{
               position: 'relative',
               height: '156px',
               width: '156px',
               borderRadius: '50%',
-              background: linkingFlow.colors.primary,
-              backgroundImage: linkingFlow.colors.primary,
+              background: '#fff',
+              backgroundImage: 'linear-gradient(84.06deg, #23a6d5, #1da1f2)',
               boxShadow: '0 5px 10px 0 rgb(97 83 202 / 30%)',
               padding: '5px',
               display: 'flex',
@@ -129,7 +99,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
                 border: '4px solid white',
               }}
               alt={`profile-${addressStr}`}
-              src={addressImage}
+              src={addressImage.data}
             ></img>
             <ShareIcon
               onClick={() => {
@@ -183,37 +153,24 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           }}
         >
           <span style={{ fontSize: '16px' }}>
-            {loadingName ? (
+            {addressName.isFetching ? (
               <div
-                className="animate-pulse rounded-md"
-                style={{
-                  height: '24px',
-                  width: '120px',
-                  background: linkingFlow.colors.buttonColor,
-                }}
-              ></div>
+                style={{ height: '24px', width: '120px' }}
+                className="animate-pulse rounded-md bg-gray-200"
+              />
             ) : (
               <div style={{ display: 'flex', gap: '5px' }}>
-                {formatIdentityLink(displayName, addressNamespaceName) ||
+                {formatIdentityLink(addressName.data, linkingFlow.name) ||
                   formatShortAddress(address)}
               </div>
             )}
           </span>
           <AddressLink address={address} />
-          {linkingFlow.name === 'default' && addressNamespaceName && (
-            <span
-              className="rounded-md border-2 text-sm"
-              style={{ color: '#717174' }}
-            >
-              {addressNamespaceName[0]!.toUpperCase() +
-                addressNamespaceName.substring(1)}
-            </span>
-          )}
         </div>
         <div className="mt-5">
           <ConnectButton
             disabled={address?.toString() !== wallet?.publicKey?.toString()}
-            dev={dev}
+            dev={environment.label === 'devnet'}
             wallet={wallet as Wallet}
             connection={connection}
             secondaryConnection={
@@ -221,37 +178,35 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
                 ? new Connection(environment.secondary)
                 : connection
             }
-            onClose={refreshName}
+            onClose={addressName.refetch}
             cluster={environment.label}
           />
         </div>
-        {linkingFlow.name !== 'default' && (
-          <button
-            disabled={address?.toString() !== wallet?.publicKey?.toString()}
-            className="rounded-md px-3 py-1 text-xs text-white"
-            onClick={() =>
-              show({
-                wallet: wallet as Wallet,
-                connection: connection,
-                cluster: environment.label,
-                secondaryConnection: environment.secondary
-                  ? new Connection(environment.secondary)
-                  : connection,
-                dev,
-                showManage: true,
-              })
-            }
-            style={{
-              borderColor: '#657786',
-              background: linkingFlow.colors.buttonColor,
-              color: linkingFlow.colors.secondaryFontColor,
-              opacity:
-                address?.toString() !== wallet?.publicKey?.toString() ? 0.5 : 1,
-            }}
-          >
-            Manage Profiles
-          </button>
-        )}
+        <button
+          disabled={address?.toString() !== wallet?.publicKey?.toString()}
+          className="rounded-md px-3 py-1 text-xs text-white"
+          onClick={() =>
+            show({
+              wallet: wallet as Wallet,
+              connection: connection,
+              cluster: environment.label,
+              secondaryConnection: environment.secondary
+                ? new Connection(environment.secondary)
+                : connection,
+              dev: environment.label === 'devnet',
+              showManage: true,
+            })
+          }
+          style={{
+            borderColor: '#657786',
+            background: '#64748b20',
+            color: '#657786',
+            opacity:
+              address?.toString() !== wallet?.publicKey?.toString() ? 0.5 : 1,
+          }}
+        >
+          Manage Profiles
+        </button>
       </div>
     </div>
   )

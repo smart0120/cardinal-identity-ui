@@ -1,18 +1,15 @@
 import type { CertificateData } from '@cardinal/certificates'
 import type { AccountData } from '@cardinal/common'
-import { deprecated, withSetNamespaceReverseEntry } from '@cardinal/namespaces'
+import { withSetGlobalReverseEntry } from '@cardinal/namespaces'
 import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
 import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Connection } from '@solana/web3.js'
-import {
-  PublicKey,
-  sendAndConfirmRawTransaction,
-  Transaction,
-} from '@solana/web3.js'
+import { PublicKey, Transaction } from '@solana/web3.js'
 import { useMutation } from 'react-query'
 
 import { nameFromMint } from '../components/NameManager'
+import { executeTransaction } from '../utils/transactions'
 
 export interface HandleSetParam {
   metaplexData?: {
@@ -23,7 +20,7 @@ export interface HandleSetParam {
   certificate?: AccountData<CertificateData> | null
 }
 
-export const useHandleSetDefault = (
+export const useHandleSetGlobalDefault = (
   connection: Connection,
   wallet: Wallet,
   namespaceName: string
@@ -37,38 +34,23 @@ export const useHandleSetDefault = (
         tokenData.metaplexData?.parsed.data.name || '',
         tokenData.metaplexData?.parsed.data.uri || ''
       )
-      if (tokenData.certificate) {
-        await deprecated.withSetReverseEntry(
-          connection,
-          wallet,
-          namespaceName,
-          entryName,
-          entryMint,
-          transaction
-        )
-      }
-      if (tokenData.tokenManager) {
-        await withSetNamespaceReverseEntry(
-          transaction,
-          connection,
-          wallet,
-          namespaceName,
-          entryName,
-          entryMint
-        )
-      }
+      await withSetGlobalReverseEntry(transaction, connection, wallet, {
+        namespaceName: namespaceName,
+        entryName: entryName,
+        mintId: entryMint,
+      })
       transaction.feePayer = wallet.publicKey
       transaction.recentBlockhash = (
         await connection.getRecentBlockhash('max')
       ).blockhash
-      await wallet.signTransaction(transaction)
-      const txid = await sendAndConfirmRawTransaction(
-        connection,
-        transaction.serialize(),
-        {
+      const txid = await executeTransaction(connection, wallet, transaction, {
+        confirmOptions: {
+          commitment: 'confirmed',
+          maxRetries: 3,
           skipPreflight: true,
-        }
-      )
+        },
+        notificationConfig: { message: 'Set to default successfully' },
+      })
       return txid
     }
   )

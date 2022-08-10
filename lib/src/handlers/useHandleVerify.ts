@@ -25,7 +25,6 @@ export interface HandleSetParam {
 export const useHandleVerify = (
   wallet: Wallet,
   cluster: Cluster,
-  dev: boolean,
   accessToken: string,
   namespace: string,
   setAccessToken: (handle: string) => void,
@@ -46,7 +45,7 @@ export const useHandleVerify = (
         const response = await fetch(
           encodeURI(
             `${apiBase(
-              dev
+              cluster === 'devnet'
             )}/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
               cluster && `&cluster=${cluster}`
             }`
@@ -61,7 +60,7 @@ export const useHandleVerify = (
         const response = await fetch(
           encodeURI(
             `${apiBase(
-              dev
+              cluster === 'devnet'
             )}/twitter/verify?publicKey=${wallet?.publicKey.toString()}&namespace=${namespace}&code=${code}&accessToken=${accessToken}${
               cluster && `&cluster=${cluster}`
             }`

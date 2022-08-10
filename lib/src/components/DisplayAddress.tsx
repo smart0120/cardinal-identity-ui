@@ -2,6 +2,7 @@ import type { Connection, PublicKey } from '@solana/web3.js'
 import ContentLoader from 'react-content-loader'
 
 import { useAddressName } from '../hooks/useAddressName'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { formatShortAddress, formatIdentityLink } from '../utils/format'
 
 export const DisplayAddress = ({
@@ -19,13 +20,11 @@ export const DisplayAddress = ({
   dark?: boolean
   style?: React.CSSProperties
 }) => {
-  const { displayName, loadingName, addressNamespaceName } = useAddressName(
-    connection,
-    address
-  )
+  const { linkingFlow } = useWalletIdentity()
+  const addressName = useAddressName(connection, address, linkingFlow.name)
 
   if (!address) return <></>
-  return loadingName ? (
+  return addressName.isLoading ? (
     <div
       style={{
         ...style,
@@ -43,9 +42,9 @@ export const DisplayAddress = ({
     </div>
   ) : (
     <div style={{ display: 'flex', gap: '5px', ...style }}>
-      {displayName?.includes('@')
-        ? formatIdentityLink(displayName, addressNamespaceName)
-        : displayName || formatShortAddress(address)}
+      {addressName.data?.includes('@')
+        ? formatIdentityLink(addressName.data, linkingFlow.name)
+        : addressName.data || formatShortAddress(address)}
     </div>
   )
 }

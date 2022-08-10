@@ -10,20 +10,32 @@ import { useHandleClaimTransaction } from '../handlers/useHandleClaimTransaction
 import { useHandleRevoke } from '../handlers/useHandleRevoke'
 import { useHandleVerify } from '../handlers/useHandleVerify'
 import { useClaimRequest } from '../hooks/useClaimRequest'
+import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
 import { useNameEntryData } from '../hooks/useNameEntryData'
-import { useReverseEntry } from '../hooks/useReverseEntry'
 import { formatShortAddress, formatIdentityLink } from '../utils/format'
 import { ButtonWithFooter } from './ButtonWithFooter'
 import { Link, Megaphone, Verified } from './icons'
 import { LabeledInput } from './LabeledInput'
 import { PostTweet } from './PostTweet'
 import { StepDetail } from './StepDetail'
-import { HandleNFT } from './HandleNFT'
+import { MasterEdition } from '@metaplex-foundation/mpl-token-metadata'
+import { useHandleSetNamespaceDefault } from '../handlers/useHandleSetNamespaceDefault'
+import { notify } from '../common/Notification'
+import { handleError } from '../utils/errors'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
+import { HandleNFT } from './HandleNFT'
+
+const handleFromTweetUrl = (raw: string | undefined): string | undefined => {
+  if (!raw) return undefined
+  return raw.split('/')[3]
+}
+
+const tweetIdFromTweetUrl = (raw: string | undefined): string | undefined => {
+  if (!raw) return undefined
+  return raw.split('/')[5]?.split('?')[0]
+}
 
 export const NameEntryClaim = ({
-  namespaceName,
-  dev = false,
   cluster = 'mainnet-beta',
   wallet,
   connection,
@@ -31,10 +43,8 @@ export const NameEntryClaim = ({
   appName,
   appTwitter,
   setShowManage,
-  notify,
   onComplete,
 }: {
-  namespaceName: string
   dev?: boolean
   cluster?: Cluster
   wallet: Wallet
@@ -43,7 +53,6 @@ export const NameEntryClaim = ({
   appName?: string
   appTwitter?: string
   setShowManage: (m: boolean) => void
-  notify?: (arg: { message?: string; txid?: string }) => void
   onComplete?: (arg0: string) => void
 }) => {
   const { linkingFlow } = useWalletIdentity()
@@ -55,19 +64,19 @@ export const NameEntryClaim = ({
   const [verificationInitiated, setVerificationInitiated] = useState(false)
   const [accessToken, setAccessToken] = useState('')
 
-  const reverseEntry = useReverseEntry(
+  const reverseEntry = useGlobalReverseEntry(
     connection,
-    namespaceName,
+    linkingFlow.name,
     wallet?.publicKey
   )
   const nameEntryData = useNameEntryData(
     secondaryConnection || connection,
-    namespaceName,
+    linkingFlow.name,
     handle
   )
   const claimRequest = useClaimRequest(
     connection,
-    namespaceName,
+    linkingFlow.name,
     handle,
     wallet?.publicKey
   )
@@ -75,28 +84,32 @@ export const NameEntryClaim = ({
   const handleVerify = useHandleVerify(
     wallet,
     cluster,
-    dev,
     accessToken,
-    namespaceName,
+    linkingFlow.name,
     setAccessToken,
     setHandle
   )
   const handleRevoke = useHandleRevoke(
     wallet,
     cluster,
-    dev,
     accessToken,
     handle,
-    namespaceName
+    linkingFlow.name
   )
   const handleClaimTransaction = useHandleClaimTransaction(
     connection,
     wallet,
     cluster,
-    dev,
     accessToken,
     handle,
-    namespaceName
+    linkingFlow.name
+  )
+
+  const hndleSetNamespaceDefault = useHandleSetNamespaceDefault(
+    connection,
+    wallet,
+    linkingFlow.name,
+    cluster
   )
 
   useMemo(() => {
@@ -109,6 +122,11 @@ export const NameEntryClaim = ({
         { verificationUrl: verificationUrl },
         {
           onSuccess: () => claimRequest?.refetch(),
+          onError: (e) =>
+            notify({
+              message: `Failed Transaction`,
+              description: e as string,
+            }),
         }
       )
     } else if (verificationUrl?.length === 0) {
@@ -183,7 +201,11 @@ export const NameEntryClaim = ({
                     paddingTop: '20px',
                   }}
                 >
-                  <HandleNFT handle={handle} cluster={cluster} dev={dev} />
+                  <HandleNFT
+                    handle={handle}
+                    cluster={cluster}
+                    dev={cluster === 'devnet'}
+                  />
                   <div
                     style={{
                       padding: '10px',
@@ -197,8 +219,8 @@ export const NameEntryClaim = ({
                         style={{
                           margin: '10px 0px',
                           height: 'auto',
-                          justifyContent: 'center',
                           wordBreak: 'break-word',
+                          justifyContent: 'center',
                         }}
                         message={<>{`${handleVerify.error}`}</>}
                         type="error"
@@ -288,12 +310,18 @@ export const NameEntryClaim = ({
                                       { verificationUrl },
                                       {
                                         onSuccess: () => {
-                                          notify &&
-                                            notify({
-                                              message: 'Revoke successful',
-                                            })
+                                          notify({
+                                            message: 'Revoke successful',
+                                          })
                                           nameEntryData.refetch()
                                           claimRequest.refetch()
+                                        },
+                                        onError: (e) => {
+                                          console.log('here', e)
+                                          notify({
+                                            message: `Failed Transaction`,
+                                            description: e as string,
+                                          })
                                         },
                                       }
                                     )
@@ -318,7 +346,9 @@ export const NameEntryClaim = ({
                               }}
                               message={
                                 <>
-                                  <div>{`${handleRevoke.error}`}</div>
+                                  <div>{`${handleError(
+                                    handleRevoke.error
+                                  )}`}</div>
                                 </>
                               }
                               type="error"
@@ -350,9 +380,26 @@ export const NameEntryClaim = ({
             showIcon
           />
         )}
+        {hndleSetNamespaceDefault.error && (
+          <Alert
+            style={{
+              height: 'auto',
+              wordBreak: 'break-word',
+            }}
+            message={
+              <>
+                <div>{`${hndleSetNamespaceDefault.error}`}</div>
+              </>
+            }
+            type="error"
+            showIcon
+          />
+        )}
       </DetailsWrapper>
       <ButtonWithFooter
-        loading={handleClaimTransaction.isLoading}
+        loading={
+          handleClaimTransaction.isLoading || hndleSetNamespaceDefault.isLoading
+        }
         complete={claimed}
         disabled={
           !handleVerify.isSuccess ||
@@ -360,20 +407,57 @@ export const NameEntryClaim = ({
           !nameEntryData.isFetched ||
           (alreadyOwned && !claimRequest.data?.parsed.isApproved)
         }
-        onClick={() =>
-          handleClaimTransaction.mutate(
-            {
-              verificationUrl,
-            },
-            {
-              onSuccess: () => {
-                nameEntryData.remove()
-                reverseEntry.remove()
-                onComplete && onComplete(handle || '')
-              },
+        onClick={async () => {
+          let isMasterEdition = true
+          if (nameEntryData.data?.nameEntry.parsed) {
+            const masterEditionId = await MasterEdition.getPDA(
+              nameEntryData.data?.nameEntry.parsed.mint
+            )
+            try {
+              await MasterEdition.getInfo(connection, masterEditionId)
+            } catch (e) {
+              isMasterEdition = false
             }
-          )
-        }
+          }
+          if (!isMasterEdition) {
+            hndleSetNamespaceDefault.mutate(
+              {
+                tokenData: { metaplexData: nameEntryData.data?.metaplexData },
+                forceMigrate: true,
+              },
+              {
+                onSuccess: () => {
+                  nameEntryData.remove()
+                  reverseEntry.remove()
+                  onComplete && onComplete(handle || '')
+                },
+                onError: (e) =>
+                  notify({
+                    message: `Failed Transaction`,
+                    description: e as string,
+                  }),
+              }
+            )
+          } else {
+            handleClaimTransaction.mutate(
+              {
+                verificationUrl,
+              },
+              {
+                onSuccess: () => {
+                  nameEntryData.remove()
+                  reverseEntry.remove()
+                  onComplete && onComplete(handle || '')
+                },
+                onError: (e) =>
+                  notify({
+                    message: `Failed Transaction`,
+                    description: e as string,
+                  }),
+              }
+            )
+          }
+        }}
       >
         Claim {handle && `@${handle}`}
       </ButtonWithFooter>
