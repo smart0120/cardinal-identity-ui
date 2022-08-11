@@ -8,6 +8,7 @@ import { sendAndConfirmRawTransaction, Transaction } from '@solana/web3.js'
 import { useMutation } from 'react-query'
 
 import { apiBase } from '../utils/constants'
+import { tracer, withTrace } from '../utils/trace'
 
 export interface HandleSetParam {
   metaplexData?: {
@@ -32,12 +33,24 @@ export const useHandleClaimTransaction = (
       tweetId?: string
       handle?: string
     }): Promise<string> => {
-      const tx = await handleClaim(wallet, cluster, handle, tweetId)
+      const trace = tracer({ name: 'useHandleClaim' })
+      const tx = await withTrace(
+        () => handleClaim(wallet, cluster, handle, tweetId),
+        trace,
+        { op: 'handleClaim' }
+      )
       if (!tx) return ''
       await wallet.signTransaction!(tx)
-      return sendAndConfirmRawTransaction(connection, tx.serialize(), {
-        skipPreflight: true,
-      })
+      const txid = withTrace(
+        () =>
+          sendAndConfirmRawTransaction(connection, tx.serialize(), {
+            skipPreflight: true,
+          }),
+        trace,
+        { op: 'sendTransaction' }
+      )
+      trace.finish()
+      return txid
     }
   )
 }

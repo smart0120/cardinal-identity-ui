@@ -9,6 +9,7 @@ import * as splToken from '@solana/spl-token'
 import type { Connection, TokenAccountBalancePair } from '@solana/web3.js'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
+import { tracer, withTrace } from '../utils/trace'
 
 export type NameEntryData = {
   nameEntry: AccountData<EntryData>
@@ -25,27 +26,50 @@ export async function getNameEntryData(
   namespaceName: string,
   entryName: string
 ): Promise<NameEntryData> {
-  const nameEntry = await getNameEntry(connection, namespaceName, entryName)
+  const trace = tracer({ name: 'getNameEntryData' })
+  const nameEntry = await withTrace(
+    () => getNameEntry(connection, namespaceName, entryName),
+    trace,
+    { op: 'getNameEntry' }
+  )
   const { mint } = nameEntry.parsed
 
-  const [[metaplexId], [certificateId]] = await Promise.all([
-    metaplex.MetadataProgram.findMetadataAccount(new PublicKey(mint)),
-    certificateIdForMint(mint),
-  ])
-  const [metaplexData, certificate] = await Promise.all([
-    metaplex.Metadata.load(connection, metaplexId),
-    tryGetAccount(() => getCertificate(connection, certificateId)),
-  ])
+  const [[metaplexId], [certificateId]] = await withTrace(
+    () =>
+      Promise.all([
+        metaplex.MetadataProgram.findMetadataAccount(new PublicKey(mint)),
+        certificateIdForMint(mint),
+      ]),
+    trace,
+    { op: 'collectIds' }
+  )
+  const [metaplexData, certificate] = await withTrace(
+    () =>
+      Promise.all([
+        metaplex.Metadata.load(connection, metaplexId),
+        tryGetAccount(() => getCertificate(connection, certificateId)),
+      ]),
+    trace,
+    { op: 'getAccounts' }
+  )
   let json
   try {
     json =
       metaplexData.data.data.uri &&
-      (await fetch(metaplexData.data.data.uri).then((r) => r.json()))
+      (await withTrace(() =>
+        fetch(metaplexData.data.data.uri).then((r) => r.json())
+      ),
+      trace,
+      { op: 'getMetadata' })
   } catch (e) {
     console.log('Failed to get json', json)
   }
 
-  const largestHolders = await connection.getTokenLargestAccounts(mint)
+  const largestHolders = await withTrace(
+    () => connection.getTokenLargestAccounts(mint),
+    trace,
+    { op: 'getTokenLargestAccounts' }
+  )
   const certificateMintToken = new splToken.Token(
     connection,
     mint,
@@ -54,16 +78,22 @@ export async function getNameEntryData(
     anchor.web3.Keypair.generate()
   )
 
-  const largestTokenAccount =
-    largestHolders?.value[0]?.address &&
-    (await certificateMintToken.getAccountInfo(
-      largestHolders?.value[0]?.address
-    ))
-
+  let largestTokenAccount: splToken.AccountInfo | undefined
+  const largestHolder = largestHolders?.value[0]?.address
+  if (largestHolder) {
+    largestTokenAccount = await withTrace(
+      () => certificateMintToken.getAccountInfo(largestHolder),
+      trace,
+      { op: 'getTokenAccount' }
+    )
+  }
   let isOwnerPDA = false
-  if (largestTokenAccount?.owner) {
-    const ownerAccountInfo = await connection.getAccountInfo(
-      largestTokenAccount?.owner
+  const largestTokenAccountOnwer = largestTokenAccount?.owner
+  if (largestTokenAccountOnwer) {
+    const ownerAccountInfo = await withTrace(
+      () => connection.getAccountInfo(largestTokenAccountOnwer),
+      trace,
+      { op: 'checkOwner' }
     )
     isOwnerPDA =
       ownerAccountInfo?.owner.toString() === NAMESPACES_PROGRAM_ID.toString()

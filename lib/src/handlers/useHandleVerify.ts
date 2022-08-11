@@ -7,6 +7,7 @@ import type { Cluster, PublicKey } from '@solana/web3.js'
 import { useMutation } from 'react-query'
 
 import { apiBase } from '../utils/constants'
+import { tracer, withTrace } from '../utils/trace'
 
 export interface HandleSetParam {
   metaplexData?: {
@@ -32,12 +33,16 @@ export const useHandleVerify = (
       handle?: string
     }): Promise<void> => {
       if (!handle || !tweetId) return
-      const response = await fetch(
-        `${apiBase(
-          dev
-        )}/namespaces/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
-          cluster && `&cluster=${cluster}`
-        }`
+      const response = await withTrace(
+        () =>
+          fetch(
+            `${apiBase(
+              dev
+            )}/namespaces/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
+              cluster && `&cluster=${cluster}`
+            }`
+          ),
+        tracer({ name: 'useHandleVerify' })
       )
       const json = await response.json()
       if (response.status !== 200) throw new Error(json.message)
