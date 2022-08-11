@@ -10,6 +10,8 @@ import { Modal } from '../modal'
 import { withSleep } from '../utils/transactions'
 
 const DEBUG = false
+const SENTRY_DSN =
+  'https://109718d85e0640f0b5f7160e2602b5f0@o1340959.ingest.sentry.io/6625303'
 
 export type ShowParams = {
   connection: Connection
@@ -56,6 +58,11 @@ export const WalletIdentityProvider: React.FC<Props> = ({
   const [onClose, setOnClose] = useState<(() => void) | undefined>()
   const [showIdentityModal, setShowIdentityModal] = useState<boolean>(false)
   const [handle, setHandle] = useState<string | undefined>(undefined)
+
+  Sentry.init({
+    dsn: SENTRY_DSN,
+    tracesSampleRate: 1.0,
+  })
 
   return (
     <WalletIdentityContext.Provider
