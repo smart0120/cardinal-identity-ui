@@ -15,7 +15,7 @@ const TwitterClaim = () => {
   const router = useRouter()
   const [address, setAddress] = useState<PublicKey>()
   const { connection } = useEnvironmentCtx()
-  const { linkingFlow } = useWalletIdentity()
+  const { identity } = useWalletIdentity()
   const { addressId } = router.query
 
   useMemo(async () => {
@@ -44,7 +44,7 @@ const TwitterClaim = () => {
   return (
     <div
       className={`fixed h-full w-full`}
-      style={{ background: linkingFlow.colors.primary }}
+      style={{ background: identity.colors.primary }}
     >
       <Header />
       <div style={{ marginTop: '10vh' }}>

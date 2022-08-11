@@ -9,8 +9,8 @@ export const getInitialProps = async ({
   ctx,
 }: {
   ctx: NextPageContext
-}): Promise<{ cluster: string; linkingFlowKey: string }> => {
-  const host = ctx.query.linkingFlow || ctx.req?.headers.host
+}): Promise<{ cluster: string; identity: string }> => {
+  const host = ctx.query.identity || ctx.req?.headers.host
   const cluster = host?.includes('dev')
     ? 'devnet'
     : (ctx.query.project || ctx.query.host)?.includes('test')
@@ -18,7 +18,7 @@ export const getInitialProps = async ({
     : ctx.query.cluster || process.env.BASE_CLUSTER
   return {
     cluster: firstParam(cluster),
-    linkingFlowKey: host?.toString() || 'default',
+    identity: host?.toString() || 'default',
   }
 }
 

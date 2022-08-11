@@ -55,7 +55,7 @@ export const NameEntryClaim = ({
   setShowManage: (m: boolean) => void
   onComplete?: (arg0: string) => void
 }) => {
-  const { linkingFlow } = useWalletIdentity()
+  const { identity } = useWalletIdentity()
   const [verificationUrl, setVerificationUrl] = useState<string | undefined>(
     undefined
   )
@@ -66,17 +66,17 @@ export const NameEntryClaim = ({
 
   const reverseEntry = useGlobalReverseEntry(
     connection,
-    linkingFlow.name,
+    identity.name,
     wallet?.publicKey
   )
   const nameEntryData = useNameEntryData(
     secondaryConnection || connection,
-    linkingFlow.name,
+    identity.name,
     handle
   )
   const claimRequest = useClaimRequest(
     connection,
-    linkingFlow.name,
+    identity.name,
     handle,
     wallet?.publicKey
   )
@@ -85,7 +85,7 @@ export const NameEntryClaim = ({
     wallet,
     cluster,
     accessToken,
-    linkingFlow.name,
+    identity.name,
     setAccessToken,
     setHandle
   )
@@ -94,7 +94,7 @@ export const NameEntryClaim = ({
     cluster,
     accessToken,
     handle,
-    linkingFlow.name
+    identity.name
   )
   const handleClaimTransaction = useHandleClaimTransaction(
     connection,
@@ -102,13 +102,13 @@ export const NameEntryClaim = ({
     cluster,
     accessToken,
     handle,
-    linkingFlow.name
+    identity.name
   )
 
   const hndleSetNamespaceDefault = useHandleSetNamespaceDefault(
     connection,
     wallet,
-    linkingFlow.name,
+    identity.name,
     cluster
   )
 
@@ -150,10 +150,10 @@ export const NameEntryClaim = ({
         <StepDetail
           disabled={!wallet?.publicKey || !connection}
           icon={<Megaphone />}
-          title={linkingFlow?.description.header || 'Verify'}
+          title={identity?.description.header || 'Verify'}
           description={
             <>
-              <div>{linkingFlow?.description.text}</div>
+              <div>{identity?.description.text}</div>
               <PostTweet
                 wallet={wallet}
                 appName={appName}
@@ -169,14 +169,14 @@ export const NameEntryClaim = ({
           disabled={!verificationInitiated}
           icon={<Link />}
           title={`Paste the URL of the ${
-            linkingFlow.verification?.toLocaleLowerCase() || 'verification'
+            identity.verification?.toLocaleLowerCase() || 'verification'
           }`}
           description={
             <div>
               <LabeledInput
                 disabled={!verificationInitiated}
-                label={linkingFlow.verification || 'Verification'}
-                name={linkingFlow.verification || 'Verification'}
+                label={identity.verification || 'Verification'}
+                name={identity.verification || 'Verification'}
                 onChange={(e) => setVerificationUrl(e.target.value)}
               />
             </div>
@@ -245,8 +245,8 @@ export const NameEntryClaim = ({
                             >
                               Verified ownership of{' '}
                               <span className="font-semibold">
-                                {linkingFlow.name === 'twitter'
-                                  ? formatIdentityLink(handle, linkingFlow.name)
+                                {identity.name === 'twitter'
+                                  ? formatIdentityLink(handle, identity.name)
                                   : handle}
                               </span>
                             </div>

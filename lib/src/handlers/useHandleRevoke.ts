@@ -5,7 +5,6 @@ import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, PublicKey } from '@solana/web3.js'
 import { useMutation } from 'react-query'
-import { LinkingFlow } from '../common/LinkingFlows'
 
 import { apiBase } from '../utils/constants'
 import { handleFromTweetUrl, tweetIdFromUrl } from '../utils/verification'

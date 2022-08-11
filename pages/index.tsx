@@ -18,7 +18,7 @@ export const TwitterBackground = styled.div`
 const TwitterHome = () => {
   const wallet = useWallet()
   const router = useRouter()
-  const { linkingFlow } = useWalletIdentity()
+  const { identity } = useWalletIdentity()
   const dev = router.query['cluster'] === 'devnet'
 
   useEffect(() => {
@@ -36,7 +36,7 @@ const TwitterHome = () => {
   return (
     <div
       className={`fixed h-full w-full`}
-      style={{ background: linkingFlow.colors.primary }}
+      style={{ background: identity.colors.primary }}
     >
       <Header />
       <div style={{ marginTop: '10vh' }}>

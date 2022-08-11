@@ -1,7 +1,7 @@
-export type LinkingFlowName = 'twitter' | 'discord' | 'default'
+export type IdentityName = 'twitter' | 'discord' | 'default'
 
-export type LinkingFlow = {
-  name: LinkingFlowName
+export type Identity = {
+  name: IdentityName
   icon?: string
   displayName?: string
   verification?: 'Verification' | 'Tweet'
@@ -18,7 +18,7 @@ export type LinkingFlow = {
   }
 }
 
-export const linkingFlows: { [key: string]: LinkingFlow } = {
+export const identities: { [key: string]: Identity } = {
   default: {
     name: 'default',
     displayName: 'default',

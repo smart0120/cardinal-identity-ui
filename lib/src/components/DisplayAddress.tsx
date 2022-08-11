@@ -20,8 +20,8 @@ export const DisplayAddress = ({
   dark?: boolean
   style?: React.CSSProperties
 }) => {
-  const { linkingFlow } = useWalletIdentity()
-  const addressName = useAddressName(connection, address, linkingFlow.name)
+  const { identity } = useWalletIdentity()
+  const addressName = useAddressName(connection, address, identity.name)
 
   if (!address) return <></>
   return addressName.isLoading ? (
@@ -43,7 +43,7 @@ export const DisplayAddress = ({
   ) : (
     <div style={{ display: 'flex', gap: '5px', ...style }}>
       {addressName.data?.includes('@')
-        ? formatIdentityLink(addressName.data, linkingFlow.name)
+        ? formatIdentityLink(addressName.data, identity.name)
         : addressName.data || formatShortAddress(address)}
     </div>
   )

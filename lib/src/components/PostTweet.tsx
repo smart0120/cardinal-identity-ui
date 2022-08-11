@@ -1,6 +1,6 @@
 import type { Wallet } from '@saberhq/solana-contrib'
 import { Button } from '../common/Button'
-import { LinkingFlow } from '../common/LinkingFlows'
+import { Identity } from '../common/Identities'
 
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
@@ -19,9 +19,9 @@ export const PostTweet = ({
   callback?: () => void
   cluster?: string | undefined
 }) => {
-  const { linkingFlow } = useWalletIdentity()
+  const { identity } = useWalletIdentity()
   const link = useGenerateLink(
-    linkingFlow,
+    identity,
     wallet?.publicKey?.toString(),
     appName,
     appTwitter,
@@ -40,14 +40,14 @@ export const PostTweet = ({
       <Button
         style={{ marginTop: '5px', padding: '0px 20px 0px 20px' }}
         variant="primary"
-        bgColor={linkingFlow?.colors.primary}
+        bgColor={identity?.colors.primary}
         disabled={disabled}
       >
         <div style={{ width: '14px' }} className="align-middle">
           <img
             className="text-white "
-            alt={`${linkingFlow?.name}-icon`}
-            src={linkingFlow?.icon}
+            alt={`${identity?.name}-icon`}
+            src={identity?.icon}
           />
         </div>
         <span style={{ fontSize: '12px' }}>Verify</span>
@@ -57,7 +57,7 @@ export const PostTweet = ({
 }
 
 const useGenerateLink = (
-  linkingFlow: LinkingFlow,
+  identity: Identity,
   pubkey: string | undefined,
   appName: string | undefined,
   appTwitter: string | undefined,
@@ -65,7 +65,7 @@ const useGenerateLink = (
 ): string => {
   if (!pubkey) return ''
   let link = ''
-  switch (linkingFlow.name) {
+  switch (identity.name) {
     case 'twitter': {
       link = [
         `https://twitter.com/intent/tweet?text=`,
@@ -84,7 +84,7 @@ const useGenerateLink = (
     }
     case 'discord': {
       link =
-        'https://discord.com/oauth2/authorize?response_type=code&client_id=992004845101916191&scope=identify&state=15773059ghq9183habn&redirect_uri=http://localhost:3000/verification?linkingFlow=discord&prompt=consent'
+        'https://discord.com/oauth2/authorize?response_type=code&client_id=992004845101916191&scope=identify&state=15773059ghq9183habn&redirect_uri=http://localhost:3000/verification?identity=discord&prompt=consent'
       break
     }
     default: {

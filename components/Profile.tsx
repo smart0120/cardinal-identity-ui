@@ -31,15 +31,15 @@ const ShareIcon = styled.div`
 `
 
 export const Profile: React.FC<Props> = ({ address }: Props) => {
-  const { linkingFlow, show } = useWalletIdentity()
+  const { identity, show } = useWalletIdentity()
   const wallet = useWallet()
   const { connection, environment } = useEnvironmentCtx()
   const addressStr = address.toString()
-  const addressName = useAddressName(connection, address, linkingFlow.name)
+  const addressName = useAddressName(connection, address, identity.name)
   const addressImage = useAddressImage(
     connection,
     address,
-    linkingFlow.name,
+    identity.name,
     environment.label === 'devnet'
   )
 
@@ -160,7 +160,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
               />
             ) : (
               <div style={{ display: 'flex', gap: '5px' }}>
-                {formatIdentityLink(addressName.data, linkingFlow.name) ||
+                {formatIdentityLink(addressName.data, identity.name) ||
                   formatShortAddress(address)}
               </div>
             )}

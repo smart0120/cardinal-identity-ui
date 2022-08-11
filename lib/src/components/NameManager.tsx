@@ -50,7 +50,7 @@ export const NameEntryRow = ({
   setError: (e: unknown) => void
   setSuccess: (e: ReactElement) => void
 }) => {
-  const { linkingFlow } = useWalletIdentity()
+  const { identity } = useWalletIdentity()
   const userNamesForNamespace = useUserNamesForNamespace(
     connection,
     wallet.publicKey,
@@ -102,7 +102,7 @@ export const NameEntryRow = ({
             userTokenData.metaplexData?.parsed.data.name || '',
             userTokenData.metaplexData?.parsed.data.uri || ''
           )[1],
-          linkingFlow.name
+          identity.name
         )}
         {globalReverseEntry.data &&
           formatName(
@@ -298,7 +298,7 @@ export const NameEntryRow = ({
                                 '',
                               userTokenData.metaplexData?.parsed.data.uri || ''
                             )[1],
-                            linkingFlow.name
+                            identity.name
                           )}
                           .
                         </div>

@@ -2,13 +2,13 @@ import { useWalletIdentity } from 'lib/src'
 import { FaCheck, FaExclamation } from 'react-icons/fa'
 
 export const Alert = ({ message, type }: { message: string; type: string }) => {
-  const { linkingFlow } = useWalletIdentity()
+  const { identity } = useWalletIdentity()
   return (
     <div
       className="flex items-center justify-center rounded-lg py-2 text-center text-xs"
       style={{
-        background: linkingFlow.colors.buttonColor || '#ffffff',
-        color: linkingFlow.colors.secondaryFontColor || '#ffffff',
+        background: identity.colors.buttonColor || '#ffffff',
+        color: identity.colors.secondaryFontColor || '#ffffff',
       }}
     >
       {type === 'success' && <FaCheck />}

@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
 
 import { ClaimCard } from '..'
-import { LinkingFlow, linkingFlows } from '../common/LinkingFlows'
+import { identities, Identity } from '../common/Identities'
 import { Modal } from '../modal'
 import { withSleep } from '../utils/transactions'
 
@@ -23,8 +23,8 @@ export type ShowParams = {
 
 export interface WalletIdentity {
   show: (arg: ShowParams) => void
-  linkingFlow: LinkingFlow
-  setLinkingFlow: Dispatch<SetStateAction<LinkingFlow>>
+  identity: Identity
+  setIdentity: Dispatch<SetStateAction<Identity>>
   handle?: string
   wallet?: Wallet
   connection?: Connection
@@ -39,7 +39,7 @@ export const WalletIdentityContext = React.createContext<WalletIdentity | null>(
 )
 
 interface Props {
-  linkingFlowKey?: string
+  identityKey?: string
   appName?: string
   appTwitter?: string
   flows?: 'discord' | 'twitter'[]
@@ -47,7 +47,7 @@ interface Props {
 }
 
 export const WalletIdentityProvider: React.FC<Props> = ({
-  linkingFlowKey,
+  identityKey,
   appName,
   appTwitter,
   children,
@@ -61,8 +61,8 @@ export const WalletIdentityProvider: React.FC<Props> = ({
   const [onClose, setOnClose] = useState<(() => void) | undefined>()
   const [showIdentityModal, setShowIdentityModal] = useState<boolean>(false)
   const [handle, setHandle] = useState<string | undefined>(undefined)
-  const [linkingFlow, setLinkingFlow] = useState<LinkingFlow>(
-    linkingFlows[linkingFlowKey!] || linkingFlows['default']!
+  const [identity, setIdentity] = useState<Identity>(
+    identities[identityKey!] || identities['default']!
   )
 
   return (
@@ -92,8 +92,8 @@ export const WalletIdentityProvider: React.FC<Props> = ({
         cluster,
         dev,
         showIdentityModal,
-        linkingFlow,
-        setLinkingFlow,
+        identity,
+        setIdentity,
       }}
     >
       <QueryClientProvider client={new QueryClient()}>
@@ -112,7 +112,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
             connection={connection}
             secondaryConnection={secondaryConnection}
             appName={appName}
-            namespaceName={linkingFlow.name}
+            namespaceName={identity.name}
             appTwitter={appTwitter}
             showManage={showManageDefault}
             onComplete={(handle: string) => {

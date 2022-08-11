@@ -21,9 +21,13 @@ export const AccountPopover = ({
   dark?: boolean
   style?: React.CSSProperties
 }) => {
-  const { show } = useWalletIdentity()
+  const { identity, show } = useWalletIdentity()
 
-  const addressName = useAddressName(connection, wallet?.publicKey ?? undefined)
+  const addressName = useAddressName(
+    connection,
+    wallet?.publicKey ?? undefined,
+    identity.name
+  )
   if (!wallet.publicKey) return <></>
   return (
     <div className="w-screen max-w-[300px] ">

@@ -8,7 +8,7 @@ import Tooltip from '@mui/material/Tooltip'
 
 const TwitterClaim = () => {
   const router = useRouter()
-  const { linkingFlow } = useWalletIdentity()
+  const { identity } = useWalletIdentity()
   const [tokenCode, setTokenCode] = useState('')
   const [error, setError] = useState<string | undefined>(undefined)
   const [linkCopied, setLinkCopied] = useState(false)
@@ -25,7 +25,7 @@ const TwitterClaim = () => {
   return (
     <div
       className={`fixed h-full w-full`}
-      style={{ background: linkingFlow.colors.primary }}
+      style={{ background: identity.colors.primary }}
     >
       <Header />
       <div style={{ marginTop: '10vh' }}>
@@ -41,8 +41,8 @@ const TwitterClaim = () => {
               borderRadius: '1rem',
               boxShadow: '0 4px 34px rgb(0 0 0 / 8%)',
               height: '320px',
-              background: linkingFlow.colors.secondary,
-              color: linkingFlow.colors.primaryFontColor,
+              background: identity.colors.secondary,
+              color: identity.colors.primaryFontColor,
             }}
           >
             {!error ? (
@@ -51,12 +51,12 @@ const TwitterClaim = () => {
                   Congrats!
                 </div>
                 <div className="text-md mt-2 flex flex-row justify-center text-center font-semibold">
-                  You have successfully verified your {linkingFlow.displayName}{' '}
+                  You have successfully verified your {identity.displayName}{' '}
                   account!
                 </div>
                 <div
                   className="text-md mt-5 flex flex-row justify-center rounded-lg p-5 text-center font-medium"
-                  style={{ background: linkingFlow.colors.buttonColor }}
+                  style={{ background: identity.colors.buttonColor }}
                 >
                   Now copy this page's URL and paste it in the previous page to
                   claim your handle as a non-transferable NFT
@@ -64,7 +64,7 @@ const TwitterClaim = () => {
                 <Tooltip placement="top" title="Copy to clipboard">
                   <div className="mt-5 flex flex-row justify-center">
                     <Button
-                      bgColor={linkingFlow?.colors.primary}
+                      bgColor={identity?.colors.primary}
                       variant={'primary'}
                       onClick={() => {
                         navigator.clipboard.writeText(window.location.href)

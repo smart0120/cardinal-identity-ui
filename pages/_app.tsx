@@ -16,13 +16,13 @@ require('@solana/wallet-adapter-react-ui/styles.css')
 const App = ({
   Component,
   pageProps,
-  linkingFlowKey,
+  identity,
   cluster,
-}: AppProps & { linkingFlowKey: string; cluster: string }) => (
+}: AppProps & { identity: string; cluster: string }) => (
   <EnvironmentProvider defaultCluster={cluster}>
     <WalletProvider wallets={getWalletAdapters()}>
       <WalletModalProvider>
-        <WalletIdentityProvider linkingFlowKey={linkingFlowKey}>
+        <WalletIdentityProvider identityKey={identity}>
           <Component {...pageProps} />
         </WalletIdentityProvider>
       </WalletModalProvider>
