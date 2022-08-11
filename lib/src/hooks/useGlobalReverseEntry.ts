@@ -16,7 +16,7 @@ export const useGlobalReverseEntry = (
     async () => {
       if (!pubkey || !connection) return
       const reverseEntry = await getGlobalReverseNameEntry(connection, pubkey)
-    return reverseEntry || undefined
+      return reverseEntry || undefined
     },
     { refetchOnMount: false, refetchOnWindowFocus: false }
   )

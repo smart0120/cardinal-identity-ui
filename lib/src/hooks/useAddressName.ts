@@ -3,7 +3,6 @@ import {
   formatName,
   getGlobalReverseNameEntry,
   getReverseNameEntryForNamespace,
-  tryGetName,
 } from '@cardinal/namespaces'
 import type { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
@@ -40,36 +39,33 @@ export async function tryGetNameForNamespace(
       pubkey,
       namespaceId
     )
-      return [
-        formatName(
-          namespaceReverseEntry.parsed.namespaceName,
-          namespaceReverseEntry.parsed.entryName
-        ),
-        namespaceReverseEntry.parsed.namespaceName,
-      ]
-  } catch (e) {
-    'pass'
-  }
-
-  try {
-    const [namespaceId] = await findNamespaceId(namespaceName)
-    const globalReverseEntry = await getGlobalReverseNameEntry(
-      connection,
-      pubkey,
-    )
-      if (
-    globalReverseEntry.parsed &&
-    globalReverseEntry.parsed.namespaceName === namespaceName
-  ) {
     return [
       formatName(
-        globalReverseEntry.parsed.namespaceName,
-        globalReverseEntry.parsed.entryName
+        namespaceReverseEntry.parsed.namespaceName,
+        namespaceReverseEntry.parsed.entryName
       ),
-      globalReverseEntry.parsed.namespaceName,
+      namespaceReverseEntry.parsed.namespaceName,
     ]
-  }
-} catch(e){'pass'}
+  } catch (e) {}
+
+  try {
+    const globalReverseEntry = await getGlobalReverseNameEntry(
+      connection,
+      pubkey
+    )
+    if (
+      globalReverseEntry.parsed &&
+      globalReverseEntry.parsed.namespaceName === namespaceName
+    ) {
+      return [
+        formatName(
+          globalReverseEntry.parsed.namespaceName,
+          globalReverseEntry.parsed.entryName
+        ),
+        globalReverseEntry.parsed.namespaceName,
+      ]
+    }
+  } catch (e) {}
 
   return undefined
 }
