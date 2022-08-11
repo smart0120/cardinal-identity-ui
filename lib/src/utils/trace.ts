@@ -20,6 +20,8 @@ export const withTrace = async <T>(
   return r
 }
 
-export const tracer = (ctx: Sentry.TransactionContext) => {
+export const tracer = (
+  ctx: Sentry.TransactionContext
+): Sentry.Transaction | undefined => {
   return SentryBrowser.startTransaction(ctx)
 }

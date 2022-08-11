@@ -25,11 +25,11 @@ export const useAddressImage = (
           () => tryGetImageUrl(namespaceName, handle, dev || false),
           tracer({ name: 'useAddressImage' })
         )
-        console.log(imageUrl)
         return imageUrl
       } else {
         return undefined
       }
-    }
+    },
+    { enabled: addressName.isFetched }
   )
 }

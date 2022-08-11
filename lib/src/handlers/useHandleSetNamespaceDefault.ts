@@ -126,7 +126,7 @@ export const useHandleSetNamespaceDefault = (
           throw new Error(errorMessage)
         }
       }
-      trace.finish()
+      trace?.finish()
       return txId
     }
   )

@@ -62,7 +62,7 @@ export const useHandleSetGlobalDefault = (
         trace,
         { op: 'sendTransaction' }
       )
-      trace.finish()
+      trace?.finish()
       return txid
     }
   )

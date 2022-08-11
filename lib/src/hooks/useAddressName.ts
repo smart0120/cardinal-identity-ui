@@ -41,7 +41,7 @@ export async function tryGetNameForNamespace(
       trace,
       { op: 'getReverseNameEntryForNamespace' }
     )
-    trace.finish()
+    trace?.finish()
     return [
       formatName(
         namespaceReverseEntry.parsed.namespaceName,
@@ -62,7 +62,7 @@ export async function tryGetNameForNamespace(
       globalReverseEntry.parsed &&
       globalReverseEntry.parsed.namespaceName === namespaceName
     ) {
-      trace.finish()
+      trace?.finish()
       return [
         formatName(
           globalReverseEntry.parsed.namespaceName,
@@ -73,6 +73,6 @@ export async function tryGetNameForNamespace(
     }
   } catch (e) {}
 
-  trace.finish()
+  trace?.finish()
   return undefined
 }

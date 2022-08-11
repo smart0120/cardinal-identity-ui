@@ -49,7 +49,7 @@ export const useHandleClaimTransaction = (
         trace,
         { op: 'sendTransaction' }
       )
-      trace.finish()
+      trace?.finish()
       return txid
     }
   )

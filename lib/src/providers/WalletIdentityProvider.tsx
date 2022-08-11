@@ -100,7 +100,18 @@ export const WalletIdentityProvider: React.FC<Props> = ({
         showIdentityModal,
       }}
     >
-      <QueryClientProvider client={new QueryClient()}>
+      <QueryClientProvider
+        client={
+          new QueryClient({
+            defaultOptions: {
+              queries: {
+                refetchOnMount: false,
+                refetchOnWindowFocus: false,
+              },
+            },
+          })
+        }
+      >
         <Modal
           isOpen={showIdentityModal}
           onDismiss={() => {

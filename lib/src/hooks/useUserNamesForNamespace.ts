@@ -143,10 +143,6 @@ export const useUserNamesForNamespace = (
           certificate: certificateData,
         }
       })
-    },
-    {
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
     }
   )
 }

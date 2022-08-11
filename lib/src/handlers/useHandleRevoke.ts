@@ -45,7 +45,7 @@ export const useHandleRevoke = (
         trace,
         { op: 'getTransaction' }
       )
-      trace.finish()
+      trace?.finish()
       const json = await response.json()
       if (response.status !== 200) throw new Error(json.error)
     }
