@@ -101,7 +101,7 @@ export const NameEntryRow = ({
             userTokenData.metaplexData?.parsed.data.uri || ''
           )[1]
         )}
-        {globalReverseEntry.data &&
+        {/* {globalReverseEntry.data &&
           formatName(
             namespaceName,
             globalReverseEntry.data.parsed.entryName
@@ -111,7 +111,7 @@ export const NameEntryRow = ({
                 userTokenData.metaplexData?.parsed.data.name || '',
                 userTokenData.metaplexData?.parsed.data.uri || ''
               )
-            ) && <BsGlobe />}
+            ) && <BsGlobe />} */}
         {namespaceReverseEntry.data &&
           formatName(
             namespaceName,
