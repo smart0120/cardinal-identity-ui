@@ -3,6 +3,7 @@ import type { ClaimRequestData } from '@cardinal/namespaces'
 import { getClaimRequest } from '@cardinal/namespaces'
 import type { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
+import { tracer, withTrace } from '../utils/trace'
 
 export const useClaimRequest = (
   connection: Connection | undefined,
@@ -14,7 +15,10 @@ export const useClaimRequest = (
     ['useClaimRequest', namespaceName, entryName, pubkey?.toString()],
     async () => {
       if (!pubkey || !entryName || !connection) return
-      return getClaimRequest(connection, namespaceName, entryName, pubkey)
+      return withTrace(
+        () => getClaimRequest(connection, namespaceName, entryName, pubkey),
+        tracer({ name: 'getClaimRequest' })
+      )
     },
     {
       enabled: !!pubkey && !!entryName && !!connection,

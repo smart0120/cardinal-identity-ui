@@ -5,6 +5,7 @@ import {
 } from '@cardinal/namespaces'
 import type { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
+import { tracer, withTrace } from '../utils/trace'
 
 export const useGlobalReverseEntry = (
   connection: Connection | undefined,
@@ -15,7 +16,10 @@ export const useGlobalReverseEntry = (
     ['useGlobalReverseEntry', namespaceName, pubkey?.toString()],
     async () => {
       if (!pubkey || !connection) return
-      const reverseEntry = await getGlobalReverseNameEntry(connection, pubkey)
+      const reverseEntry = await withTrace(
+        () => getGlobalReverseNameEntry(connection, pubkey),
+        tracer({ name: 'getGlobalReverseNameEntry' })
+      )
       return reverseEntry || undefined
     },
     { refetchOnMount: false, refetchOnWindowFocus: false }

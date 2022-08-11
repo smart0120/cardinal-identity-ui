@@ -4,6 +4,7 @@ import { useQuery } from 'react-query'
 
 import { TWITTER_NAMESPACE_NAME } from '../utils/constants'
 import { tryGetImageUrl } from '../utils/format'
+import { tracer, withTrace } from '../utils/trace'
 import { useAddressName } from './useAddressName'
 
 export const useAddressImage = (
@@ -20,10 +21,9 @@ export const useAddressImage = (
         ? breakName(addressName.data)
         : []
       if (handle) {
-        const imageUrl = await tryGetImageUrl(
-          namespaceName,
-          handle,
-          dev || false
+        const imageUrl = await withTrace(
+          () => tryGetImageUrl(namespaceName, handle, dev || false),
+          tracer({ name: 'useAddressImage' })
         )
         console.log(imageUrl)
         return imageUrl

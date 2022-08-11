@@ -3,6 +3,7 @@ import type { Cluster, Connection } from '@solana/web3.js'
 import React, { useContext, useState } from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
+import * as Sentry from '@sentry/browser'
 
 import { ClaimCard } from '..'
 import { Modal } from '../modal'
@@ -76,6 +77,13 @@ export const WalletIdentityProvider: React.FC<Props> = ({
           onClose && setOnClose(() => onClose)
           setShowIdentityModal(true)
           setShowManageDefault(showManageDefault || false)
+          Sentry.configureScope((scope) => {
+            scope.setUser({
+              username: wallet.publicKey?.toString(),
+              wallet: wallet.publicKey?.toString(),
+            })
+            scope.setTag('wallet', wallet.publicKey?.toString())
+          })
         },
         handle,
         wallet,
