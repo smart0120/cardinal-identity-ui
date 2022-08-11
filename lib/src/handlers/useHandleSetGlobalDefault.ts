@@ -1,10 +1,6 @@
 import type { CertificateData } from '@cardinal/certificates'
 import type { AccountData } from '@cardinal/common'
-import {
-  deprecated,
-  withSetGlobalReverseEntry,
-  withSetNamespaceReverseEntry,
-} from '@cardinal/namespaces'
+import { withSetGlobalReverseEntry } from '@cardinal/namespaces'
 import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
 import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
@@ -50,7 +46,6 @@ export const useHandleSetGlobalDefault = (
       const txid = await executeTransaction(connection, wallet, transaction, {
         confirmOptions: {
           commitment: 'confirmed',
-          maxRetries: 3,
           skipPreflight: true,
         },
         notificationConfig: { message: 'Set to default successfully' },
