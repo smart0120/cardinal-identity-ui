@@ -34,7 +34,7 @@
   "dependencies": {
     "@cardinal/certificates": "^2.0.1",
     "@cardinal/common": "^2.0.9",
-    "@cardinal/namespaces": "^4.1.39",
+    "@cardinal/namespaces": "^4.1.42",
     "@cardinal/token-manager": "^1.5.11",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
