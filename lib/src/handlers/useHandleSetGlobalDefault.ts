@@ -46,7 +46,6 @@ export const useHandleSetGlobalDefault = (
       const txid = await executeTransaction(connection, wallet, transaction, {
         confirmOptions: {
           commitment: 'confirmed',
-          maxRetries: 3,
           skipPreflight: true,
         },
         notificationConfig: { message: 'Set to default successfully' },
