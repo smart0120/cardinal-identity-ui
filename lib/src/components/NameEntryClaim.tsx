@@ -182,6 +182,7 @@ export const NameEntryClaim = ({
                           margin: '10px 0px',
                           height: 'auto',
                           wordBreak: 'break-word',
+                          justifyContent: 'center',
                         }}
                         message={
                           <>
@@ -303,9 +304,8 @@ export const NameEntryClaim = ({
       </DetailsWrapper>
       <ButtonWithFooter
         loading={
-          !onComplete &&
-          (handleClaimTransaction.isLoading ||
-            handleSetNamespaceDefault.isLoading)
+          handleClaimTransaction.isLoading ||
+          handleSetNamespaceDefault.isLoading
         }
         complete={handleClaimTransaction.isSuccess}
         disabled={
