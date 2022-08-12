@@ -5,6 +5,7 @@ import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, PublicKey } from '@solana/web3.js'
 import { useMutation } from 'react-query'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
 import { apiBase } from '../utils/constants'
 import {
@@ -26,10 +27,11 @@ export const useHandleVerify = (
   wallet: Wallet,
   cluster: Cluster,
   accessToken: string,
-  namespace: string,
   setAccessToken: (handle: string) => void,
   setHandle: (handle: string) => void
 ) => {
+  const { identity } = useWalletIdentity()
+
   return useMutation(
     async ({
       verificationUrl,
@@ -44,9 +46,9 @@ export const useHandleVerify = (
         const tweetId = tweetIdFromUrl(verificationUrl)
         const response = await fetch(
           encodeURI(
-            `${apiBase(
-              cluster === 'devnet'
-            )}/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
+            `${apiBase(cluster === 'devnet')}/${
+              identity.name
+            }/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
               cluster && `&cluster=${cluster}`
             }`
           )
@@ -59,9 +61,9 @@ export const useHandleVerify = (
         if (!code) throw new Error('No code found in url')
         const response = await fetch(
           encodeURI(
-            `${apiBase(
-              cluster === 'devnet'
-            )}/twitter/verify?publicKey=${wallet?.publicKey.toString()}&namespace=${namespace}&code=${code}&accessToken=${accessToken}${
+            `${apiBase(cluster === 'devnet')}/${
+              identity.name
+            }/verify?publicKey=${wallet?.publicKey.toString()}&code=${code}&accessToken=${accessToken}${
               cluster && `&cluster=${cluster}`
             }`
           )

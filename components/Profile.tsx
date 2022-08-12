@@ -50,16 +50,22 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
         borderRadius: '1rem',
         // boxShadow: '0 0 80px 50px rgba(255, 255, 255, 0.3)',
         boxShadow: '0 4px 34px rgb(0 0 0 / 30%)',
-        background: '#FFF',
+        background: identity.colors.secondary,
       }}
     >
       <div style={{ marginBottom: '30px' }}>
         {addressName.isFetching ? (
           <Alert message={'Loading'} type="warning" />
         ) : addressName.data ? (
-          <Alert message={'Succesfully linked Twitter'} type="success" />
+          <Alert
+            message={`Succesfully linked ${identity.displayName}`}
+            type="success"
+          />
         ) : (
-          <Alert message={'Twitter not linked'} type="warning" />
+          <Alert
+            message={`${identity.displayName} not linked`}
+            type="warning"
+          />
         )}
       </div>
       <div
@@ -182,31 +188,33 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
             cluster={environment.label}
           />
         </div>
-        <button
-          disabled={address?.toString() !== wallet?.publicKey?.toString()}
-          className="rounded-md px-3 py-1 text-xs text-white"
-          onClick={() =>
-            show({
-              wallet: wallet as Wallet,
-              connection: connection,
-              cluster: environment.label,
-              secondaryConnection: environment.secondary
-                ? new Connection(environment.secondary)
-                : connection,
-              dev: environment.label === 'devnet',
-              showManage: true,
-            })
-          }
-          style={{
-            borderColor: '#657786',
-            background: '#64748b20',
-            color: '#657786',
-            opacity:
-              address?.toString() !== wallet?.publicKey?.toString() ? 0.5 : 1,
-          }}
-        >
-          Manage Profiles
-        </button>
+        {identity.name !== 'default' && (
+          <button
+            disabled={address?.toString() !== wallet?.publicKey?.toString()}
+            className="rounded-md px-3 py-1 text-xs text-white"
+            onClick={() =>
+              show({
+                wallet: wallet as Wallet,
+                connection: connection,
+                cluster: environment.label,
+                secondaryConnection: environment.secondary
+                  ? new Connection(environment.secondary)
+                  : connection,
+                dev: environment.label === 'devnet',
+                showManage: true,
+              })
+            }
+            style={{
+              borderColor: '#657786',
+              background: identity.colors.buttonColor,
+              color: identity.colors.secondaryFontColor,
+              opacity:
+                address?.toString() !== wallet?.publicKey?.toString() ? 0.5 : 1,
+            }}
+          >
+            Manage Profiles
+          </button>
+        )}
       </div>
     </div>
   )

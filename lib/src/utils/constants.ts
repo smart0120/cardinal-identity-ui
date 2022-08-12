@@ -1,3 +1,4 @@
 export function apiBase(dev?: boolean): string {
-  return `https://${dev ? 'dev-api' : 'api'}.cardinal.so`
+  return `http://localhost:8080/dev`
+  // return `https://${dev ? 'dev-api' : 'api'}.cardinal.so`
 }

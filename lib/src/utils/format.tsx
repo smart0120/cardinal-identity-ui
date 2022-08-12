@@ -75,7 +75,7 @@ export async function tryGetImageUrl(
     const response = await fetch(
       `${apiBase(
         dev
-      )}/twitter/proxy?url=https://api.twitter.com/2/users/by&usernames=${name}&user.fields=profile_image_url&namespace=${namespace}`
+      )}/${namespace}/proxy?url=https://api.twitter.com/2/users/by&usernames=${name}&user.fields=profile_image_url`
     )
     const json = (await response.json()) as {
       data: { profile_image_url: string }[]
@@ -105,7 +105,7 @@ export async function tryGetProfile(
     const response = await fetch(
       `${apiBase(
         dev
-      )}/namespaces/twitter/proxy?url=https://api.twitter.com/2/users/by&usernames=${handle}&user.fields=profile_image_url`
+      )}/twitter/proxy?url=https://api.twitter.com/2/users/by&usernames=${handle}&user.fields=profile_image_url`
     )
     const json = (await response.json()) as {
       data: {

@@ -5,9 +5,10 @@ import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, PublicKey } from '@solana/web3.js'
 import { useMutation } from 'react-query'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
 import { apiBase } from '../utils/constants'
-import { handleFromTweetUrl, tweetIdFromUrl } from '../utils/verification'
+import { tweetIdFromUrl } from '../utils/verification'
 
 export interface HandleSetParam {
   metaplexData?: {
@@ -21,10 +22,11 @@ export interface HandleSetParam {
 export const useHandleRevoke = (
   wallet: Wallet,
   cluster: Cluster,
-  accessToken: string,
   handle: string,
-  namespace: string
+  accessToken: string
 ) => {
+  const { identity } = useWalletIdentity()
+
   return useMutation(
     async ({
       verificationUrl,
@@ -34,22 +36,12 @@ export const useHandleRevoke = (
       if (!verificationUrl) return
       let requestURL = ''
 
-      if (namespace === 'twitter') {
-        const tweetId = tweetIdFromUrl(verificationUrl)
-        requestURL = `${apiBase(
-          cluster === 'devnet'
-        )}/namespaces/twitter/revoke?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}${
-          cluster && `&cluster=${cluster}`
-        }`
-      } else if (namespace === 'discord') {
-        requestURL = `${apiBase(
-          cluster === 'devnet'
-        )}/namespaces/twitter/revoke?publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=${namespace}&accessToken=${accessToken}${
-          cluster && `&cluster=${cluster}`
-        }`
-      } else {
-        throw new Error('Invalid verification URL provided')
-      }
+      const tweetId = tweetIdFromUrl(verificationUrl)
+      requestURL = `${apiBase(cluster === 'devnet')}/${
+        identity.name
+      }/revoke?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&accessToken=${accessToken}${
+        cluster && `&cluster=${cluster}`
+      }`
 
       const response = await fetch(requestURL)
       const json = await response.json()

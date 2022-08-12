@@ -240,7 +240,6 @@ export const handleError = (
       (e as SendTransactionError).message,
     ] ?? [(e as Error).toString()] ??
     []
-  console.log(additionalErrors)
 
   const matchedErrors: { programMatch?: boolean; errorMatch?: string }[] = dec
     ? [

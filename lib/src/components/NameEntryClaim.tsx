@@ -85,24 +85,16 @@ export const NameEntryClaim = ({
     wallet,
     cluster,
     accessToken,
-    identity.name,
     setAccessToken,
     setHandle
   )
-  const handleRevoke = useHandleRevoke(
-    wallet,
-    cluster,
-    accessToken,
-    handle,
-    identity.name
-  )
+  const handleRevoke = useHandleRevoke(wallet, cluster, handle, accessToken)
   const handleClaimTransaction = useHandleClaimTransaction(
     connection,
     wallet,
     cluster,
-    accessToken,
     handle,
-    identity.name
+    accessToken
   )
 
   const hndleSetNamespaceDefault = useHandleSetNamespaceDefault(

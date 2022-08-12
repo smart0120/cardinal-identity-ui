@@ -6,6 +6,7 @@ import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, Connection, PublicKey } from '@solana/web3.js'
 import { sendAndConfirmRawTransaction, Transaction } from '@solana/web3.js'
 import { useMutation } from 'react-query'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
 import { apiBase } from '../utils/constants'
 
@@ -22,10 +23,11 @@ export const useHandleClaimTransaction = (
   connection: Connection,
   wallet: Wallet,
   cluster: Cluster,
-  accessToken: string,
   handle: string,
-  namespace: string
+  accessToken: string
 ) => {
+  const { identity } = useWalletIdentity()
+
   return useMutation(
     [wallet.publicKey.toString()],
     async ({
@@ -34,7 +36,13 @@ export const useHandleClaimTransaction = (
       verificationUrl?: string
     }): Promise<string> => {
       if (!verificationUrl) throw new Error('No verification url provided')
-      const tx = await handleClaim(wallet, cluster, handle, verificationUrl)
+      const tx = await handleClaim(
+        wallet,
+        cluster,
+        identity.name,
+        handle,
+        verificationUrl
+      )
       if (!tx) return ''
       await wallet.signTransaction!(tx)
       return sendAndConfirmRawTransaction(connection, tx.serialize(), {
@@ -47,6 +55,7 @@ export const useHandleClaimTransaction = (
 export async function handleClaim(
   wallet: Wallet,
   cluster: Cluster,
+  namespace: string,
   handle: string | undefined,
   tweetId: string | undefined
 ): Promise<Transaction | null> {
@@ -54,7 +63,7 @@ export async function handleClaim(
   const response = await fetch(
     `${apiBase(
       cluster === 'devnet'
-    )}/namespaces/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=twitter${
+    )}/${namespace}/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
       cluster === 'devnet' ? `&cluster=${cluster}` : ''
     }`,
     {
