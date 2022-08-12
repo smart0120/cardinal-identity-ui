@@ -9,7 +9,6 @@ import { LoadingSpinner } from '../common/LoadingSpinner'
 import { useHandleClaimTransaction } from '../handlers/useHandleClaimTransaction'
 import { useHandleRevoke } from '../handlers/useHandleRevoke'
 import { useHandleVerify } from '../handlers/useHandleVerify'
-import { useClaimRequest } from '../hooks/useClaimRequest'
 import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
 import { useNameEntryData } from '../hooks/useNameEntryData'
 import { TWITTER_NAMESPACE_NAME } from '../utils/constants'
@@ -62,7 +61,6 @@ export const NameEntryClaim = ({
   const [tweetUrl, setTweetUrl] = useState<string | undefined>(undefined)
   const handle = handleFromTweetUrl(tweetUrl)
   const tweetId = tweetIdFromTweetUrl(tweetUrl)
-  const [claimed, setClaimed] = useState(false)
 
   const reverseEntry = useGlobalReverseEntry(
     connection,
@@ -73,12 +71,6 @@ export const NameEntryClaim = ({
     secondaryConnection || connection,
     namespaceName,
     handle
-  )
-  const claimRequest = useClaimRequest(
-    connection,
-    namespaceName,
-    handle,
-    wallet?.publicKey
   )
 
   const handleVerify = useHandleVerify(wallet, cluster, dev)
@@ -101,7 +93,6 @@ export const NameEntryClaim = ({
       handleVerify.mutate(
         { tweetId, handle },
         {
-          onSuccess: () => claimRequest?.refetch(),
           onError: (e) =>
             notify({
               message: `Failed Transaction`,
@@ -110,14 +101,7 @@ export const NameEntryClaim = ({
         }
       )
     }
-  }, [
-    wallet.publicKey.toString(),
-    tweetUrl,
-    handle,
-    tweetSent,
-    tweetId,
-    claimRequest.data?.pubkey.toString(),
-  ])
+  }, [wallet.publicKey.toString(), tweetUrl, handle, tweetSent, tweetId])
 
   const alreadyOwned =
     nameEntryData.data?.owner?.toString() && !nameEntryData.data?.isOwnerPDA
@@ -221,9 +205,7 @@ export const NameEntryClaim = ({
                         showIcon
                       />
                     )}
-                    {nameEntryData.isFetching ||
-                    claimRequest.isFetching ||
-                    handleRevoke.isLoading ? (
+                    {nameEntryData.isFetching || handleRevoke.isLoading ? (
                       <div className="mb-2 h-8 min-w-full animate-pulse rounded-lg bg-gray-200"></div>
                     ) : (
                       alreadyOwned &&
@@ -280,7 +262,6 @@ export const NameEntryClaim = ({
                                             message: 'Revoke successful',
                                           })
                                           nameEntryData.refetch()
-                                          claimRequest.refetch()
                                         },
                                         onError: (e) => {
                                           notify({
@@ -363,7 +344,7 @@ export const NameEntryClaim = ({
         loading={
           handleClaimTransaction.isLoading || hndleSetNamespaceDefault.isLoading
         }
-        complete={claimed}
+        complete={handleClaimTransaction.isSuccess}
         disabled={
           !handleVerify.isSuccess ||
           tweetUrl?.length === 0 ||
