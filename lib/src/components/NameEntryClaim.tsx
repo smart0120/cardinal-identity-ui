@@ -9,7 +9,6 @@ import { LoadingSpinner } from '../common/LoadingSpinner'
 import { useHandleClaimTransaction } from '../handlers/useHandleClaimTransaction'
 import { useHandleRevoke } from '../handlers/useHandleRevoke'
 import { useHandleVerify } from '../handlers/useHandleVerify'
-import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
 import { useNameEntryData } from '../hooks/useNameEntryData'
 import { TWITTER_NAMESPACE_NAME } from '../utils/constants'
 import { formatShortAddress, formatTwitterLink } from '../utils/format'
@@ -61,18 +60,11 @@ export const NameEntryClaim = ({
   const [tweetUrl, setTweetUrl] = useState<string | undefined>(undefined)
   const handle = handleFromTweetUrl(tweetUrl)
   const tweetId = tweetIdFromTweetUrl(tweetUrl)
-
-  const reverseEntry = useGlobalReverseEntry(
-    connection,
-    namespaceName,
-    wallet?.publicKey
-  )
   const nameEntryData = useNameEntryData(
     secondaryConnection || connection,
     namespaceName,
     handle
   )
-
   const handleVerify = useHandleVerify(wallet, cluster, dev)
   const handleRevoke = useHandleRevoke(wallet, cluster, dev)
   const handleClaimTransaction = useHandleClaimTransaction(
@@ -81,7 +73,7 @@ export const NameEntryClaim = ({
     cluster
   )
 
-  const hndleSetNamespaceDefault = useHandleSetNamespaceDefault(
+  const handleSetNamespaceDefault = useHandleSetNamespaceDefault(
     connection,
     wallet,
     namespaceName,
@@ -209,7 +201,8 @@ export const NameEntryClaim = ({
                       <div className="mb-2 h-8 min-w-full animate-pulse rounded-lg bg-gray-200"></div>
                     ) : (
                       alreadyOwned &&
-                      handleVerify.isSuccess && (
+                      handleVerify.isSuccess &&
+                      !handleRevoke.isSuccess && (
                         <>
                           <Alert
                             style={{
@@ -261,7 +254,6 @@ export const NameEntryClaim = ({
                                           notify({
                                             message: 'Revoke successful',
                                           })
-                                          nameEntryData.refetch()
                                         },
                                         onError: (e) => {
                                           notify({
@@ -324,7 +316,7 @@ export const NameEntryClaim = ({
             showIcon
           />
         )}
-        {hndleSetNamespaceDefault.error && (
+        {handleSetNamespaceDefault.error && (
           <Alert
             style={{
               height: 'auto',
@@ -332,7 +324,7 @@ export const NameEntryClaim = ({
             }}
             message={
               <>
-                <div>{`${hndleSetNamespaceDefault.error}`}</div>
+                <div>{`${handleSetNamespaceDefault.error}`}</div>
               </>
             }
             type="error"
@@ -342,14 +334,15 @@ export const NameEntryClaim = ({
       </DetailsWrapper>
       <ButtonWithFooter
         loading={
-          handleClaimTransaction.isLoading || hndleSetNamespaceDefault.isLoading
+          handleClaimTransaction.isLoading ||
+          handleSetNamespaceDefault.isLoading
         }
         complete={handleClaimTransaction.isSuccess}
         disabled={
           !handleVerify.isSuccess ||
           tweetUrl?.length === 0 ||
           !nameEntryData.isFetched ||
-          alreadyOwned
+          (alreadyOwned && !handleRevoke.isSuccess)
         }
         onClick={async () => {
           let isMasterEdition = true
@@ -364,15 +357,13 @@ export const NameEntryClaim = ({
             }
           }
           if (!isMasterEdition) {
-            hndleSetNamespaceDefault.mutate(
+            handleSetNamespaceDefault.mutate(
               {
                 tokenData: { metaplexData: nameEntryData.data?.metaplexData },
                 forceMigrate: true,
               },
               {
                 onSuccess: () => {
-                  nameEntryData.remove()
-                  reverseEntry.remove()
                   onComplete && onComplete(handle || '')
                 },
                 onError: (e) =>
@@ -390,8 +381,6 @@ export const NameEntryClaim = ({
               },
               {
                 onSuccess: () => {
-                  nameEntryData.remove()
-                  reverseEntry.remove()
                   onComplete && onComplete(handle || '')
                 },
                 onError: (e) =>

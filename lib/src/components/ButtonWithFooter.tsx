@@ -1,5 +1,6 @@
 import styled from '@emotion/styled'
 import { lighten } from 'polished'
+import { FaCheckCircle } from 'react-icons/fa'
 
 import { LoadingSpinner } from '../common/LoadingSpinner'
 
@@ -24,13 +25,7 @@ export const ButtonWithFooter: React.FC<Props> = ({
   return (
     <BottomArea>
       <BigButton disabled={disabled} {...props}>
-        {loading ? (
-          <LoadingSpinner />
-        ) : complete ? (
-          <i className="fas fa-check-circle"></i>
-        ) : (
-          children
-        )}
+        {loading ? <LoadingSpinner /> : complete ? <FaCheckCircle /> : children}
       </BigButton>
       <FooterText>{footer}</FooterText>
     </BottomArea>

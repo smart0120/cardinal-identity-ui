@@ -22,6 +22,10 @@ export const useGlobalReverseEntry = (
       )
       return reverseEntry || undefined
     },
-    { refetchOnMount: false, refetchOnWindowFocus: false }
+    {
+      enabled: !!connection || !!pubkey,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+    }
   )
 }
