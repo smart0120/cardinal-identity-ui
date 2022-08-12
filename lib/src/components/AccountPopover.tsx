@@ -64,8 +64,8 @@ export const AccountPopover = ({
               <span>
                 {addressName.isLoading ? (
                   <div
-                    className="animate h-4 w-24 animate-pulse"
-                    style={{ background: rgba(0, 0, 0, 0.1) }}
+                    className="h-5 w-24 animate-pulse rounded-md"
+                    style={{ backgroundColor: dark ? '#555' : '#DDD' }}
                   />
                 ) : addressName.data ? (
                   'Edit Twitter'

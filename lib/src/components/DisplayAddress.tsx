@@ -19,8 +19,6 @@ export const DisplayAddress: React.FC<Props> = ({
   loader,
 }: Props) => {
   const addressName = useAddressName(connection, address)
-
-  if (!address) return <></>
   return addressName.isLoading ? (
     loader ?? (
       <div
