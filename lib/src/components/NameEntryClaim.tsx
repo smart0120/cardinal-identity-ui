@@ -18,22 +18,10 @@ import { Link, Megaphone, Verified } from './icons'
 import { LabeledInput } from './LabeledInput'
 import { PostTweet } from './PostTweet'
 import { StepDetail } from './StepDetail'
-import { MasterEdition } from '@metaplex-foundation/mpl-token-metadata'
-import { useHandleSetNamespaceDefault } from '../handlers/useHandleSetNamespaceDefault'
 import { notify } from '../common/Notification'
 import { handleError } from '../utils/errors'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { HandleNFT } from './HandleNFT'
-
-const handleFromTweetUrl = (raw: string | undefined): string | undefined => {
-  if (!raw) return undefined
-  return raw.split('/')[3]
-}
-
-const tweetIdFromTweetUrl = (raw: string | undefined): string | undefined => {
-  if (!raw) return undefined
-  return raw.split('/')[5]?.split('?')[0]
-}
 
 export const NameEntryClaim = ({
   cluster = 'mainnet-beta',
@@ -95,13 +83,6 @@ export const NameEntryClaim = ({
     cluster,
     handle,
     accessToken
-  )
-
-  const hndleSetNamespaceDefault = useHandleSetNamespaceDefault(
-    connection,
-    wallet,
-    identity.name,
-    cluster
   )
 
   useMemo(() => {
@@ -372,26 +353,9 @@ export const NameEntryClaim = ({
             showIcon
           />
         )}
-        {hndleSetNamespaceDefault.error && (
-          <Alert
-            style={{
-              height: 'auto',
-              wordBreak: 'break-word',
-            }}
-            message={
-              <>
-                <div>{`${hndleSetNamespaceDefault.error}`}</div>
-              </>
-            }
-            type="error"
-            showIcon
-          />
-        )}
       </DetailsWrapper>
       <ButtonWithFooter
-        loading={
-          handleClaimTransaction.isLoading || hndleSetNamespaceDefault.isLoading
-        }
+        loading={handleClaimTransaction.isLoading}
         complete={claimed}
         disabled={
           !handleVerify.isSuccess ||
@@ -400,55 +364,23 @@ export const NameEntryClaim = ({
           (alreadyOwned && !claimRequest.data?.parsed.isApproved)
         }
         onClick={async () => {
-          let isMasterEdition = true
-          if (nameEntryData.data?.nameEntry.parsed) {
-            const masterEditionId = await MasterEdition.getPDA(
-              nameEntryData.data?.nameEntry.parsed.mint
-            )
-            try {
-              await MasterEdition.getInfo(connection, masterEditionId)
-            } catch (e) {
-              isMasterEdition = false
+          handleClaimTransaction.mutate(
+            {
+              verificationUrl,
+            },
+            {
+              onSuccess: () => {
+                nameEntryData.remove()
+                reverseEntry.remove()
+                onComplete && onComplete(handle || '')
+              },
+              onError: (e) =>
+                notify({
+                  message: `Failed Transaction`,
+                  description: e as string,
+                }),
             }
-          }
-          if (!isMasterEdition) {
-            hndleSetNamespaceDefault.mutate(
-              {
-                tokenData: { metaplexData: nameEntryData.data?.metaplexData },
-                forceMigrate: true,
-              },
-              {
-                onSuccess: () => {
-                  nameEntryData.remove()
-                  reverseEntry.remove()
-                  onComplete && onComplete(handle || '')
-                },
-                onError: (e) =>
-                  notify({
-                    message: `Failed Transaction`,
-                    description: e as string,
-                  }),
-              }
-            )
-          } else {
-            handleClaimTransaction.mutate(
-              {
-                verificationUrl,
-              },
-              {
-                onSuccess: () => {
-                  nameEntryData.remove()
-                  reverseEntry.remove()
-                  onComplete && onComplete(handle || '')
-                },
-                onError: (e) =>
-                  notify({
-                    message: `Failed Transaction`,
-                    description: e as string,
-                  }),
-              }
-            )
-          }
+          )
         }}
       >
         Claim {handle && `@${handle}`}

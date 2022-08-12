@@ -9,7 +9,7 @@ export const useAddressImage = (
   connection: Connection,
   address: PublicKey | undefined,
   namespaceName: string,
-  dev?: boolean,
+  dev?: boolean
 ) => {
   const addressName = useAddressName(connection, address, namespaceName)
   return useQuery<string | undefined>(
@@ -24,7 +24,6 @@ export const useAddressImage = (
           handle,
           dev || false
         )
-        console.log(imageUrl)
         return imageUrl
       } else {
         return undefined

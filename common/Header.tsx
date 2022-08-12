@@ -1,7 +1,6 @@
 import styled from '@emotion/styled'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 import { LogoTitled } from 'lib/src/common/LogoTitled'
-import { lighten } from 'polished'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
 
 const WalletButton = styled(WalletMultiButton)`

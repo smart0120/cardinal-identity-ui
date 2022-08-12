@@ -36,18 +36,29 @@ export const useHandleClaimTransaction = (
       verificationUrl?: string
     }): Promise<string> => {
       if (!verificationUrl) throw new Error('No verification url provided')
-      const tx = await handleClaim(
+      const transactions = await handleClaim(
         wallet,
         cluster,
         identity.name,
         handle,
         verificationUrl
       )
-      if (!tx) return ''
-      await wallet.signTransaction!(tx)
-      return sendAndConfirmRawTransaction(connection, tx.serialize(), {
-        skipPreflight: true,
+      if (!transactions) return ''
+      await wallet.signAllTransactions(transactions)
+      let txId = ''
+      transactions.forEach(async (tx, index) => {
+        const id = await sendAndConfirmRawTransaction(
+          connection,
+          tx.serialize(),
+          {
+            skipPreflight: true,
+          }
+        )
+        if (index === transactions.length - 1) {
+          txId = id
+        }
       })
+      return txId
     }
   )
 }
@@ -58,7 +69,7 @@ export async function handleClaim(
   namespace: string,
   handle: string | undefined,
   tweetId: string | undefined
-): Promise<Transaction | null> {
+): Promise<Transaction[] | null> {
   if (!handle || !tweetId) return null
   const response = await fetch(
     `${apiBase(
@@ -76,7 +87,8 @@ export async function handleClaim(
   )
   const json = await response.json()
   if (response.status !== 200 || json.error) throw new Error(json.error)
-  const { transaction } = json
-  const buffer = Buffer.from(decodeURIComponent(transaction), 'base64')
-  return Transaction.from(buffer)
+  const transactions = json.transactions as string[]
+  return transactions.map((tx) =>
+    Transaction.from(Buffer.from(decodeURIComponent(tx), 'base64'))
+  )
 }
