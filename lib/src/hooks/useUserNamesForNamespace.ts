@@ -143,6 +143,9 @@ export const useUserNamesForNamespace = (
           certificate: certificateData,
         }
       })
+    },
+    {
+      refetchOnMount: true,
     }
   )
 }

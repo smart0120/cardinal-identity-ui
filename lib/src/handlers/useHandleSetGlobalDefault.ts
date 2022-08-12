@@ -6,7 +6,7 @@ import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Connection } from '@solana/web3.js'
 import { PublicKey, Transaction } from '@solana/web3.js'
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 
 import { nameFromMint } from '../components/NameManager'
 import { tracer, withTrace } from '../utils/trace'
@@ -26,6 +26,7 @@ export const useHandleSetGlobalDefault = (
   wallet: Wallet,
   namespaceName: string
 ) => {
+  const queryClient = useQueryClient()
   return useMutation(
     async ({ tokenData }: { tokenData?: HandleSetParam }): Promise<string> => {
       if (!tokenData) return ''
@@ -64,6 +65,9 @@ export const useHandleSetGlobalDefault = (
       )
       trace?.finish()
       return txid
+    },
+    {
+      onSuccess: () => queryClient.invalidateQueries(),
     }
   )
 }

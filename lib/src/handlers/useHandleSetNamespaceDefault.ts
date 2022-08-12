@@ -13,7 +13,7 @@ import {
   sendAndConfirmRawTransaction,
   Transaction,
 } from '@solana/web3.js'
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 
 import { nameFromMint } from '../components/NameManager'
 import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
@@ -33,6 +33,7 @@ export const useHandleSetNamespaceDefault = (
   namespaceName: string,
   cluster = 'mainnet'
 ) => {
+  const queryClient = useQueryClient()
   const globalReverseEntry = useGlobalReverseEntry(
     connection,
     namespaceName,
@@ -128,6 +129,9 @@ export const useHandleSetNamespaceDefault = (
       }
       trace?.finish()
       return txId
+    },
+    {
+      onSuccess: () => queryClient.invalidateQueries(),
     }
   )
 }

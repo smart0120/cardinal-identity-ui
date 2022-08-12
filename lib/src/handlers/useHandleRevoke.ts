@@ -4,7 +4,7 @@ import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs
 import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, PublicKey } from '@solana/web3.js'
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 
 import { apiBase } from '../utils/constants'
 import { tracer, withTrace } from '../utils/trace'
@@ -23,6 +23,7 @@ export const useHandleRevoke = (
   cluster: Cluster,
   dev: boolean
 ) => {
+  const queryClient = useQueryClient()
   return useMutation(
     async ({
       tweetId,
@@ -48,6 +49,9 @@ export const useHandleRevoke = (
       trace?.finish()
       const json = await response.json()
       if (response.status !== 200) throw new Error(json.error)
+    },
+    {
+      onSuccess: () => queryClient.invalidateQueries(),
     }
   )
 }

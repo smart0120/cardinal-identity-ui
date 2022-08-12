@@ -9,7 +9,6 @@ import { ClaimCard } from '..'
 import { Modal } from '../modal'
 import { withSleep } from '../utils/transactions'
 
-const DEBUG = false
 const SENTRY_DSN =
   'https://109718d85e0640f0b5f7160e2602b5f0@o1340959.ingest.sentry.io/6625303'
 
@@ -43,6 +42,15 @@ interface Props {
   appTwitter?: string
   children: React.ReactNode
 }
+
+const QUERY_CLIENT = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+    },
+  },
+})
 
 export const WalletIdentityProvider: React.FC<Props> = ({
   appName,
@@ -100,22 +108,12 @@ export const WalletIdentityProvider: React.FC<Props> = ({
         showIdentityModal,
       }}
     >
-      <QueryClientProvider
-        client={
-          new QueryClient({
-            defaultOptions: {
-              queries: {
-                refetchOnMount: false,
-                refetchOnWindowFocus: false,
-              },
-            },
-          })
-        }
-      >
+      <QueryClientProvider client={QUERY_CLIENT}>
         <Modal
           isOpen={showIdentityModal}
           onDismiss={() => {
             setShowIdentityModal(false)
+            QUERY_CLIENT.invalidateQueries()
             onClose && onClose()
           }}
           darkenOverlay={true}
@@ -139,7 +137,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
           />
         </Modal>
         {children}
-        {DEBUG && <ReactQueryDevtools initialIsOpen={false} />}
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </WalletIdentityContext.Provider>
   )

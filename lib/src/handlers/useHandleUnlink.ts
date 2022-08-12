@@ -13,7 +13,7 @@ import {
   sendAndConfirmRawTransaction,
   Transaction,
 } from '@solana/web3.js'
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 
 import { nameFromMint } from '../components/NameManager'
 import type { UserTokenData } from '../hooks/useUserNamesForNamespace'
@@ -26,6 +26,7 @@ export const useHandleUnlink = (
   namespaceName: string,
   userTokenData: UserTokenData
 ) => {
+  const queryClient = useQueryClient()
   return useMutation(
     async ({
       globalReverseNameEntryData,
@@ -60,6 +61,9 @@ export const useHandleUnlink = (
         { op: 'sendTransaction' }
       )
       return txid
+    },
+    {
+      onSuccess: () => queryClient.invalidateQueries(),
     }
   )
 }
