@@ -15,7 +15,7 @@ export const useAddressImage = (
 ) => {
   const addressName = useAddressName(connection, address, namespaceName)
   return useQuery<string | undefined>(
-    ['useAddressImage', address, namespaceName, addressName.data],
+    ['useAddressImage', address?.toString(), namespaceName, addressName.data],
     async () => {
       const [_namespace, handle] = addressName.data
         ? breakName(addressName.data)

@@ -7,7 +7,6 @@ import {
 import type { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
 
-import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { TWITTER_NAMESPACE_NAME } from '../utils/constants'
 import { tracer, withTrace } from '../utils/trace'
 
@@ -16,10 +15,8 @@ export const useAddressName = (
   address: PublicKey | undefined,
   namespaceName = TWITTER_NAMESPACE_NAME
 ) => {
-  const { handle } = useWalletIdentity()
-
   return useQuery<string | undefined>(
-    ['useAddressName', address, namespaceName, handle],
+    ['useAddressName', address?.toString(), namespaceName],
     async () => {
       if (!address || !connection) return
       const n = await tryGetNameForNamespace(connection, address, namespaceName)
