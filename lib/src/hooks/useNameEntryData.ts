@@ -123,6 +123,8 @@ export const useNameEntryData = (
     },
     {
       enabled: !!entryName && !!connection,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
     }
   )
 }

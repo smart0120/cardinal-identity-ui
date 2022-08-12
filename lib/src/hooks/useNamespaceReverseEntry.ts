@@ -29,6 +29,7 @@ export const useNamespaceReverseEntry = (
         // no namespace reverse entry found and global not allowed
       }
       return reverseEntry || undefined
-    }
+    },
+    { refetchOnMount: false, refetchOnWindowFocus: false }
   )
 }

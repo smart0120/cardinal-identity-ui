@@ -21,6 +21,7 @@ export const useGlobalReverseEntry = (
         tracer({ name: 'getGlobalReverseNameEntry' })
       )
       return reverseEntry || undefined
-    }
+    },
+    { refetchOnMount: false, refetchOnWindowFocus: false }
   )
 }

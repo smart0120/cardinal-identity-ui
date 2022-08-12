@@ -21,7 +21,8 @@ export const useAddressName = (
       if (!address || !connection) return
       const n = await tryGetNameForNamespace(connection, address, namespaceName)
       return n ? n[0] : undefined
-    }
+    },
+    { refetchOnMount: false, refetchOnWindowFocus: false }
   )
 }
 

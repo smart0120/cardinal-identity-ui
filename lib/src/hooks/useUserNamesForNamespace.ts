@@ -146,6 +146,7 @@ export const useUserNamesForNamespace = (
     },
     {
       refetchOnMount: true,
+      refetchOnWindowFocus: false,
     }
   )
 }

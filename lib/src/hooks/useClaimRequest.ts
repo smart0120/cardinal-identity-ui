@@ -22,6 +22,8 @@ export const useClaimRequest = (
     },
     {
       enabled: !!pubkey && !!entryName && !!connection,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
     }
   )
 }

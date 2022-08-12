@@ -30,6 +30,10 @@ export const useAddressImage = (
         return undefined
       }
     },
-    { enabled: addressName.isFetched }
+    {
+      enabled: addressName.isFetched,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+    }
   )
 }

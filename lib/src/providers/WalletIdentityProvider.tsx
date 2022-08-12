@@ -43,14 +43,7 @@ interface Props {
   children: React.ReactNode
 }
 
-const QUERY_CLIENT = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-    },
-  },
-})
+const QUERY_CLIENT = new QueryClient()
 
 export const WalletIdentityProvider: React.FC<Props> = ({
   appName,
