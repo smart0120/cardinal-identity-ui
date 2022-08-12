@@ -97,7 +97,7 @@ export const NameEntryClaim = ({
   )
 
   useMemo(() => {
-    if (tweetUrl && tweetSent && !claimRequest?.data?.parsed?.isApproved) {
+    if (tweetUrl && tweetSent) {
       handleVerify.mutate(
         { tweetId, handle },
         {
@@ -221,11 +221,13 @@ export const NameEntryClaim = ({
                         showIcon
                       />
                     )}
-                    {nameEntryData.isFetching || claimRequest.isFetching ? (
+                    {nameEntryData.isFetching ||
+                    claimRequest.isFetching ||
+                    handleRevoke.isLoading ? (
                       <div className="mb-2 h-8 min-w-full animate-pulse rounded-lg bg-gray-200"></div>
                     ) : (
                       alreadyOwned &&
-                      !claimRequest.data?.parsed.isApproved && (
+                      handleVerify.isSuccess && (
                         <>
                           <Alert
                             style={{
@@ -281,7 +283,6 @@ export const NameEntryClaim = ({
                                           claimRequest.refetch()
                                         },
                                         onError: (e) => {
-                                          console.log('here', e)
                                           notify({
                                             message: `Failed Transaction`,
                                             description: e as string,
@@ -367,7 +368,7 @@ export const NameEntryClaim = ({
           !handleVerify.isSuccess ||
           tweetUrl?.length === 0 ||
           !nameEntryData.isFetched ||
-          (alreadyOwned && !claimRequest.data?.parsed.isApproved)
+          alreadyOwned
         }
         onClick={async () => {
           let isMasterEdition = true
