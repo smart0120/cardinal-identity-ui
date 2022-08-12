@@ -67,7 +67,8 @@ export const NameEntryClaim = ({
   const handleClaimTransaction = useHandleClaimTransaction(
     connection,
     wallet,
-    cluster
+    cluster,
+    dev
   )
 
   const handleSetNamespaceDefault = useHandleSetNamespaceDefault(

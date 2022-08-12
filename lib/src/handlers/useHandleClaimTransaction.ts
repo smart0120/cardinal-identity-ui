@@ -22,7 +22,8 @@ export interface HandleSetParam {
 export const useHandleClaimTransaction = (
   connection: Connection,
   wallet: Wallet,
-  cluster: Cluster
+  cluster: Cluster,
+  dev = false
 ) => {
   const queryClient = useQueryClient()
   return useMutation(
@@ -66,12 +67,13 @@ export async function handleClaim(
   wallet: Wallet,
   cluster: Cluster,
   handle: string | undefined,
-  tweetId: string | undefined
+  tweetId: string | undefined,
+  dev?: boolean
 ): Promise<Transaction[] | null> {
   if (!handle || !tweetId) return null
   const response = await fetch(
     `${apiBase(
-      cluster === 'devnet'
+      dev
     )}/namespaces/twitter/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=twitter${
       cluster === 'devnet' ? `&cluster=${cluster}` : ''
     }`,
