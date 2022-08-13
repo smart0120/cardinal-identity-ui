@@ -1,47 +1,42 @@
 import type { Connection, PublicKey } from '@solana/web3.js'
-import ContentLoader from 'react-content-loader'
 
 import { useAddressName } from '../hooks/useAddressName'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { formatShortAddress, formatIdentityLink } from '../utils/format'
 
-export const DisplayAddress = ({
-  connection,
-  address,
-  height = '20px',
-  width = '100px',
-  dark = false,
-  style,
-}: {
+type Props = {
   connection: Connection
   address: PublicKey | undefined
-  height?: string
-  width?: string
   dark?: boolean
   style?: React.CSSProperties
-}) => {
+  loader?: React.ReactElement
+}
+
+export const DisplayAddress: React.FC<Props> = ({
+  connection,
+  address,
+  dark = false,
+  style,
+  loader,
+}: Props) => {
   const { identity } = useWalletIdentity()
   const addressName = useAddressName(connection, address, identity.name)
-
-  if (!address) return <></>
   return addressName.isLoading ? (
+    loader ?? (
+      <div
+        className="h-5 w-24 animate-pulse rounded-md"
+        style={{ backgroundColor: dark ? '#555' : '#DDD' }}
+      />
+    )
+  ) : (
     <div
       style={{
+        display: 'flex',
+        gap: '5px',
+        color: dark ? 'white' : 'black',
         ...style,
-        height,
-        width,
-        overflow: 'hidden',
       }}
     >
-      <ContentLoader
-        backgroundColor={dark ? '#333' : undefined}
-        foregroundColor={dark ? '#555' : undefined}
-      >
-        <rect style={{ ...style }} x={0} y={0} width={width} height={height} />
-      </ContentLoader>
-    </div>
-  ) : (
-    <div style={{ display: 'flex', gap: '5px', ...style }}>
       {addressName.data?.includes('@')
         ? formatIdentityLink(addressName.data, identity.name)
         : addressName.data || formatShortAddress(address)}

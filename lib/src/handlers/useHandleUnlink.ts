@@ -13,11 +13,12 @@ import {
   sendAndConfirmRawTransaction,
   Transaction,
 } from '@solana/web3.js'
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 
 import { nameFromMint } from '../components/NameManager'
 import type { UserTokenData } from '../hooks/useUserNamesForNamespace'
 import { withInvalidate } from '@cardinal/token-manager'
+import { tracer, withTrace } from '../utils/trace'
 
 export const useHandleUnlink = (
   connection: Connection,
@@ -25,6 +26,7 @@ export const useHandleUnlink = (
   namespaceName: string,
   userTokenData: UserTokenData
 ) => {
+  const queryClient = useQueryClient()
   return useMutation(
     async ({
       globalReverseNameEntryData,
@@ -33,20 +35,35 @@ export const useHandleUnlink = (
       globalReverseNameEntryData?: AccountData<ReverseEntryData>
       namespaceReverseEntry?: AccountData<ReverseEntryData>
     }): Promise<string> => {
-      const transaction = await handleUnlink(connection, wallet, {
-        namespaceName: namespaceName,
-        userTokenData: userTokenData,
-        globalReverseNameEntryData: globalReverseNameEntryData,
-        namespaceReverseEntry: namespaceReverseEntry,
-      })
+      const trace = tracer({ name: 'useHandleUnlink' })
+      const transaction = await withTrace(
+        () =>
+          handleUnlink(connection, wallet, {
+            namespaceName: namespaceName,
+            userTokenData: userTokenData,
+            globalReverseNameEntryData: globalReverseNameEntryData,
+            namespaceReverseEntry: namespaceReverseEntry,
+          }),
+        trace,
+        { op: 'handleUnlink' }
+      )
       transaction.feePayer = wallet.publicKey
       transaction.recentBlockhash = (
         await connection.getRecentBlockhash('max')
       ).blockhash
       await wallet.signTransaction(transaction)
-      return sendAndConfirmRawTransaction(connection, transaction.serialize(), {
-        skipPreflight: true,
-      })
+      const txid = withTrace(
+        () =>
+          sendAndConfirmRawTransaction(connection, transaction.serialize(), {
+            skipPreflight: true,
+          }),
+        trace,
+        { op: 'sendTransaction' }
+      )
+      return txid
+    },
+    {
+      onSuccess: () => queryClient.invalidateQueries(),
     }
   )
 }

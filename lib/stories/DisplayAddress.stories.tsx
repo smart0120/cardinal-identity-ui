@@ -38,8 +38,6 @@ const Template: ComponentStory<typeof DisplayAddress> = ({ ...args }) => {
               new Connection('https://api.mainnet-beta.solana.com')
             }
             style={args.style}
-            height={args.height}
-            width={args.width}
             dark={args.dark}
           />
         </div>

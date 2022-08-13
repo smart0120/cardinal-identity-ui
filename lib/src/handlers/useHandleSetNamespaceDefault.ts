@@ -13,11 +13,13 @@ import {
   sendAndConfirmRawTransaction,
   Transaction,
 } from '@solana/web3.js'
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 
 import { nameFromMint } from '../components/NameManager'
 import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { handleError } from '../utils/errors'
+import { tracer, withTrace } from '../utils/trace'
 import { handleMigrate } from './handleMigrate'
 
 export interface HandleSetParam {
@@ -29,12 +31,13 @@ export interface HandleSetParam {
 export const useHandleSetNamespaceDefault = (
   connection: Connection,
   wallet: Wallet,
-  namespaceName: string,
   cluster = 'mainnet'
 ) => {
+  const queryClient = useQueryClient()
+  const { identity } = useWalletIdentity()
   const globalReverseEntry = useGlobalReverseEntry(
     connection,
-    namespaceName,
+    identity.name,
     wallet?.publicKey
   )
 
@@ -54,34 +57,48 @@ export const useHandleSetNamespaceDefault = (
         tokenData.metaplexData?.parsed.data.name || '',
         tokenData.metaplexData?.parsed.data.uri || ''
       )
-
+      const trace = tracer({ name: 'useGlobalReverseEntry' })
       if (tokenData.certificate || forceMigrate) {
         console.log('Type certificate, migrating ...')
-        const response = await handleMigrate(wallet, entryName, cluster)
+        const response = await withTrace(
+          () => handleMigrate(wallet, entryName, cluster),
+          trace,
+          { op: 'handleMigrate' }
+        )
         newMintId = response?.mintId
         transactions = response?.transactions || []
         console.log('Added migration instruction')
       }
 
       const transaction = new Transaction()
-      await withSetNamespaceReverseEntry(
-        transaction,
-        connection,
-        wallet,
-        namespaceName,
-        entryName,
-        newMintId || entryMint
+      await withTrace(
+        () =>
+          withSetNamespaceReverseEntry(
+            transaction,
+            connection,
+            wallet,
+            identity.name,
+            entryName,
+            newMintId || entryMint
+          ),
+        trace,
+        { op: 'withSetNamespaceReverseEntry' }
       )
 
       if (
         globalReverseEntry.data &&
-        globalReverseEntry.data.parsed.namespaceName === namespaceName
+        globalReverseEntry.data.parsed.namespaceName === identity.name
       ) {
-        await withSetGlobalReverseEntry(transaction, connection, wallet, {
-          namespaceName: namespaceName,
-          entryName: entryName,
-          mintId: newMintId || entryMint,
-        })
+        await withTrace(
+          () =>
+            withSetGlobalReverseEntry(transaction, connection, wallet, {
+              namespaceName: identity.name,
+              entryName: entryName,
+              mintId: newMintId || entryMint,
+            }),
+          trace,
+          { op: 'withSetGlobalReverseEntry' }
+        )
       }
       transaction.feePayer = wallet.publicKey
       transaction.recentBlockhash = (
@@ -95,12 +112,13 @@ export const useHandleSetNamespaceDefault = (
         const tx = transactions[i]!
         let txId = ''
         try {
-          const id = await sendAndConfirmRawTransaction(
-            connection,
-            tx.serialize(),
-            {
-              skipPreflight: true,
-            }
+          const id = await withTrace(
+            () =>
+              sendAndConfirmRawTransaction(connection, tx.serialize(), {
+                skipPreflight: true,
+              }),
+            trace,
+            { op: `sendTransaction ${i}/${transactions.length}` }
           )
           if (i === transactions.length - 1) {
             txId = id
@@ -110,7 +128,11 @@ export const useHandleSetNamespaceDefault = (
           throw new Error(errorMessage)
         }
       }
+      trace?.finish()
       return txId
+    },
+    {
+      onSuccess: () => queryClient.invalidateQueries(),
     }
   )
 }

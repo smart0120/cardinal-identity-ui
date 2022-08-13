@@ -3,13 +3,15 @@ import type { Cluster, Connection } from '@solana/web3.js'
 import React, { Dispatch, SetStateAction, useContext, useState } from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
+import * as Sentry from '@sentry/browser'
 
 import { ClaimCard } from '..'
 import { identities, Identity } from '../common/Identities'
 import { Modal } from '../modal'
 import { withSleep } from '../utils/transactions'
 
-const DEBUG = false
+const SENTRY_DSN =
+  'https://109718d85e0640f0b5f7160e2602b5f0@o1340959.ingest.sentry.io/6625303'
 
 export type ShowParams = {
   connection: Connection
@@ -46,6 +48,8 @@ interface Props {
   children: React.ReactNode
 }
 
+const QUERY_CLIENT = new QueryClient()
+
 export const WalletIdentityProvider: React.FC<Props> = ({
   identityKey,
   appName,
@@ -64,6 +68,11 @@ export const WalletIdentityProvider: React.FC<Props> = ({
   const [identity, setIdentity] = useState<Identity>(
     identities[identityKey!] || identities['default']!
   )
+
+  Sentry.init({
+    dsn: SENTRY_DSN,
+    tracesSampleRate: 1.0,
+  })
 
   return (
     <WalletIdentityContext.Provider
@@ -85,6 +94,13 @@ export const WalletIdentityProvider: React.FC<Props> = ({
           onClose && setOnClose(() => onClose)
           setShowIdentityModal(true)
           setShowManageDefault(showManageDefault || false)
+          Sentry.configureScope((scope) => {
+            scope.setUser({
+              username: wallet.publicKey?.toString(),
+              wallet: wallet.publicKey?.toString(),
+            })
+            scope.setTag('wallet', wallet.publicKey?.toString())
+          })
         },
         handle,
         wallet,
@@ -96,11 +112,12 @@ export const WalletIdentityProvider: React.FC<Props> = ({
         setIdentity,
       }}
     >
-      <QueryClientProvider client={new QueryClient()}>
+      <QueryClientProvider client={QUERY_CLIENT}>
         <Modal
           isOpen={showIdentityModal}
           onDismiss={() => {
             setShowIdentityModal(false)
+            QUERY_CLIENT.invalidateQueries()
             onClose && onClose()
           }}
           darkenOverlay={true}
@@ -125,7 +142,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
           />
         </Modal>
         {children}
-        {DEBUG && <ReactQueryDevtools initialIsOpen={false} />}
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </WalletIdentityContext.Provider>
   )

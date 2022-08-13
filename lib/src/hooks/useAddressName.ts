@@ -7,22 +7,21 @@ import {
 import type { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
 
-import { useWalletIdentity } from '../providers/WalletIdentityProvider'
+import { tracer, withTrace } from '../utils/trace'
 
 export const useAddressName = (
   connection: Connection,
   address: PublicKey | undefined,
   namespaceName: string
 ) => {
-  const { handle } = useWalletIdentity()
-
   return useQuery<string | undefined>(
-    ['useAddressName', address, namespaceName, handle],
+    ['useAddressName', address?.toString(), namespaceName],
     async () => {
       if (!address || !connection) return
       const n = await tryGetNameForNamespace(connection, address, namespaceName)
       return n ? n[0] : undefined
-    }
+    },
+    { refetchOnMount: false, refetchOnWindowFocus: false }
   )
 }
 
@@ -31,13 +30,15 @@ export async function tryGetNameForNamespace(
   pubkey: PublicKey,
   namespaceName: string
 ): Promise<string[] | undefined> {
+  const trace = tracer({ name: 'tryGetNameForNamespace' })
   try {
     const [namespaceId] = await findNamespaceId(namespaceName)
-    const namespaceReverseEntry = await getReverseNameEntryForNamespace(
-      connection,
-      pubkey,
-      namespaceId
+    const namespaceReverseEntry = await withTrace(
+      () => getReverseNameEntryForNamespace(connection, pubkey, namespaceId),
+      trace,
+      { op: 'getReverseNameEntryForNamespace' }
     )
+    trace?.finish()
     return [
       formatName(
         namespaceReverseEntry.parsed.namespaceName,
@@ -48,14 +49,17 @@ export async function tryGetNameForNamespace(
   } catch (e) {}
 
   try {
-    const globalReverseEntry = await getGlobalReverseNameEntry(
-      connection,
-      pubkey
+    console.log('No reverse entry for namespace found falling back to global')
+    const globalReverseEntry = await withTrace(
+      () => getGlobalReverseNameEntry(connection, pubkey),
+      trace,
+      { op: 'getGlobalReverseNameEntry' }
     )
     if (
       globalReverseEntry.parsed &&
       globalReverseEntry.parsed.namespaceName === namespaceName
     ) {
+      trace?.finish()
       return [
         formatName(
           globalReverseEntry.parsed.namespaceName,
@@ -66,5 +70,6 @@ export async function tryGetNameForNamespace(
     }
   } catch (e) {}
 
+  trace?.finish()
   return undefined
 }

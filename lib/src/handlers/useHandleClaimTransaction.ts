@@ -5,10 +5,11 @@ import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, Connection, PublicKey } from '@solana/web3.js'
 import { sendAndConfirmRawTransaction, Transaction } from '@solana/web3.js'
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
 import { apiBase } from '../utils/constants'
+import { tracer, withTrace } from '../utils/trace'
 
 export interface HandleSetParam {
   metaplexData?: {
@@ -23,9 +24,11 @@ export const useHandleClaimTransaction = (
   connection: Connection,
   wallet: Wallet,
   cluster: Cluster,
-  handle: string,
-  accessToken: string
+  dev: boolean,
+  accessToken: string,
+  handle: string
 ) => {
+  const queryClient = useQueryClient()
   const { identity } = useWalletIdentity()
 
   return useMutation(
@@ -36,29 +39,32 @@ export const useHandleClaimTransaction = (
       verificationUrl?: string
     }): Promise<string> => {
       if (!verificationUrl) throw new Error('No verification url provided')
-      const transactions = await handleClaim(
-        wallet,
-        cluster,
-        identity.name,
-        handle,
-        verificationUrl
+      let requestURL = ''
+      const trace = tracer({ name: 'useHandleClaim' })
+      const transactions = await withTrace(
+        () =>
+          handleClaim(wallet, cluster, identity.name, handle, verificationUrl),
+        trace,
+        { op: 'handleClaim' }
       )
       if (!transactions) return ''
-      await wallet.signAllTransactions(transactions)
       let txId = ''
-      transactions.forEach(async (tx, index) => {
-        const id = await sendAndConfirmRawTransaction(
-          connection,
-          tx.serialize(),
-          {
-            skipPreflight: true,
-          }
+      await wallet.signAllTransactions(transactions)
+      for (const tx of transactions) {
+        txId = await withTrace(
+          () =>
+            sendAndConfirmRawTransaction(connection, tx.serialize(), {
+              skipPreflight: true,
+            }),
+          trace,
+          { op: 'sendTransaction' }
         )
-        if (index === transactions.length - 1) {
-          txId = id
-        }
-      })
+      }
+      trace?.finish()
       return txId
+    },
+    {
+      onSuccess: () => queryClient.invalidateQueries(),
     }
   )
 }
@@ -68,13 +74,14 @@ export async function handleClaim(
   cluster: Cluster,
   namespace: string,
   handle: string | undefined,
-  tweetId: string | undefined
+  tweetId: string | undefined,
+  dev?: boolean
 ): Promise<Transaction[] | null> {
   if (!handle || !tweetId) return null
   const response = await fetch(
     `${apiBase(
-      cluster === 'devnet'
-    )}/${namespace}/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
+      dev
+    )}/namespaces/${namespace}/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=twitter${
       cluster === 'devnet' ? `&cluster=${cluster}` : ''
     }`,
     {
