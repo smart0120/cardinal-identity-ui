@@ -23,13 +23,16 @@ const TwitterHome = () => {
 
   useEffect(() => {
     if (wallet.connected) {
-      router.push(
-        `/${wallet?.publicKey?.toString()}${dev ? '?cluster=devnet' : ''}`,
-        undefined,
-        {
-          shallow: true,
-        }
+      const url = new URL(
+        window.location.origin + `/${wallet?.publicKey?.toString()}`
       )
+      if (dev) {
+        url.searchParams.append('cluster', 'devnet')
+      }
+      url.searchParams.append('identity', identity.name)
+      router.push(url, undefined, {
+        shallow: true,
+      })
     }
   }, [wallet.connected, wallet.publicKey, router])
 

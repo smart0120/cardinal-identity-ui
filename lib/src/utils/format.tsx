@@ -28,7 +28,7 @@ export const formatIdentityLink = (
         target="_blank"
         rel="noreferrer"
       >
-        {handle}
+        {decodeURIComponent(handle)}
       </a>
     )
   }

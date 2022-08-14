@@ -28,9 +28,12 @@ import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
 export const nameFromMint = (name: string, uri: string): [string, string] => {
   if (uri.includes('name')) {
-    return [name, getQueryParam(uri, 'name') || '']
+    return [name, decodeURIComponent(getQueryParam(uri, 'name') || '')]
   }
-  return [breakName(name || '')[0], breakName(name || '')[1]]
+  return [
+    breakName(name || '')[0],
+    decodeURIComponent(breakName(name || '')[1]),
+  ]
 }
 
 export const NameEntryRow = ({
@@ -82,7 +85,6 @@ export const NameEntryRow = ({
   const handleSetNamespacesDefault = useHandleSetNamespaceDefault(
     connection,
     wallet,
-    namespaceName,
     cluster
   )
 
@@ -359,7 +361,6 @@ export const NameManager = ({
   const handleSetNamespacesDefault = useHandleSetNamespaceDefault(
     connection,
     wallet,
-    namespaceName,
     cluster
   )
   const handleSetGlobalDefault = useHandleSetGlobalDefault(

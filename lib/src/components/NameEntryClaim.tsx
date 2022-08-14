@@ -4,7 +4,10 @@ import type { Cluster, Connection } from '@solana/web3.js'
 import { useMemo, useState } from 'react'
 
 import { Alert } from '../common/Alert'
-import { useHandleClaimTransaction } from '../handlers/useHandleClaimTransaction'
+import {
+  handleClaim,
+  useHandleClaimTransaction,
+} from '../handlers/useHandleClaimTransaction'
 import { useHandleRevoke } from '../handlers/useHandleRevoke'
 import { useHandleVerify } from '../handlers/useHandleVerify'
 import { useNameEntryData } from '../hooks/useNameEntryData'
@@ -12,23 +15,12 @@ import { formatIdentityLink, formatShortAddress } from '../utils/format'
 import { ButtonWithFooter } from './ButtonWithFooter'
 import { Link, Megaphone, Verified } from './icons'
 import { LabeledInput } from './LabeledInput'
-import { PostTweet } from './PostTweet'
+import { InitiateVerification } from './InitiateVerification'
 import { StepDetail } from './StepDetail'
 import { useHandleSetNamespaceDefault } from '../handlers/useHandleSetNamespaceDefault'
-import { notify } from '../common/Notification'
 import { handleError } from '../utils/errors'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { HandleNFT } from './HandleNFT'
-
-const handleFromTweetUrl = (raw: string | undefined): string | undefined => {
-  if (!raw) return undefined
-  return raw.split('/')[3]
-}
-
-const tweetIdFromTweetUrl = (raw: string | undefined): string | undefined => {
-  if (!raw) return undefined
-  return raw.split('/')[5]?.split('?')[0]
-}
 
 export const NameEntryClaim = ({
   dev = false,
@@ -83,9 +75,8 @@ export const NameEntryClaim = ({
     connection,
     wallet,
     cluster,
-    dev,
-    accessToken,
-    handle
+    handle,
+    dev
   )
 
   const handleSetNamespaceDefault = useHandleSetNamespaceDefault(
@@ -96,22 +87,11 @@ export const NameEntryClaim = ({
 
   useMemo(() => {
     if (verificationUrl && verificationInitiated) {
-      handleVerify.mutate(
-        { verificationUrl: verificationUrl },
-        {
-          onError: (e) =>
-            notify({
-              message: `Failed Transaction`,
-              description: e as string,
-            }),
-        }
-      )
+      handleVerify.mutate({ verificationUrl: verificationUrl })
+    } else if (verificationUrl?.length === 0) {
+      handleClaimTransaction.reset()
     }
-  }, [
-    wallet.publicKey.toString(),
-    verificationInitiated,
-    verificationInitiated,
-  ])
+  }, [wallet.publicKey.toString(), verificationUrl, verificationInitiated])
 
   const alreadyOwned =
     nameEntryData.data?.owner?.toString() && !nameEntryData.data?.isOwnerPDA
@@ -124,11 +104,11 @@ export const NameEntryClaim = ({
         <StepDetail
           disabled={!wallet?.publicKey || !connection}
           icon={<Megaphone />}
-          title="Tweet!"
+          title={identity?.description.header || 'Verify'}
           description={
             <>
-              <div>Tweet your public key</div>
-              <PostTweet
+              <div>{identity?.description.text}</div>
+              <InitiateVerification
                 wallet={wallet}
                 appName={appName}
                 appTwitter={appTwitter}
@@ -142,13 +122,15 @@ export const NameEntryClaim = ({
         <StepDetail
           disabled={!verificationInitiated}
           icon={<Link />}
-          title="Paste the URL of the tweet"
+          title={`Paste the URL of the ${
+            identity.verification?.toLocaleLowerCase() || 'verification'
+          }`}
           description={
             <div>
               <LabeledInput
                 disabled={!verificationInitiated}
-                label="Tweet"
-                name="tweet"
+                label={identity.verification || 'Verification'}
+                name={identity.verification || 'Verification'}
                 onChange={(e) => setVerificationUrl(e.target.value)}
               />
             </div>
@@ -164,7 +146,7 @@ export const NameEntryClaim = ({
                 You will receive a non-tradeable NFT to prove you own your
                 Twitter handle.
               </div>
-              {handle && (
+              {handle && verificationUrl?.length !== 0 && (
                 <div
                   style={{
                     display: 'flex',
@@ -188,8 +170,9 @@ export const NameEntryClaim = ({
                           margin: '10px 0px',
                           height: 'auto',
                           wordBreak: 'break-word',
+                          justifyContent: 'center',
                         }}
-                        message={<>{`${handleVerify.error}`}</>}
+                        message={<div>{`Error: ${handleVerify.error}`}</div>}
                         type="error"
                         showIcon
                       />
@@ -204,7 +187,8 @@ export const NameEntryClaim = ({
                         message={
                           <>
                             <div>
-                              Verified ownership of{' '}
+                              Verified ownership of
+                              <br />
                               {formatIdentityLink(handle, identity.name)}
                             </div>
                           </>
@@ -225,6 +209,7 @@ export const NameEntryClaim = ({
                               marginBottom: '10px',
                               height: 'auto',
                               wordBreak: 'break-word',
+                              justifyContent: 'center',
                             }}
                             message={
                               <>
@@ -240,7 +225,8 @@ export const NameEntryClaim = ({
                             showIcon
                           />
                           {nameEntryData?.data?.owner?.toString() ===
-                          wallet?.publicKey?.toString() ? (
+                            wallet?.publicKey?.toString() &&
+                          !handleClaimTransaction.isLoading ? (
                             <>
                               <div>
                                 You already own this handle! If you want to set
@@ -268,13 +254,12 @@ export const NameEntryClaim = ({
                                 marginTop: '10px',
                                 height: 'auto',
                                 wordBreak: 'break-word',
+                                justifyContent: 'center',
                               }}
                               message={
-                                <>
-                                  <div>{`${handleError(
-                                    handleRevoke.error
-                                  )}`}</div>
-                                </>
+                                <div>{`Error: ${handleError(
+                                  handleRevoke.error
+                                )}`}</div>
                               }
                               type="error"
                               showIcon
@@ -294,11 +279,10 @@ export const NameEntryClaim = ({
             style={{
               height: 'auto',
               wordBreak: 'break-word',
+              justifyContent: 'center',
             }}
             message={
-              <>
-                <div>{`${handleClaimTransaction.error}`}</div>
-              </>
+              <div>{`Error: ${handleError(handleClaimTransaction.error)}`}</div>
             }
             type="error"
             showIcon
@@ -309,11 +293,12 @@ export const NameEntryClaim = ({
             style={{
               height: 'auto',
               wordBreak: 'break-word',
+              justifyContent: 'center',
             }}
             message={
-              <>
-                <div>{`${handleSetNamespaceDefault.error}`}</div>
-              </>
+              <div>{`Error: ${handleError(
+                handleSetNamespaceDefault.error
+              )}`}</div>
             }
             type="error"
             showIcon
@@ -337,16 +322,12 @@ export const NameEntryClaim = ({
           handleClaimTransaction.mutate(
             {
               verificationUrl,
+              accessToken,
             },
             {
               onSuccess: () => {
                 onComplete && onComplete(handle || '')
               },
-              onError: (e) =>
-                notify({
-                  message: `Failed Transaction`,
-                  description: e as string,
-                }),
             }
           )
         }}
@@ -356,13 +337,6 @@ export const NameEntryClaim = ({
     </>
   )
 }
-
-const ButtonWrapper = styled.div`
-  display: flex;
-  margin-top: 5px;
-  justify-content: center;
-`
-
 const DetailsWrapper = styled.div`
   display: grid;
   grid-row-gap: 28px;

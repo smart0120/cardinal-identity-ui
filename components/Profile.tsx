@@ -53,21 +53,23 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
         background: identity.colors.secondary,
       }}
     >
-      <div style={{ marginBottom: '30px' }}>
-        {addressName.isFetching ? (
-          <Alert message={'Loading'} type="warning" />
-        ) : addressName.data ? (
-          <Alert
-            message={`Succesfully linked ${identity.displayName}`}
-            type="success"
-          />
-        ) : (
-          <Alert
-            message={`${identity.displayName} not linked`}
-            type="warning"
-          />
-        )}
-      </div>
+      {identity.name !== 'default' && (
+        <div style={{ marginBottom: '30px' }}>
+          {addressName.isFetching ? (
+            <Alert message={'Loading'} type="warning" />
+          ) : addressName.data ? (
+            <Alert
+              message={`Succesfully linked ${identity.displayName}`}
+              type="success"
+            />
+          ) : (
+            <Alert
+              message={`${identity.displayName} not linked`}
+              type="warning"
+            />
+          )}
+        </div>
+      )}
       <div
         style={{
           display: 'flex',

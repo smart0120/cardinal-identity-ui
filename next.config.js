@@ -2,7 +2,7 @@ const { withSentryConfig } = require('@sentry/nextjs')
 
 module.exports = withSentryConfig(
   {
-    reactStrictMode: true,
+    reactStrictMode: false,
     env: {
       MAINNET_PRIMARY: process.env.MAINNET_PRIMARY,
       BASE_CLUSTER: process.env.BASE_CLUSTER,

@@ -24,9 +24,8 @@ export const useHandleClaimTransaction = (
   connection: Connection,
   wallet: Wallet,
   cluster: Cluster,
-  dev: boolean,
-  accessToken: string,
-  handle: string
+  handle: string,
+  dev: boolean
 ) => {
   const queryClient = useQueryClient()
   const { identity } = useWalletIdentity()
@@ -35,15 +34,24 @@ export const useHandleClaimTransaction = (
     [wallet.publicKey.toString()],
     async ({
       verificationUrl,
+      accessToken,
     }: {
       verificationUrl?: string
+      accessToken?: string
     }): Promise<string> => {
       if (!verificationUrl) throw new Error('No verification url provided')
-      let requestURL = ''
       const trace = tracer({ name: 'useHandleClaim' })
       const transactions = await withTrace(
         () =>
-          handleClaim(wallet, cluster, identity.name, handle, verificationUrl),
+          handleClaim(
+            wallet,
+            cluster,
+            identity.name,
+            handle,
+            verificationUrl,
+            accessToken,
+            dev
+          ),
         trace,
         { op: 'handleClaim' }
       )
@@ -75,13 +83,16 @@ export async function handleClaim(
   namespace: string,
   handle: string | undefined,
   tweetId: string | undefined,
-  dev?: boolean
+  accessToken: string | undefined,
+  dev: boolean
 ): Promise<Transaction[] | null> {
   if (!handle || !tweetId) return null
   const response = await fetch(
     `${apiBase(
       dev
-    )}/namespaces/${namespace}/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=twitter${
+    )}/${namespace}/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${encodeURIComponent(
+      handle
+    )}&accessToken=${accessToken}${
       cluster === 'devnet' ? `&cluster=${cluster}` : ''
     }`,
     {
@@ -93,6 +104,7 @@ export async function handleClaim(
     }
   )
   const json = await response.json()
+  console.log(json)
   if (response.status !== 200 || json.error) throw new Error(json.error)
   const transactions = json.transactions as string[]
   return transactions.map((tx) =>

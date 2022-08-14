@@ -12,16 +12,23 @@ export const HandleNFT: React.FC<Props> = ({ handle, dev, cluster }: Props) => {
   const { identity } = useWalletIdentity()
   return (
     <Outer>
-      <StyledImg
-        alt={formatName('twitter', handle)}
-        src={encodeURI(
-          `https://${
-            dev ? 'dev-nft' : 'nft'
-          }.cardinal.so/img/?text=@${encodeURIComponent(handle)}:${
-            identity.name
-          }${cluster && `&cluster=${cluster}`}`
-        )}
-      />
+      {!handle ? (
+        <div
+          className="animate-pulse bg-gray-200"
+          style={{ height: '156px', width: '156px', borderRadius: '50%' }}
+        />
+      ) : (
+        <StyledImg
+          alt={formatName('twitter', handle)}
+          src={encodeURI(
+            `https://${
+              dev ? 'dev-nft' : 'nft'
+            }.cardinal.so/img/?text=@${encodeURIComponent(handle)}.${
+              identity.name
+            }${cluster && `&cluster=${cluster}`}`
+          )}
+        />
+      )}
     </Outer>
   )
 }

@@ -21,7 +21,7 @@ export type Identity = {
 export const identities: { [key: string]: Identity } = {
   default: {
     name: 'default',
-    displayName: 'default',
+    displayName: 'Default',
     description: {
       header: 'Verify your social media accounts',
       text: 'Link your social media',

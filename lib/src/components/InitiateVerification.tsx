@@ -4,7 +4,7 @@ import { Identity } from '../common/Identities'
 
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
-export const PostTweet = ({
+export const InitiateVerification = ({
   wallet,
   appName,
   appTwitter,
@@ -36,6 +36,7 @@ export const PostTweet = ({
       }}
       target="_blank"
       rel="noreferrer noopener"
+      className="inline-block"
     >
       <Button
         style={{ marginTop: '5px', padding: '0px 20px 0px 20px' }}
@@ -88,7 +89,7 @@ const useGenerateLink = (
       break
     }
     default: {
-      throw new Error('Incorrect linking flow')
+      throw new Error('Incorrect identity')
     }
   }
   return link
