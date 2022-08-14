@@ -1,6 +1,6 @@
 import type { CertificateData } from '@cardinal/certificates'
 import type { AccountData } from '@cardinal/common'
-import { withSetGlobalReverseEntry } from '@cardinal/namespaces'
+import { EntryData, withSetGlobalReverseEntry } from '@cardinal/namespaces'
 import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
 import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
@@ -9,6 +9,7 @@ import { PublicKey, Transaction } from '@solana/web3.js'
 import { useMutation, useQueryClient } from 'react-query'
 
 import { nameFromMint } from '../components/NameManager'
+
 import { tracer, withTrace } from '../utils/trace'
 import { executeTransaction } from '../utils/transactions'
 
@@ -19,23 +20,34 @@ export interface HandleSetParam {
   } | null
   tokenManager?: AccountData<TokenManagerData>
   certificate?: AccountData<CertificateData> | null
+  nameEntryData?: AccountData<EntryData> | null
 }
 
 export const useHandleSetGlobalDefault = (
   connection: Connection,
-  wallet: Wallet,
-  namespaceName: string
+  wallet: Wallet
 ) => {
   const queryClient = useQueryClient()
   return useMutation(
-    async ({ tokenData }: { tokenData?: HandleSetParam }): Promise<string> => {
-      if (!tokenData) return ''
+    async ({
+      tokenData,
+      namespaceName,
+    }: {
+      tokenData?: HandleSetParam
+      namespaceName?: string
+    }): Promise<string> => {
+      if (!tokenData || !namespaceName) return ''
       const transaction = new Transaction()
-      const entryMint = new PublicKey(tokenData.metaplexData?.parsed.mint!)
-      const [, entryName] = nameFromMint(
-        tokenData.metaplexData?.parsed.data.name || '',
-        tokenData.metaplexData?.parsed.data.uri || ''
+      const entryMint = new PublicKey(
+        tokenData.metaplexData?.parsed.mint ||
+          tokenData.nameEntryData.parsed.mint
       )
+      const entryName = tokenData.nameEntryData
+        ? tokenData.nameEntryData.parsed.name
+        : nameFromMint(
+            tokenData.metaplexData?.parsed.data.name || '',
+            tokenData.metaplexData?.parsed.data.uri || ''
+          )[1]
       const trace = tracer({ name: 'useHandleSetGlobalDefault' })
       await withTrace(
         () =>
@@ -56,7 +68,6 @@ export const useHandleSetGlobalDefault = (
           executeTransaction(connection, wallet, transaction, {
             confirmOptions: {
               commitment: 'confirmed',
-              skipPreflight: true,
             },
             notificationConfig: { message: 'Set to default successfully' },
           }),

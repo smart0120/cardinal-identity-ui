@@ -14,7 +14,7 @@ interface Props
     ShowParams {
   disabled?: boolean
   variant?: 'primary' | 'secondary'
-  forceFlow?: Identity
+  forceIdentity?: Identity
 }
 
 export const ConnectButton: React.FC<Props> = ({
@@ -27,18 +27,18 @@ export const ConnectButton: React.FC<Props> = ({
   onClose,
   disabled,
   showManage,
-  forceFlow,
+  forceIdentity,
   ...buttonProps
 }: Props) => {
   const { show, identity, setIdentity } = useWalletIdentity()
   return (
     <Button
-      bgColor={forceFlow?.colors.primary || identity?.colors.primary}
+      bgColor={forceIdentity?.colors.primary || identity?.colors.primary}
       variant={variant}
       disabled={disabled}
       {...buttonProps}
       onClick={() => {
-        if (!forceFlow) {
+        if (!forceIdentity) {
           !disabled &&
             show({
               wallet,
@@ -50,22 +50,22 @@ export const ConnectButton: React.FC<Props> = ({
               showManage,
             })
         } else {
-          setIdentity(forceFlow)
+          setIdentity(forceIdentity)
         }
       }}
     >
-      {(forceFlow && forceFlow.name !== 'default') ||
+      {(forceIdentity && forceIdentity.name !== 'default') ||
       identity.name !== 'default' ? (
         <>
           <div style={{ width: '14px' }} className="align-middle">
             <img
               className="text-white "
-              alt={`${forceFlow?.name || identity?.name}-icon`}
-              src={forceFlow?.icon || identity?.icon}
+              alt={`${forceIdentity?.name || identity?.name}-icon`}
+              src={forceIdentity?.icon || identity?.icon}
             />
           </div>
           <span className="ml-2">
-            Link {forceFlow?.displayName || 'Profile'}
+            Link {forceIdentity?.displayName || 'Profile'}
           </span>
         </>
       ) : (

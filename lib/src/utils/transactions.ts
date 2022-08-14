@@ -3,6 +3,7 @@ import type { Wallet } from '@saberhq/solana-contrib'
 import type {
   ConfirmOptions,
   Connection,
+  SendTransactionError,
   Signer,
   Transaction,
 } from '@solana/web3.js'
@@ -49,8 +50,8 @@ export const executeTransaction = async (
         txid,
       })
   } catch (e) {
-    console.log('Failed transaction: ', e)
-    const errorMessage = handleError(e, `${e}`)
+    console.log('Failed transaction: ', (e as SendTransactionError).logs, e)
+    const errorMessage = handleError(e, `${(e as SendTransactionError).logs}`)
     config.notificationConfig &&
       notify({
         message: 'Failed transaction',

@@ -9,11 +9,10 @@ import { tracer, withTrace } from '../utils/trace'
 
 export const useGlobalReverseEntry = (
   connection: Connection | undefined,
-  namespaceName: string,
   pubkey: PublicKey | undefined
 ) => {
   return useQuery<AccountData<ReverseEntryData> | undefined>(
-    ['useGlobalReverseEntry', namespaceName, pubkey?.toString()],
+    ['useGlobalReverseEntry', pubkey?.toString()],
     async () => {
       if (!pubkey || !connection) return
       const reverseEntry = await withTrace(

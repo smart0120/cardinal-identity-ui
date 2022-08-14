@@ -4,10 +4,7 @@ import type { Cluster, Connection } from '@solana/web3.js'
 import { useMemo, useState } from 'react'
 
 import { Alert } from '../common/Alert'
-import {
-  handleClaim,
-  useHandleClaimTransaction,
-} from '../handlers/useHandleClaimTransaction'
+import { useHandleClaimTransaction } from '../handlers/useHandleClaimTransaction'
 import { useHandleRevoke } from '../handlers/useHandleRevoke'
 import { useHandleVerify } from '../handlers/useHandleVerify'
 import { useNameEntryData } from '../hooks/useNameEntryData'

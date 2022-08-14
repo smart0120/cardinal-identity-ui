@@ -37,7 +37,6 @@ export const useHandleSetNamespaceDefault = (
   const { identity } = useWalletIdentity()
   const globalReverseEntry = useGlobalReverseEntry(
     connection,
-    identity.name,
     wallet?.publicKey
   )
 

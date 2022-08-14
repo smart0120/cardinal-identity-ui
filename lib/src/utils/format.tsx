@@ -87,7 +87,7 @@ export async function tryGetImageUrl(
         dev ? 'dev-nft' : 'nft'
       }.cardinal.so/img/?text=@${encodeURIComponent(
         name
-      )}:${namespace}&proxy=true${dev ? `&cluster=devnet` : ''}`
+      )}.${namespace}&proxy=true${dev ? `&cluster=devnet` : ''}`
     )
   } else {
     return undefined

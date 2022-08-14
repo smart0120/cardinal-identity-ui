@@ -5,14 +5,12 @@ import type { Connection } from '@solana/web3.js'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 import { AiFillStar } from 'react-icons/ai'
-import { BsGlobe } from 'react-icons/bs'
 import { BiUnlink } from 'react-icons/bi'
 
 import { Alert } from '../common/Alert'
 import { ButtonLight } from '../common/Button'
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import { useHandleSetNamespaceDefault } from '../handlers/useHandleSetNamespaceDefault'
-import { useHandleSetGlobalDefault } from '../handlers/useHandleSetGlobalDefault'
 import { useHandleUnlink } from '../handlers/useHandleUnlink'
 import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
 import { useNamespaceReverseEntry } from '../hooks/useNamespaceReverseEntry'
@@ -59,11 +57,7 @@ export const NameEntryRow = ({
     wallet.publicKey,
     namespaceName
   )
-  const globalReverseEntry = useGlobalReverseEntry(
-    connection,
-    namespaceName,
-    wallet.publicKey
-  )
+  const globalReverseEntry = useGlobalReverseEntry(connection, wallet.publicKey)
   const namespaceReverseEntry = useNamespaceReverseEntry(
     connection,
     namespaceName,
@@ -106,17 +100,6 @@ export const NameEntryRow = ({
           )[1],
           identity.name
         )}
-        {/* {globalReverseEntry.data &&
-          formatName(
-            namespaceName,
-            globalReverseEntry.data.parsed.entryName
-          ) ===
-            formatName(
-              ...nameFromMint(
-                userTokenData.metaplexData?.parsed.data.name || '',
-                userTokenData.metaplexData?.parsed.data.uri || ''
-              )
-            ) && <BsGlobe />} */}
         {namespaceReverseEntry.data &&
           formatName(
             namespaceName,
@@ -363,22 +346,13 @@ export const NameManager = ({
     wallet,
     cluster
   )
-  const handleSetGlobalDefault = useHandleSetGlobalDefault(
-    connection,
-    wallet,
-    namespaceName
-  )
   const userNamesForNamespace = useUserNamesForNamespace(
     connection,
     wallet.publicKey,
     namespaceName
   )
-  const globalReverseEntry = useGlobalReverseEntry(
-    connection,
-    namespaceName,
-    wallet.publicKey
-  )
-  const namespcaeReverseEntry = useNamespaceReverseEntry(
+  const globalReverseEntry = useGlobalReverseEntry(connection, wallet.publicKey)
+  const namespaceReverseEntry = useNamespaceReverseEntry(
     connection,
     namespaceName,
     wallet.publicKey
@@ -394,7 +368,7 @@ export const NameManager = ({
       <div className="my-1 h-[1px] bg-gray-200"></div>
       {!userNamesForNamespace.isFetched ||
       !globalReverseEntry.isFetched ||
-      !namespcaeReverseEntry.isFetched ? (
+      !namespaceReverseEntry.isFetched ? (
         <>
           <div className="h-8 w-full animate-pulse rounded-lg bg-gray-200"></div>
           <div className="h-8 w-full animate-pulse rounded-lg bg-gray-200"></div>
@@ -416,10 +390,10 @@ export const NameManager = ({
                       userTokenData.metaplexData?.parsed.data.uri || ''
                     )
                   )) ||
-              (namespcaeReverseEntry.data &&
+              (namespaceReverseEntry.data &&
                 formatName(
                   namespaceName,
-                  namespcaeReverseEntry.data.parsed.entryName
+                  namespaceReverseEntry.data.parsed.entryName
                 ) ===
                   formatName(
                     ...nameFromMint(
@@ -452,22 +426,6 @@ export const NameManager = ({
               message={
                 <>
                   <div>{`${handleSetNamespacesDefault.error}`}</div>
-                </>
-              }
-              type="error"
-              showIcon
-            />
-          )}
-          {handleSetGlobalDefault.error && (
-            <Alert
-              style={{
-                marginTop: '10px',
-                height: 'auto',
-                wordBreak: 'break-word',
-              }}
-              message={
-                <>
-                  <div>{`${handleSetGlobalDefault.error}`}</div>
                 </>
               }
               type="error"

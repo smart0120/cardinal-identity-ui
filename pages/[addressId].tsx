@@ -1,6 +1,5 @@
 import { firstParam } from '@cardinal/common'
 import { getNameEntry } from '@cardinal/namespaces'
-import styled from '@emotion/styled'
 import { useWallet } from '@solana/wallet-adapter-react'
 import type { PublicKey } from '@solana/web3.js'
 import { Header } from 'common/Header'
@@ -10,7 +9,7 @@ import { useRouter } from 'next/router'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
 import { useMemo, useState } from 'react'
 
-const TwitterClaim = () => {
+const Claim = () => {
   const wallet = useWallet()
   const router = useRouter()
   const [address, setAddress] = useState<PublicKey>()
@@ -34,7 +33,7 @@ const TwitterClaim = () => {
     } else {
       const nameEntry = await getNameEntry(
         connection,
-        'twitter',
+        identity.name,
         firstParam(addressId)
       )
       nameEntry.parsed.data && setAddress(nameEntry.parsed.data as PublicKey)
@@ -73,4 +72,4 @@ const TwitterClaim = () => {
   )
 }
 
-export default TwitterClaim
+export default Claim

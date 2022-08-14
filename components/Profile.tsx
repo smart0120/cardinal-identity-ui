@@ -12,6 +12,7 @@ import {
   useAddressName,
   useWalletIdentity,
 } from 'lib/src'
+import { useGlobalReverseEntry } from 'lib/src/hooks/useGlobalReverseEntry'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
 import { FaShare, FaUserAlt } from 'react-icons/fa'
 
@@ -39,9 +40,9 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
   const addressImage = useAddressImage(
     connection,
     address,
-    identity.name,
     environment.label === 'devnet'
   )
+  const globalReverseEntry = useGlobalReverseEntry(connection, wallet.publicKey)
 
   return (
     <div
@@ -91,8 +92,8 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
               width: '156px',
               borderRadius: '50%',
               background: '#fff',
-              backgroundImage: 'linear-gradient(84.06deg, #23a6d5, #1da1f2)',
-              boxShadow: '0 5px 10px 0 rgb(97 83 202 / 30%)',
+              backgroundImage: `linear-gradient(84.06deg, ${identity.colors.primary}, ${identity.colors.primary})`,
+              // boxShadow: '0 5px 10px 0 rgb(97 83 202 / 30%)',
               padding: '5px',
               display: 'flex',
               justifyContent: 'center',
@@ -167,14 +168,46 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
                 className="animate-pulse rounded-md bg-gray-200"
               />
             ) : (
-              <div style={{ display: 'flex', gap: '5px' }}>
-                {formatIdentityLink(addressName.data, identity.name) ||
-                  formatShortAddress(address)}
-              </div>
+              !!globalReverseEntry.data && (
+                <div style={{ display: 'flex', gap: '5px' }}>
+                  {formatIdentityLink(
+                    addressName.data,
+                    globalReverseEntry.data.parsed.namespaceName
+                  ) || formatShortAddress(address)}
+                </div>
+              )
             )}
           </span>
           <AddressLink address={address} />
         </div>
+        {identity.name === 'default' && !!globalReverseEntry.data && (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              textAlign: 'center',
+            }}
+          >
+            <button
+              disabled={address?.toString() !== wallet?.publicKey?.toString()}
+              className="rounded-md px-3 py-1 text-sm text-black"
+              style={{
+                background: identity.colors.buttonColor,
+                color: identity.colors.secondaryFontColor,
+                opacity:
+                  address?.toString() !== wallet?.publicKey?.toString()
+                    ? 0.5
+                    : 1,
+              }}
+            >
+              {globalReverseEntry.data.parsed.namespaceName
+                .charAt(0)
+                .toUpperCase() +
+                globalReverseEntry.data.parsed.namespaceName.slice(1)}
+            </button>
+          </div>
+        )}
         <div className="mt-5">
           <ConnectButton
             disabled={address?.toString() !== wallet?.publicKey?.toString()}
@@ -207,7 +240,6 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
               })
             }
             style={{
-              borderColor: '#657786',
               background: identity.colors.buttonColor,
               color: identity.colors.secondaryFontColor,
               opacity:
