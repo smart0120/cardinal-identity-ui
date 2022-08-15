@@ -8,6 +8,8 @@ import type { Connection, PublicKey } from '@solana/web3.js'
 import { sendAndConfirmRawTransaction, Transaction } from '@solana/web3.js'
 import { useMutation, useQueryClient } from 'react-query'
 
+import { Alert } from '../common/Alert'
+import { TransactionLink } from '../common/TransactionLink'
 import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
 import type { UserTokenData } from '../hooks/useUserNamesForNamespace'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
@@ -20,7 +22,7 @@ export const useHandleSetNamespaceDefault = (
   connection: Connection,
   wallet: Wallet
 ) => {
-  const { cluster } = useWalletIdentity()
+  const { cluster, setMessage } = useWalletIdentity()
   const queryClient = useQueryClient()
   const globalReverseEntry = useGlobalReverseEntry(
     connection,
@@ -35,12 +37,12 @@ export const useHandleSetNamespaceDefault = (
         UserTokenData,
         'certificate' | 'tokenManager' | 'metaplexData' | 'identity'
       >
-    }): Promise<string> => {
-      if (!tokenData) return ''
+    }): Promise<[string, string] | undefined> => {
+      if (!tokenData) return undefined
       let newMintId: PublicKey | undefined
       let transactions: Transaction[] = []
       const entryMint = tryPublicKey(tokenData.metaplexData?.parsed.mint)
-      if (!entryMint) return ''
+      if (!entryMint) return undefined
       const [entryName, namespaceName] = nameFromToken(tokenData)
       const trace = tracer({ name: 'useGlobalReverseEntry' })
       if (tokenData.certificate) {
@@ -114,10 +116,41 @@ export const useHandleSetNamespaceDefault = (
         }
       }
       trace?.finish()
-      return txid
+      return [txid, namespaceName]
     },
     {
-      onSuccess: () => queryClient.invalidateQueries(),
+      onSuccess: (result) => {
+        result &&
+          setMessage(
+            <Alert
+              type="success"
+              message={
+                <div className="flex w-full flex-col text-center">
+                  <div>
+                    Succesfully set handle as default {result[1]} identity.
+                  </div>
+                  <div>
+                    Changes will be reflected{' '}
+                    <TransactionLink txid={result[0]} />
+                  </div>
+                </div>
+              }
+            />
+          )
+        queryClient.invalidateQueries()
+      },
+      onError: () => {
+        setMessage(
+          <Alert
+            type="error"
+            message={
+              <div className="flex w-full flex-col text-center">
+                Failed to set namespace default
+              </div>
+            }
+          />
+        )
+      },
     }
   )
 }

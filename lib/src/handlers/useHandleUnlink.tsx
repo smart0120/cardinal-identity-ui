@@ -13,7 +13,12 @@ import type { Connection } from '@solana/web3.js'
 import { sendAndConfirmRawTransaction, Transaction } from '@solana/web3.js'
 import { useMutation, useQueryClient } from 'react-query'
 
+import { Alert } from '../common/Alert'
+import { TransactionLink } from '../common/TransactionLink'
 import type { UserTokenData } from '../hooks/useUserNamesForNamespace'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
+import { handleError } from '../utils/errors'
+import { formatIdentityLink } from '../utils/format'
 import { nameFromToken } from '../utils/nameUtils'
 import { tracer, withTrace } from '../utils/trace'
 
@@ -23,6 +28,7 @@ export const useHandleUnlink = (
   namespaceName: string,
   userTokenData: UserTokenData
 ) => {
+  const { setMessage } = useWalletIdentity()
   const queryClient = useQueryClient()
   return useMutation(
     async ({
@@ -31,7 +37,10 @@ export const useHandleUnlink = (
     }: {
       globalReverseNameEntryData?: AccountData<ReverseEntryData>
       namespaceReverseEntry?: AccountData<ReverseEntryData>
-    }): Promise<string> => {
+    }): Promise<{
+      txid?: string
+      userTokenData?: UserTokenData
+    }> => {
       const trace = tracer({ name: 'useHandleUnlink' })
       const transaction = await withTrace(
         () =>
@@ -49,7 +58,7 @@ export const useHandleUnlink = (
         await connection.getRecentBlockhash('max')
       ).blockhash
       await wallet.signTransaction(transaction)
-      const txid = withTrace(
+      const txid = await withTrace(
         () =>
           sendAndConfirmRawTransaction(connection, transaction.serialize(), {
             skipPreflight: true,
@@ -57,10 +66,40 @@ export const useHandleUnlink = (
         trace,
         { op: 'sendTransaction' }
       )
-      return txid
+      return {
+        txid,
+        userTokenData,
+      }
     },
     {
-      onSuccess: () => queryClient.invalidateQueries(),
+      onSuccess: ({ txid, userTokenData }) => {
+        queryClient.invalidateQueries()
+        userTokenData &&
+          txid &&
+          setMessage(
+            <div className="flex w-full flex-col text-center">
+              <div>
+                Succesfully unlinked{' '}
+                {formatIdentityLink(...nameFromToken(userTokenData))}.
+              </div>
+              <div>
+                Changes will be reflected <TransactionLink txid={txid} />
+              </div>
+            </div>
+          )
+      },
+      onError: (e) => {
+        setMessage(
+          <Alert
+            type="error"
+            message={
+              <div className="flex w-full flex-col text-center">
+                {handleError(e, `${e}`)}
+              </div>
+            }
+          />
+        )
+      },
     }
   )
 }
@@ -79,7 +118,7 @@ export async function handleUnlink(
   const transaction = new Transaction()
   const entryMint = tryPublicKey(params.userTokenData.metaplexData?.parsed.mint)
   if (!entryMint) throw new Error('Failed to get mint')
-  const [, entryName] = nameFromToken(params.userTokenData)
+  const [entryName] = nameFromToken(params.userTokenData)
   if (params.userTokenData.certificate) {
     await withRevokeCertificateV2(connection, wallet, transaction, {
       certificateMint: entryMint,

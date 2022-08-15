@@ -38,6 +38,8 @@ export interface WalletIdentity {
   wallet?: Wallet
   connection?: Connection
   secondaryConnection?: Connection
+  message?: React.ReactNode
+  setMessage: (node: React.ReactNode) => void
   cluster?: Cluster
   dev?: boolean
   showIdentityModal: boolean
@@ -69,6 +71,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
   const [showIdentityModal, setShowIdentityModal] = useState<boolean>(false)
   const [identities, setIdentities] = useState(defaultIdentities)
   const [defaultVerifyIdentity, setDefaultVerifyIdentity] = useState<Identity>()
+  const [message, setMessage] = useState<React.ReactNode>()
 
   Sentry.init({
     dsn: SENTRY_DSN,
@@ -95,6 +98,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
           setDev(dev)
           onClose && setOnClose(() => onClose)
           setShowIdentityModal(true)
+          setMessage(undefined)
           identities && setIdentities(identities)
           verifyIdentity && setDefaultVerifyIdentity(IDENTITIES[verifyIdentity])
           Sentry.configureScope((scope) => {
@@ -112,6 +116,8 @@ export const WalletIdentityProvider: React.FC<Props> = ({
         secondaryConnection,
         cluster,
         dev,
+        message,
+        setMessage,
         showIdentityModal,
       }}
     >

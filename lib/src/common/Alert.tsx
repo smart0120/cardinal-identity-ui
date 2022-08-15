@@ -16,7 +16,7 @@ export const Alert = ({
   type: 'success' | 'info' | 'warning' | 'error'
   showIcon?: boolean
   message: React.ReactNode
-  style: React.CSSProperties
+  style?: React.CSSProperties
 }) => {
   return (
     <StyledAlert type={type} style={style}>

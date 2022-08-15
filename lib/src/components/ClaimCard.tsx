@@ -3,6 +3,7 @@ import type { Connection } from '@solana/web3.js'
 import { useState } from 'react'
 
 import type { Identity } from '../common/Identities'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { NameEntryClaim } from './NameEntryClaim'
 import { NameManager } from './NameManager'
 import { PoweredByFooter } from './PoweredByFooter'
@@ -22,6 +23,7 @@ export const ClaimCard = ({
   defaultVerifyIdentity,
   onComplete,
 }: ClaimCardProps) => {
+  const { message, setMessage } = useWalletIdentity()
   const [verifyIdentity, setVerifyIdentity] = useState<Identity | undefined>(
     defaultVerifyIdentity
   )
@@ -39,16 +41,23 @@ export const ClaimCard = ({
               wallet={wallet}
               connection={connection}
               secondaryConnection={secondaryConnection}
-              setVerifyIdentity={setVerifyIdentity}
+              setVerifyIdentity={(i) => {
+                setVerifyIdentity(i)
+                setMessage(undefined)
+              }}
               onComplete={onComplete}
             />
           ) : (
             <NameManager
               connection={connection}
               wallet={wallet}
-              setVerifyIdentity={setVerifyIdentity}
+              setVerifyIdentity={(i) => {
+                setVerifyIdentity(i)
+                setMessage(undefined)
+              }}
             />
           )}
+          {message && <div className="mb-4">{message}</div>}
           <PoweredByFooter />
         </>
       </div>

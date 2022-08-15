@@ -2,7 +2,6 @@ import type { AccountData } from '@cardinal/common'
 import type { ReverseEntryData } from '@cardinal/namespaces'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Connection } from '@solana/web3.js'
-import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 import { AiFillStar } from 'react-icons/ai'
 import { BiUnlink } from 'react-icons/bi'
@@ -12,9 +11,7 @@ import { Alert } from '../common/Alert'
 import { ButtonLight } from '../common/Button'
 import type { Identity } from '../common/Identities'
 import { LoadingSpinner } from '../common/LoadingSpinner'
-import { notify } from '../common/Notification'
 import { Tooltip } from '../common/Tooltip'
-import { TransactionLink } from '../common/TransactionLink'
 import { useHandleSetGlobalDefault } from '../handlers/useHandleSetGlobalDefault'
 import { useHandleSetNamespaceDefault } from '../handlers/useHandleSetNamespaceDefault'
 import { useHandleUnlink } from '../handlers/useHandleUnlink'
@@ -34,16 +31,13 @@ export const NameEntryRow = ({
   wallet,
   namespaceName,
   userTokenData,
-  setError,
-  setSuccess,
 }: {
   connection: Connection
   wallet: Wallet
   namespaceName: string
   userTokenData: UserTokenData
-  setError: (e: string | undefined) => void
-  setSuccess: (e: ReactElement) => void
 }) => {
+  const { setMessage } = useWalletIdentity()
   const userNamesForNamespace = useUserNamesForNamespace(
     connection,
     wallet.publicKey
@@ -66,16 +60,12 @@ export const NameEntryRow = ({
     wallet
   )
 
-  const namespaceReverseEntries = useNamespaceReverseEntries(
-    connection,
-    wallet.publicKey
-  )
-
   useEffect(() => {
     if (handleUnlink.isLoading || handleSetNamespacesDefault.isLoading) {
-      setError(undefined)
+      setMessage(undefined)
     }
   }, [handleUnlink.isLoading, handleSetNamespacesDefault.isLoading])
+
   return (
     <div className="flex items-center justify-between gap-5 px-2">
       <div
@@ -99,33 +89,9 @@ export const NameEntryRow = ({
           >
             <ButtonLight
               onClick={() =>
-                handleSetNamespacesDefault.mutate(
-                  {
-                    tokenData: userTokenData,
-                  },
-                  {
-                    onSuccess: (txid) => {
-                      userNamesForNamespace.remove()
-                      setSuccess(
-                        <div className="flex w-full flex-col text-center">
-                          <div>
-                            Succesfully set handle as default {namespaceName}{' '}
-                            identity.
-                          </div>
-                          <div>
-                            Changes will be reflected{' '}
-                            <TransactionLink txid={txid} />
-                          </div>
-                        </div>
-                      )
-                    },
-                    onError: (e) =>
-                      notify({
-                        message: `Failed Transaction`,
-                        description: e as string,
-                      }),
-                  }
-                )
+                handleSetNamespacesDefault.mutate({
+                  tokenData: userTokenData,
+                })
               }
             >
               {handleSetNamespacesDefault.isLoading ? (
@@ -163,35 +129,7 @@ export const NameEntryRow = ({
                       : undefined,
                 },
                 {
-                  onSuccess: (txid) => {
-                    userNamesForNamespace.remove()
-                    globalReverseEntry.refetch()
-                    namespaceReverseEntries.refetch()
-                    setSuccess(
-                      <div className="flex w-full flex-col text-center">
-                        <div>
-                          Succesfully unlinked{' '}
-                          {formatIdentityLink(
-                            ...nameFromMint(
-                              userTokenData.metaplexData?.parsed.data.name ||
-                                '',
-                              userTokenData.metaplexData?.parsed.data.uri || ''
-                            )
-                          )}
-                          .
-                        </div>
-                        <div>
-                          Changes will be reflected{' '}
-                          <TransactionLink txid={txid} />
-                        </div>
-                      </div>
-                    )
-                  },
-                  onError: (e) =>
-                    notify({
-                      message: `Failed Transaction`,
-                      description: e as string,
-                    }),
+                  onSuccess: () => userNamesForNamespace.remove(),
                 }
               )
             }
@@ -221,8 +159,6 @@ export const NameManager = ({
 }) => {
   const { identities, appInfo } = useWalletIdentity()
   const [topError, setTopError] = useState<string>()
-  const [error, setError] = useState<string>()
-  const [success, setSuccess] = useState<ReactElement>()
   const handleSetNamespacesDefault = useHandleSetNamespaceDefault(
     connection,
     wallet
@@ -334,8 +270,6 @@ export const NameManager = ({
                         connection={connection}
                         wallet={wallet}
                         userTokenData={userTokenData}
-                        setError={setError}
-                        setSuccess={setSuccess}
                       />
                     ))}
                 </>
@@ -355,34 +289,6 @@ export const NameManager = ({
               </>
             }
             type="error"
-            showIcon
-          />
-        )}
-        {error && (
-          <Alert
-            style={{
-              marginTop: '10px',
-              height: 'auto',
-              wordBreak: 'break-word',
-            }}
-            message={
-              <>
-                <div>{`${error}`}</div>
-              </>
-            }
-            type="error"
-            showIcon
-          />
-        )}
-        {success && (
-          <Alert
-            style={{
-              marginTop: '10px',
-              height: 'auto',
-              wordBreak: 'break-word',
-            }}
-            message={success}
-            type="success"
             showIcon
           />
         )}
