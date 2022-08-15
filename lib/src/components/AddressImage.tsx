@@ -7,7 +7,6 @@ export const AddressImage = ({
   connection,
   address,
   style,
-  dev = false,
   height = '150px',
   width = '150px',
   dark = false,
@@ -16,7 +15,6 @@ export const AddressImage = ({
 }: {
   connection: Connection
   address: PublicKey | undefined
-  dev?: boolean
   height?: string
   width?: string
   dark?: boolean

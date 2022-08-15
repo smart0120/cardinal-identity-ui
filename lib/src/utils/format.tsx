@@ -94,38 +94,3 @@ export async function tryGetImageUrl(
     return undefined
   }
 }
-
-export async function tryGetProfile(
-  handle: string,
-  dev?: boolean
-): Promise<
-  | { profile_image_url: string; username: string; id: string; name: string }
-  | undefined
-> {
-  try {
-    const response = await fetch(
-      `${apiBase(
-        dev
-      )}/twitter/proxy?url=https://api.twitter.com/2/users/by&usernames=${handle}&user.fields=profile_image_url`
-    )
-    const json = (await response.json()) as {
-      data: {
-        profile_image_url: string
-        username: string
-        id: string
-        name: string
-      }[]
-    }
-    return {
-      profile_image_url: json?.data[0]?.profile_image_url.replace(
-        '_normal',
-        ''
-      ) as string,
-      username: json?.data[0]?.username as string,
-      id: json?.data[0]?.id as string,
-      name: json?.data[0]?.name as string,
-    }
-  } catch (e) {
-    return undefined
-  }
-}

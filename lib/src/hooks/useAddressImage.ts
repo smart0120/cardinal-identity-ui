@@ -17,14 +17,10 @@ export const useAddressImage = (
     ['useAddressImage', address?.toString(), addressName.data],
     async () => {
       if (addressName.data) {
-        const [reverseEntryHandle, reverseEntryNamespaceName] = addressName.data
+        const [reverseEntryName, reverseEntryNamespaceName] = addressName.data
         const imageUrl = await withTrace(
           () =>
-            tryGetImageUrl(
-              reverseEntryNamespaceName,
-              reverseEntryHandle,
-              dev || false
-            ),
+            tryGetImageUrl(reverseEntryNamespaceName, reverseEntryName, dev),
           tracer({ name: 'useAddressImage' })
         )
         return imageUrl
