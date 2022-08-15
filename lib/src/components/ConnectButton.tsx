@@ -47,13 +47,9 @@ export const ConnectButton: React.FC<Props> = ({
           })
       }}
     >
-      {identity && (
+      {identity && identity.icon && (
         <div style={{ width: '14px' }} className="align-middle">
-          <img
-            className="text-white "
-            alt={`${identity?.name}-icon`}
-            src={identity?.icon}
-          />
+          {identity.icon()}
         </div>
       )}
       <span className="ml-2">Link {identity?.displayName || 'profile'}</span>

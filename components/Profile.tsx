@@ -6,8 +6,7 @@ import { Connection } from '@solana/web3.js'
 import { notify } from 'common/Notification'
 import {
   ConnectButton,
-  formatIdentityLink,
-  formatShortAddress,
+  DisplayAddress,
   useAddressImage,
   useAddressName,
   useWalletIdentity,
@@ -87,20 +86,17 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           />
         ) : addressImage.data ? (
           <div
+            className="relative flex items-center justify-center rounded-full"
             style={{
               height: '156px',
               width: '156px',
-              borderRadius: '50%',
+              padding: '5px',
               background: `${
                 identity?.colors.primary ??
                 (addressImage.data[1] &&
                   isKnownIdentity(addressImage.data[1]) &&
                   IDENTITIES[addressImage.data[1]].colors.primary)
               }`,
-              padding: '5px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
             }}
           >
             <img
@@ -158,16 +154,9 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
         )}
         <div className="flex flex-col justify-center text-center">
           {addressName.isFetching ? (
-            <div
-              style={{ height: '24px', width: '120px' }}
-              className="animate-pulse rounded-md bg-gray-200"
-            />
+            <div className="h-6  w-28 animate-pulse rounded-md bg-gray-200" />
           ) : (
-            <div className="flex justify-center gap-2">
-              {addressName.data
-                ? formatIdentityLink(addressName.data[0], addressName.data[1])
-                : formatShortAddress(address)}
-            </div>
+            <DisplayAddress connection={connection} address={address} />
           )}
           <AddressLink address={address} />
         </div>
@@ -219,11 +208,9 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
 export const PlaceholderProfile: React.FC = () => {
   return (
     <div
+      className="rounded-2xl bg-light-0 p-6"
       style={{
-        padding: '1.5rem',
-        borderRadius: '1rem',
         boxShadow: '0 4px 34px rgb(0 0 0 / 8%)',
-        background: '#FFF',
       }}
     >
       <div style={{ marginBottom: '40px' }}>
@@ -240,12 +227,12 @@ export const PlaceholderProfile: React.FC = () => {
           }}
         />
         <div
-          style={{ height: '24px', width: '120px', marginBottom: '5px' }}
-          className="animate-pulse rounded-md bg-gray-200"
+          style={{ marginBottom: '5px' }}
+          className="h-6 w-32 animate-pulse rounded-md bg-gray-200"
         />
         <div
-          style={{ height: '24px', width: '100px', marginBottom: '50px' }}
-          className="animate-pulse rounded-md bg-gray-200"
+          style={{ marginBottom: '50px' }}
+          className="h-6 w-28 animate-pulse rounded-md bg-gray-200"
         />
       </div>
     </div>

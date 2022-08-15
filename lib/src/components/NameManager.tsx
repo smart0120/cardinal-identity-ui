@@ -106,7 +106,6 @@ export const NameEntryRow = ({
                   {
                     onSuccess: (txid) => {
                       userNamesForNamespace.remove()
-                      namespaceReverseEntry.refetch()
                       setSuccess(
                         <div className="flex w-full flex-col text-center">
                           <div>
@@ -280,11 +279,8 @@ export const NameManager = ({
                     className="bg-dark-6 flex h-5 w-5 items-center justify-center rounded-full px-1"
                     style={{ background: identity.colors.primary }}
                   >
-                    <img
-                      className="w-full"
-                      src={identity.icon}
-                      alt={identity.name}
-                    />
+                    {!!identity.icon &&
+                      identity.icon({ variant: 'light', className: 'w-full' })}
                   </div>
                   <div className="text-sm font-semibold text-black">
                     {identity.displayName}

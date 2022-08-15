@@ -35,13 +35,7 @@ export const InitiateVerification = ({
         bgColor={identity?.colors.primary}
         disabled={disabled}
       >
-        <div style={{ width: '14px' }} className="align-middle">
-          <img
-            className="text-white "
-            alt={`${identity?.name}-icon`}
-            src={identity?.icon}
-          />
-        </div>
+        {identity && identity.icon({ variant: 'light', height: 14, width: 14 })}
         <span style={{ fontSize: '12px' }}>Verify</span>
       </Button>
     </a>
