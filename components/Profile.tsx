@@ -170,34 +170,6 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           )}
           <AddressLink address={address} />
         </div>
-        {identity && !!globalReverseEntry.data && (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              textAlign: 'center',
-            }}
-          >
-            <button
-              disabled={address?.toString() !== wallet?.publicKey?.toString()}
-              className="rounded-md px-3 py-1 text-sm text-black"
-              style={{
-                background: identity?.colors.buttonColor,
-                color: identity?.colors.secondaryFontColor,
-                opacity:
-                  address?.toString() !== wallet?.publicKey?.toString()
-                    ? 0.5
-                    : 1,
-              }}
-            >
-              {globalReverseEntry.data.parsed.namespaceName
-                .charAt(0)
-                .toUpperCase() +
-                globalReverseEntry.data.parsed.namespaceName.slice(1)}
-            </button>
-          </div>
-        )}
         <div className="mt-5">
           <ConnectButton
             disabled={address?.toString() !== wallet?.publicKey?.toString()}

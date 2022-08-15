@@ -1,5 +1,9 @@
 export type IdentityName = 'twitter' | 'discord'
 
+export function isKnownIdentity(string: string): string is IdentityName {
+  return ['twitter', 'discord'].includes(string)
+}
+
 export type Identity = {
   name: IdentityName
   icon?: string

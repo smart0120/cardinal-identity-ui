@@ -2,6 +2,7 @@ import { shortenAddress } from '@cardinal/namespaces'
 import { PublicKey } from '@solana/web3.js'
 
 import { apiBase } from './constants'
+import { profileImage } from './profileImage'
 
 export const formatIdentityLink = (
   handle: string | undefined,
@@ -82,15 +83,13 @@ export async function tryGetImageUrl(
       data: { profile_image_url: string }[]
     }
     return json?.data[0]?.profile_image_url.replace('_normal', '') as string
-  } else if (namespace === 'discord') {
-    return encodeURI(
-      `https://${
-        dev ? 'dev-nft' : 'nft'
-      }.cardinal.so/img/?text=@${encodeURIComponent(
-        name
-      )}.${namespace}&proxy=true${dev ? `&cluster=devnet` : ''}`
-    )
-  } else {
-    return undefined
   }
+  return `data:image/svg+xml;utf8,${profileImage(namespace, name)}`
+  // return encodeURI(
+  //   `https://${
+  //     dev ? 'dev-nft' : 'nft'
+  //   }.cardinal.so/img/?text=@${encodeURIComponent(
+  //     name
+  //   )}.${namespace}&proxy=true${dev ? `&cluster=devnet` : ''}`
+  // )
 }
