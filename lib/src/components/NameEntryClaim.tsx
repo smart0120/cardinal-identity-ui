@@ -163,8 +163,8 @@ export const NameEntryClaim = ({
         />
         <StepDetail
           disabled={
-            verificationUrl &&
-            verificationUrl?.length === 0 &&
+            !verificationUrl ||
+            verificationUrl?.length === 0 ||
             !(
               handleVerify.isError ||
               handleVerify.isSuccess ||

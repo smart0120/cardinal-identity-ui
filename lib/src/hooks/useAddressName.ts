@@ -48,24 +48,26 @@ export async function tryGetNameForNamespace(
     ]
   } catch (e) {}
 
-  try {
-    console.log('No reverse entry for namespace found falling back to global')
-    const globalReverseEntry = await withTrace(
-      () => getGlobalReverseNameEntry(connection, pubkey),
-      trace,
-      { op: 'getGlobalReverseNameEntry' }
-    )
-    if (globalReverseEntry.parsed) {
-      trace?.finish()
-      return [
-        formatName(
+  if (!namespaceName) {
+    try {
+      console.log('No reverse entry for namespace found falling back to global')
+      const globalReverseEntry = await withTrace(
+        () => getGlobalReverseNameEntry(connection, pubkey),
+        trace,
+        { op: 'getGlobalReverseNameEntry' }
+      )
+      if (globalReverseEntry.parsed) {
+        trace?.finish()
+        return [
+          formatName(
+            globalReverseEntry.parsed.namespaceName,
+            globalReverseEntry.parsed.entryName
+          ),
           globalReverseEntry.parsed.namespaceName,
-          globalReverseEntry.parsed.entryName
-        ),
-        globalReverseEntry.parsed.namespaceName,
-      ]
-    }
-  } catch (e) {}
+        ]
+      }
+    } catch (e) {}
+  }
 
   trace?.finish()
   return undefined

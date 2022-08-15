@@ -38,7 +38,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
   const { connection, environment } = useEnvironmentCtx()
   const addressStr = address.toString()
   const addressName = useAddressName(connection, address, identity?.name)
-  const addressImage = useAddressImage(connection, address)
+  const addressImage = useAddressImage(connection, address, identity?.name)
   const globalReverseEntry = useGlobalReverseEntry(
     connection,
     wallet.publicKey ?? undefined
@@ -109,7 +109,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
               }}
               alt={`profile-${addressStr}`}
               src={addressImage.data}
-            ></img>
+            />
             <ShareIcon
               onClick={() => {
                 navigator.clipboard.writeText(window.location.href)
@@ -168,12 +168,10 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
                 className="animate-pulse rounded-md bg-gray-200"
               />
             ) : (
-              !!globalReverseEntry.data && (
+              addressName.data && (
                 <div style={{ display: 'flex', gap: '5px' }}>
-                  {formatIdentityLink(
-                    addressName.data,
-                    globalReverseEntry.data.parsed.namespaceName
-                  ) || formatShortAddress(address)}
+                  {formatIdentityLink(addressName.data, identity?.name) ||
+                    formatShortAddress(address)}
                 </div>
               )
             )}

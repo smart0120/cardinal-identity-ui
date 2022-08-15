@@ -24,9 +24,7 @@ export const useAddressImage = (
         const imageUrl = await withTrace(
           () =>
             tryGetImageUrl(
-              namespaceName === 'default'
-                ? reverseEntryNamespaceName
-                : namespaceName,
+              reverseEntryNamespaceName,
               reverseEntryHandle,
               dev || false
             ),

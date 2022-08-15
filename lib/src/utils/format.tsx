@@ -1,5 +1,6 @@
 import { shortenAddress } from '@cardinal/namespaces'
 import { PublicKey } from '@solana/web3.js'
+
 import { apiBase } from './constants'
 
 export const formatIdentityLink = (
