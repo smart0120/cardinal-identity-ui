@@ -4,6 +4,8 @@ import type { Connection, PublicKey } from '@solana/web3.js'
 import { Transaction } from '@solana/web3.js'
 import { useMutation, useQueryClient } from 'react-query'
 
+import { Alert } from '../common/Alert'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { handleError } from '../utils/errors'
 import { tracer, withTrace } from '../utils/trace'
 import { executeTransaction } from '../utils/transactions'
@@ -18,6 +20,7 @@ export const useHandleSetGlobalDefault = (
   connection: Connection,
   wallet: Wallet
 ) => {
+  const { setMessage } = useWalletIdentity()
   const queryClient = useQueryClient()
   return useMutation(
     async ({
@@ -57,7 +60,21 @@ export const useHandleSetGlobalDefault = (
     },
     {
       onSuccess: () => queryClient.invalidateQueries(),
-      onError: async (e) => handleError(e, `${e}`),
+      onError: async (e) => {
+        setMessage(
+          <Alert
+            message={handleError(e, `${e}`)}
+            type="error"
+            style={{
+              margin: '10px 0px',
+              height: 'auto',
+              wordBreak: 'break-word',
+              justifyContent: 'center',
+              textAlign: 'center',
+            }}
+          />
+        )
+      },
     }
   )
 }

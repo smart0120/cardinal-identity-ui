@@ -2,7 +2,7 @@ import type { AccountData } from '@cardinal/common'
 import type { ReverseEntryData } from '@cardinal/namespaces'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Connection } from '@solana/web3.js'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { AiFillStar } from 'react-icons/ai'
 import { BiUnlink } from 'react-icons/bi'
 import { FaPlus } from 'react-icons/fa'
@@ -12,7 +12,6 @@ import { ButtonLight } from '../common/Button'
 import type { Identity } from '../common/Identities'
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import { Tooltip } from '../common/Tooltip'
-import { useHandleSetGlobalDefault } from '../handlers/useHandleSetGlobalDefault'
 import { useHandleSetNamespaceDefault } from '../handlers/useHandleSetNamespaceDefault'
 import { useHandleUnlink } from '../handlers/useHandleUnlink'
 import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
@@ -21,7 +20,6 @@ import { useNamespaceReverseEntry } from '../hooks/useNamespaceReverseEntry'
 import type { UserTokenData } from '../hooks/useUserNamesForNamespace'
 import { useUserNamesForNamespace } from '../hooks/useUserNamesForNamespace'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
-import { handleError } from '../utils/errors'
 import { formatIdentityLink } from '../utils/format'
 import { isReverseEntry, nameFromMint } from '../utils/nameUtils'
 import { SetDefaultButton } from './SetDefaultButton'
@@ -48,7 +46,6 @@ export const NameEntryRow = ({
     namespaceName,
     wallet.publicKey
   )
-
   const handleUnlink = useHandleUnlink(
     connection,
     wallet,
@@ -158,12 +155,10 @@ export const NameManager = ({
   setVerifyIdentity: (arg0: Identity) => void
 }) => {
   const { identities, appInfo } = useWalletIdentity()
-  const [topError, setTopError] = useState<string>()
   const handleSetNamespacesDefault = useHandleSetNamespaceDefault(
     connection,
     wallet
   )
-
   const namespaceReverseEntries = useNamespaceReverseEntries(
     connection,
     wallet.publicKey
@@ -173,7 +168,6 @@ export const NameManager = ({
     wallet.publicKey
   )
   const globalReverseEntry = useGlobalReverseEntry(connection, wallet.publicKey)
-  const handleSetGlobalDefault = useHandleSetGlobalDefault(connection, wallet)
 
   return (
     <div>
@@ -181,25 +175,6 @@ export const NameManager = ({
         {appInfo?.name ? `${appInfo.name} uses` : 'Use'} Cardinal to manage to
         your personal <strong>Solana</strong> identity.
       </div>
-      {(handleSetGlobalDefault.error || topError) && (
-        <Alert
-          message={
-            topError ||
-            handleError(
-              handleSetGlobalDefault.error,
-              `${handleSetGlobalDefault.error}`
-            )
-          }
-          type="error"
-          style={{
-            margin: '10px 0px',
-            height: 'auto',
-            wordBreak: 'break-word',
-            justifyContent: 'center',
-            textAlign: 'center',
-          }}
-        />
-      )}
       <div className="mb-10 flex flex-col gap-8">
         {identities
           .sort((identity) =>
@@ -227,7 +202,6 @@ export const NameManager = ({
                     connection={connection}
                     wallet={wallet}
                     identity={identity}
-                    setError={setTopError}
                   />
                   <ButtonLight
                     onClick={() => setVerifyIdentity(identity)}

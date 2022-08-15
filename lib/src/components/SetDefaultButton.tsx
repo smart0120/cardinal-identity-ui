@@ -10,19 +10,15 @@ import { Tooltip } from '../common/Tooltip'
 import { useHandleSetGlobalDefault } from '../handlers/useHandleSetGlobalDefault'
 import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
 import { useNamespaceReverseEntries } from '../hooks/useNamespaceReverseEntries'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
 export interface Props {
   connection: Connection
   wallet: Wallet
   identity: Identity
-  setError: (arg0: string | undefined) => void
 }
-export const SetDefaultButton = ({
-  connection,
-  wallet,
-  identity,
-  setError,
-}: Props) => {
+export const SetDefaultButton = ({ connection, wallet, identity }: Props) => {
+  const { setMessage } = useWalletIdentity()
   const namespaceReverseEntries = useNamespaceReverseEntries(
     connection,
     wallet.publicKey
@@ -40,12 +36,12 @@ export const SetDefaultButton = ({
             (tk) => tk.parsed.namespaceName === identity.name
           )
           if (!foundReverseEntry) {
-            setError(
+            setMessage(
               'You must set a default handle for the identity before setting it global'
             )
             return
           } else {
-            setError(undefined)
+            setMessage(undefined)
             const nameEntry = await getNameEntry(
               connection,
               identity.name,
