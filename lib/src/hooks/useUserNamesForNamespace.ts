@@ -174,7 +174,7 @@ export const useUserNamesForNamespace = (
           identity: identityFromMetaplexData(
             metaplexData[tokenAccount.pubkey.toString()],
             identityWithIds
-          ),
+          )!,
         }
       })
     },

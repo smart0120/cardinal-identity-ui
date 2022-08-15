@@ -1,15 +1,17 @@
 import type { CertificateData } from '@cardinal/certificates'
 import type { AccountData } from '@cardinal/common'
+import { tryPublicKey } from '@cardinal/common'
 import type { EntryData } from '@cardinal/namespaces'
 import { withSetGlobalReverseEntry } from '@cardinal/namespaces'
 import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
 import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
-import type { Connection } from '@solana/web3.js'
-import { PublicKey, Transaction } from '@solana/web3.js'
+import type { Connection, PublicKey } from '@solana/web3.js'
+import { Transaction } from '@solana/web3.js'
 import { useMutation, useQueryClient } from 'react-query'
 
 import { nameFromMint } from '../components/NameManager'
+import { handleError } from '../utils/errors'
 import { tracer, withTrace } from '../utils/trace'
 import { executeTransaction } from '../utils/transactions'
 
@@ -38,10 +40,10 @@ export const useHandleSetGlobalDefault = (
     }): Promise<string> => {
       if (!tokenData || !namespaceName) return ''
       const transaction = new Transaction()
-      const entryMint = new PublicKey(
-        tokenData.metaplexData?.parsed.mint ||
-          tokenData.nameEntryData.parsed.mint
-      )
+      const entryMint =
+        tryPublicKey(tokenData.metaplexData?.parsed.mint) ||
+        tokenData.nameEntryData?.parsed.mint
+      if (!entryMint) return ''
       const entryName = tokenData.nameEntryData
         ? tokenData.nameEntryData.parsed.name
         : nameFromMint(
@@ -79,6 +81,7 @@ export const useHandleSetGlobalDefault = (
     },
     {
       onSuccess: () => queryClient.invalidateQueries(),
+      onError: async (e) => handleError(e, `${e}`),
     }
   )
 }

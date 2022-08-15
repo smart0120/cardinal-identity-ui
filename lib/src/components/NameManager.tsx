@@ -1,5 +1,7 @@
-import { AccountData, getQueryParam } from '@cardinal/common'
-import { breakName, getNameEntry, ReverseEntryData } from '@cardinal/namespaces'
+import type { AccountData } from '@cardinal/common'
+import { getQueryParam } from '@cardinal/common'
+import type { ReverseEntryData } from '@cardinal/namespaces'
+import { breakName, getNameEntry } from '@cardinal/namespaces'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Connection } from '@solana/web3.js'
 import type { ReactElement } from 'react'
@@ -50,7 +52,7 @@ export const NameEntryRow = ({
   wallet: Wallet
   namespaceName: string
   userTokenData: UserTokenData
-  setError: (e: unknown) => void
+  setError: (e: string | undefined) => void
   setSuccess: (e: ReactElement) => void
 }) => {
   const { identities } = useWalletIdentity()
@@ -217,7 +219,7 @@ export const NameEntryRow = ({
                 {
                   globalReverseNameEntryData:
                     globalReverseEntry.data &&
-                    globalReverseEntry.data.parsed.entryName ===
+                    globalReverseEntry.data.parsed?.entryName ===
                       nameFromMint(
                         userTokenData.metaplexData?.parsed.data.name || '',
                         userTokenData.metaplexData?.parsed.data.uri || ''
@@ -326,7 +328,7 @@ export const NameManager = ({
             topError ||
             handleError(
               handleSetGlobalDefault.error,
-              handleSetGlobalDefault.error.toString()
+              `${handleSetGlobalDefault.error}`
             )
           }
           type="error"
@@ -371,11 +373,11 @@ export const NameManager = ({
                         <ButtonLight
                           onClick={async () => {
                             const foundReverseEntry =
-                              batchedNamespaceReverseEntries.data.filter(
+                              batchedNamespaceReverseEntries.data?.find(
                                 (tk) =>
                                   tk.parsed.namespaceName === identity.name
                               )
-                            if (foundReverseEntry.length === 0) {
+                            if (!foundReverseEntry) {
                               setTopError(
                                 'You must set a default handle for the identity before setting it global'
                               )
@@ -385,7 +387,7 @@ export const NameManager = ({
                               const nameEntry = await getNameEntry(
                                 connection,
                                 identity.name,
-                                foundReverseEntry[0].parsed.entryName
+                                foundReverseEntry.parsed.entryName
                               )
                               handleSetGlobalDefault.mutate({
                                 tokenData: { nameEntryData: nameEntry },
@@ -507,14 +509,14 @@ export const NameManager = ({
 
 export function sortOnReverseEntry(
   userTokenData: UserTokenData,
-  globalReverseEntry: AccountData<ReverseEntryData>,
-  namespaceReverseEntry: AccountData<ReverseEntryData>[]
+  globalReverseEntry: AccountData<ReverseEntryData> | undefined,
+  namespaceReverseEntry: AccountData<ReverseEntryData>[] | undefined
 ): number {
   const entryName = nameFromMint(
     userTokenData.metaplexData?.parsed.data.name || '',
     userTokenData.metaplexData?.parsed.data.uri || ''
   )[1]
-  if (globalReverseEntry.parsed.entryName === entryName) {
+  if (globalReverseEntry?.parsed?.entryName === entryName) {
     return -1
   }
   if (

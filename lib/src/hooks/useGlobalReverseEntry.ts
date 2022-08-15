@@ -1,10 +1,9 @@
 import type { AccountData } from '@cardinal/common'
-import {
-  getGlobalReverseNameEntry,
-  ReverseEntryData,
-} from '@cardinal/namespaces'
+import type { ReverseEntryData } from '@cardinal/namespaces'
+import { getGlobalReverseNameEntry } from '@cardinal/namespaces'
 import type { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
+
 import { tracer, withTrace } from '../utils/trace'
 
 export const useGlobalReverseEntry = (
