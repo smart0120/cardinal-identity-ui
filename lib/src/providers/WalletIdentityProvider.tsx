@@ -33,7 +33,7 @@ export type ShowParams = {
 export interface WalletIdentity {
   show: (arg: ShowParams) => void
   identities: Identity[]
-  appInfo?: AppInfo | null
+  appInfo?: AppInfo
   handle?: string
   wallet?: Wallet
   connection?: Connection

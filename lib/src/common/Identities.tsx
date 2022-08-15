@@ -1,5 +1,7 @@
+import type { Cluster } from '@solana/web3.js'
 import type { SVGProps } from 'react'
 
+import type { AppInfo } from '../providers/WalletIdentityProvider'
 import { apiBase } from '../utils/constants'
 
 export type IdentityName = 'twitter' | 'discord'
@@ -26,6 +28,14 @@ export type Identity = {
     entryName?: string,
     dev?: boolean
   ) => Promise<string | undefined>
+  verificationUrl: (address?: string, appInfo?: AppInfo) => string
+  verifierUrl: (
+    address: string,
+    proof: string,
+    accessToken?: string,
+    cluster?: Cluster,
+    dev?: boolean
+  ) => string
   namePrefix?: string
   displayName?: string
   verification?: 'Verification' | 'Tweet'
@@ -77,6 +87,29 @@ export const IDENTITIES: {
       }
       return json?.data[0]?.profile_image_url.replace('_normal', '') as string
     },
+    verificationUrl: (address, appInfo) => {
+      const tweetAt = appInfo?.twitter ?? appInfo?.name
+      return [
+        `https://twitter.com/intent/tweet?text=`,
+        encodeURIComponent(
+          [
+            `Claiming my Twitter handle as a @Solana NFT${
+              tweetAt ? ` on ${tweetAt}` : ''
+            } using @cardinal_labs protocol and linking it to my address ${address}\n\n`,
+            `Verify and claim yours at https://twitter.cardinal.so!`,
+          ].join('')
+        ),
+      ].join('')
+    },
+    verifierUrl: (address, proof, _accessToken, cluster, dev) => {
+      const handle = proof.split('/')[3]
+      const tweetId = proof.split('/')[5]?.split('?')[0]
+      return `${apiBase(
+        dev
+      )}/twitter/verify?tweetId=${tweetId}&publicKey=${address}&handle=${handle}${
+        cluster && `&cluster=${cluster}`
+      }`
+    },
     namePrefix: '@',
     displayName: 'Twitter',
     verification: 'Tweet',
@@ -113,6 +146,17 @@ export const IDENTITIES: {
       </svg>
     ),
     nameLink: () => `https://discord.com/channels/@me`,
+    verificationUrl: () =>
+      `https://discord.com/oauth2/authorize?response_type=code&client_id=992004845101916191&scope=identify&state=15773059ghq9183habn&redirect_uri=http://localhost:3000/verification?identity=discord&prompt=consent`,
+    verifierUrl: (address, proof, accessToken, cluster, dev) => {
+      const urlParams = new URLSearchParams(proof)
+      const code = urlParams.get('code')
+      return `${apiBase(
+        dev
+      )}/discord/verify?publicKey=${address}&code=${code}&accessToken=${
+        accessToken ?? ''
+      }${cluster && `&cluster=${cluster}`}`
+    },
     displayName: 'Discord',
     verification: 'Verification',
     description: {

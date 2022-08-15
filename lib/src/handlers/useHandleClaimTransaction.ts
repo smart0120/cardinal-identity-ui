@@ -25,7 +25,7 @@ export const useHandleClaimTransaction = (
   connection: Connection,
   wallet: Wallet,
   identity: Identity,
-  handle: string
+  handle: string | undefined
 ) => {
   const queryClient = useQueryClient()
   const { dev, cluster } = useWalletIdentity()
@@ -33,13 +33,13 @@ export const useHandleClaimTransaction = (
   return useMutation(
     [wallet.publicKey.toString()],
     async ({
-      verificationUrl,
+      proof,
       accessToken,
     }: {
-      verificationUrl?: string
+      proof?: string
       accessToken?: string
     }): Promise<string> => {
-      if (!verificationUrl) throw new Error('No verification url provided')
+      if (!proof) throw new Error('No verification url provided')
       const trace = tracer({ name: 'useHandleClaim' })
       const transactions = await withTrace(
         () =>
@@ -48,7 +48,7 @@ export const useHandleClaimTransaction = (
             cluster,
             identity.name,
             handle,
-            verificationUrl,
+            proof,
             accessToken,
             dev
           ),
@@ -79,12 +79,12 @@ export const useHandleClaimTransaction = (
 
 export async function handleClaim(
   wallet: Wallet,
-  cluster: Cluster,
+  cluster: Cluster | undefined,
   namespace: string,
   handle: string | undefined,
   tweetId: string | undefined,
   accessToken: string | undefined,
-  dev: boolean
+  dev: boolean | undefined
 ): Promise<Transaction[] | null> {
   if (!handle || !tweetId) return null
   const response = await fetch(

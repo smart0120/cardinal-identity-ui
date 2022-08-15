@@ -8,9 +8,7 @@ import { useMutation } from 'react-query'
 
 import type { Identity } from '../common/Identities'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
-import { apiBase } from '../utils/constants'
 import { tracer, withTrace } from '../utils/trace'
-import { discordCodeFromUrl, handleFromTweetUrl } from '../utils/verification'
 
 export interface HandleSetParam {
   metaplexData?: {
@@ -21,70 +19,42 @@ export interface HandleSetParam {
   certificate?: AccountData<CertificateData> | null
 }
 
+export type VerifyResponse = {
+  error?: string
+  handle?: string
+  accessToken?: string
+}
+
 export const useHandleVerify = (
   wallet: Wallet,
   identity: Identity,
-  accessToken: string,
-  setAccessToken: (handle: string) => void,
-  setHandle: (handle: string) => void
+  accessToken: string | undefined,
+  setAccessToken: (handle: string | undefined) => void,
+  setHandle: (handle: string | undefined) => void
 ) => {
   const { dev, cluster } = useWalletIdentity()
   return useMutation(
     [wallet.publicKey.toString()],
-    async ({
-      verificationUrl,
-    }: {
-      verificationUrl?: string
-    }): Promise<void> => {
-      if (!verificationUrl) return
-      let handle = ''
-      let code = ''
+    async ({ proof }: { proof?: string }): Promise<void> => {
+      if (!proof || proof.length === 0) return
 
-      // custom info per identity
-      switch (identity.name) {
-        case 'twitter': {
-          handle = handleFromTweetUrl(verificationUrl)?.toString() || ''
-          break
-        }
-        case 'discord': {
-          code = discordCodeFromUrl(verificationUrl)?.toString() || ''
-          break
-        }
-        default: {
-          throw new Error('Invalid identity namespace')
-        }
-      }
-
+      const verifierUrl = identity.verifierUrl(
+        wallet.publicKey.toString(),
+        proof,
+        accessToken,
+        cluster,
+        dev
+      )
       const response = await withTrace(
-        () =>
-          fetch(
-            `${apiBase(dev)}/${
-              identity.name
-            }/verify?tweetId=${verificationUrl}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}&code=${code}&accessToken=${accessToken}${
-              cluster && `&cluster=${cluster}`
-            }`
-          ),
+        () => fetch(verifierUrl),
         tracer({ name: 'useHandleVerify' })
       )
-      const json = await response.json()
+      const json = (await response.json()) as VerifyResponse
       if (response.status !== 200) throw new Error(json.error)
-      console.log('Verification response: ', json)
+      console.log('Verification response: ', JSON.stringify(json))
 
-      // custom info per identity
-      switch (identity.name) {
-        case 'twitter': {
-          setHandle(json.handle)
-          break
-        }
-        case 'discord': {
-          setHandle(json.info.username || '')
-          setAccessToken(json.info.accessToken || '')
-          break
-        }
-        default: {
-          throw new Error('Invalid identity namespace')
-        }
-      }
+      setHandle(json.handle)
+      setAccessToken(json?.accessToken)
       return
     },
     {

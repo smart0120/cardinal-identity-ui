@@ -17,9 +17,9 @@ import { formatIdentityLink, formatShortAddress } from '../utils/format'
 import { ButtonWithFooter } from './ButtonWithFooter'
 import { HandleNFT } from './HandleNFT'
 import { Link, Megaphone, Verified } from './icons'
-import { InitiateVerification } from './InitiateVerification'
 import { LabeledInput } from './LabeledInput'
 import { StepDetail } from './StepDetail'
+import { VerificationButton } from './VerificationButton'
 
 export const NameEntryClaim = ({
   identity,
@@ -36,12 +36,10 @@ export const NameEntryClaim = ({
   onComplete?: (arg0: string) => void
   setVerifyIdentity: (arg0: Identity | undefined) => void
 }) => {
-  const { cluster, appInfo } = useWalletIdentity()
-  const [verificationUrl, setVerificationUrl] = useState<string | undefined>(
-    undefined
-  )
-  const [handle, setHandle] = useState('')
-  const [accessToken, setAccessToken] = useState('')
+  const { appInfo } = useWalletIdentity()
+  const [proof, setProof] = useState<string | undefined>(undefined)
+  const [handle, setHandle] = useState<string>()
+  const [accessToken, setAccessToken] = useState<string>()
   const [verificationInitiated, setVerificationInitiated] = useState(false)
 
   const globalReverseEntry = useGlobalReverseEntry(
@@ -74,12 +72,12 @@ export const NameEntryClaim = ({
   )
 
   useMemo(() => {
-    if (verificationUrl && verificationInitiated) {
-      handleVerify.mutate({ verificationUrl: verificationUrl })
-    } else if (verificationUrl?.length === 0) {
+    if (proof && verificationInitiated) {
+      handleVerify.mutate({ proof: proof })
+    } else if (proof?.length === 0) {
       handleClaimTransaction.reset()
     }
-  }, [wallet.publicKey.toString(), verificationUrl, verificationInitiated])
+  }, [wallet.publicKey.toString(), proof, verificationInitiated])
 
   const alreadyOwned =
     nameEntryData.data?.owner?.toString() && !nameEntryData.data?.isOwnerPDA
@@ -124,12 +122,11 @@ export const NameEntryClaim = ({
           description={
             <>
               <div>{identity?.description.text}</div>
-              <InitiateVerification
+              <VerificationButton
                 wallet={wallet}
                 identity={identity}
                 disabled={false}
                 callback={() => setVerificationInitiated(true)}
-                cluster={cluster}
               />
             </>
           }
@@ -146,15 +143,15 @@ export const NameEntryClaim = ({
                 disabled={!verificationInitiated}
                 label={identity.verification || 'Verification'}
                 name={identity.verification || 'Verification'}
-                onChange={(e) => setVerificationUrl(e.target.value)}
+                onChange={(e) => setProof(e.target.value)}
               />
             </div>
           }
         />
         <StepDetail
           disabled={
-            !verificationUrl ||
-            verificationUrl?.length === 0 ||
+            !proof ||
+            proof?.length === 0 ||
             !(
               handleVerify.isError ||
               handleVerify.isSuccess ||
@@ -169,7 +166,7 @@ export const NameEntryClaim = ({
                 You will receive a non-tradeable NFT to prove you own your
                 Twitter handle.
               </div>
-              {verificationUrl && verificationUrl?.length !== 0 && (
+              {proof && proof?.length !== 0 && (
                 <div
                   style={{
                     display: 'flex',
@@ -319,7 +316,7 @@ export const NameEntryClaim = ({
         complete={handleClaimTransaction.isSuccess}
         disabled={
           !handleVerify.isSuccess ||
-          verificationUrl?.length === 0 ||
+          proof?.length === 0 ||
           nameEntryData.isFetching ||
           nameEntryData?.data?.owner?.toString() ===
             wallet?.publicKey?.toString()
@@ -327,7 +324,7 @@ export const NameEntryClaim = ({
         onClick={async () => {
           handleClaimTransaction.mutate(
             {
-              verificationUrl,
+              proof,
               accessToken,
             },
             {

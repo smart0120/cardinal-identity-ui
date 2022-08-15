@@ -2,7 +2,7 @@ import type { Identity } from '../common/Identities'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
 interface Props {
-  handle: string
+  handle: string | undefined
   identity: Identity
 }
 
