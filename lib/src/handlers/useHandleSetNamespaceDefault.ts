@@ -46,7 +46,7 @@ export const useHandleSetNamespaceDefault = (
       if (tokenData.certificate) {
         console.log('Type certificate, migrating ...')
         const response = await withTrace(
-          () => handleMigrate(wallet, entryName, cluster),
+          () => handleMigrate(wallet, entryName, namespaceName, cluster),
           trace,
           { op: 'handleMigrate' }
         )
