@@ -3,6 +3,7 @@ import type { EntryData } from '@cardinal/namespaces'
 import { getNameEntry } from '@cardinal/namespaces'
 import type { Connection } from '@solana/web3.js'
 import { useQuery } from 'react-query'
+
 import { tracer, withTrace } from '../utils/trace'
 
 export const useNameEntry = (

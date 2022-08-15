@@ -1,14 +1,15 @@
+import Tooltip from '@mui/material/Tooltip'
 import { Header } from 'common/Header'
 import { useWalletIdentity } from 'lib/src'
 import { Button } from 'lib/src/common/Button'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { IoCheckmarkCircleOutline } from 'react-icons/io5'
-import Tooltip from '@mui/material/Tooltip'
 
-const TwitterClaim = () => {
+const Verification = () => {
   const router = useRouter()
-  const { identity } = useWalletIdentity()
+  const { identities } = useWalletIdentity()
+  const identity = identities.length === 1 ? identities[0] : undefined
   const [tokenCode, setTokenCode] = useState('')
   const [error, setError] = useState<string | undefined>(undefined)
   const [linkCopied, setLinkCopied] = useState(false)
@@ -25,7 +26,7 @@ const TwitterClaim = () => {
   return (
     <div
       className={`fixed h-full w-full`}
-      style={{ background: identity.colors.primary }}
+      style={{ background: identity?.colors.primary }}
     >
       <Header />
       <div style={{ marginTop: '10vh' }}>
@@ -41,8 +42,8 @@ const TwitterClaim = () => {
               borderRadius: '1rem',
               boxShadow: '0 4px 34px rgb(0 0 0 / 8%)',
               height: '320px',
-              background: identity.colors.secondary,
-              color: identity.colors.primaryFontColor,
+              background: identity?.colors.secondary,
+              color: identity?.colors.primaryFontColor,
             }}
           >
             {!error ? (
@@ -51,12 +52,12 @@ const TwitterClaim = () => {
                   Congrats!
                 </div>
                 <div className="text-md mt-2 flex flex-row justify-center text-center font-semibold">
-                  You have successfully verified your {identity.displayName}{' '}
+                  You have successfully verified your {identity?.displayName}{' '}
                   account!
                 </div>
                 <div
                   className="text-md mt-5 flex flex-row justify-center rounded-lg p-5 text-center font-medium"
-                  style={{ background: identity.colors.buttonColor }}
+                  style={{ background: identity?.colors.buttonColor }}
                 >
                   Now copy this page's URL and paste it in the previous page to
                   claim your handle as a non-transferable NFT
@@ -91,4 +92,4 @@ const TwitterClaim = () => {
   )
 }
 
-export default TwitterClaim
+export default Verification

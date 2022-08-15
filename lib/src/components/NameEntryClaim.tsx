@@ -1,52 +1,54 @@
 import styled from '@emotion/styled'
 import type { Wallet } from '@saberhq/solana-contrib'
-import type { Cluster, Connection } from '@solana/web3.js'
+import type { Connection } from '@solana/web3.js'
 import { useMemo, useState } from 'react'
 
 import { Alert } from '../common/Alert'
+import { ButtonLight } from '../common/Button'
+import type { Identity } from '../common/Identities'
 import { useHandleClaimTransaction } from '../handlers/useHandleClaimTransaction'
 import { useHandleRevoke } from '../handlers/useHandleRevoke'
+import { useHandleSetNamespaceDefault } from '../handlers/useHandleSetNamespaceDefault'
 import { useHandleVerify } from '../handlers/useHandleVerify'
+import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
 import { useNameEntryData } from '../hooks/useNameEntryData'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
+import { handleError } from '../utils/errors'
 import { formatIdentityLink, formatShortAddress } from '../utils/format'
 import { ButtonWithFooter } from './ButtonWithFooter'
-import { Link, Megaphone, Verified } from './icons'
-import { LabeledInput } from './LabeledInput'
-import { InitiateVerification } from './InitiateVerification'
-import { StepDetail } from './StepDetail'
-import { useHandleSetNamespaceDefault } from '../handlers/useHandleSetNamespaceDefault'
-import { handleError } from '../utils/errors'
-import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { HandleNFT } from './HandleNFT'
+import { Link, Megaphone, Verified } from './icons'
+import { InitiateVerification } from './InitiateVerification'
+import { LabeledInput } from './LabeledInput'
+import { StepDetail } from './StepDetail'
 
 export const NameEntryClaim = ({
-  dev = false,
-  cluster = 'mainnet-beta',
+  identity,
   wallet,
   connection,
   secondaryConnection,
-  appName,
-  appTwitter,
-  setShowManage,
   onComplete,
+  setVerifyIdentity,
 }: {
-  dev?: boolean
-  cluster?: Cluster
+  identity: Identity
   wallet: Wallet
   connection: Connection
   secondaryConnection?: Connection
-  appName?: string
-  appTwitter?: string
-  setShowManage: (m: boolean) => void
   onComplete?: (arg0: string) => void
+  setVerifyIdentity: (arg0: Identity) => void
 }) => {
-  const { identity } = useWalletIdentity()
+  const { dev, cluster, appInfo } = useWalletIdentity()
   const [verificationUrl, setVerificationUrl] = useState<string | undefined>(
     undefined
   )
   const [handle, setHandle] = useState('')
   const [accessToken, setAccessToken] = useState('')
   const [verificationInitiated, setVerificationInitiated] = useState(false)
+
+  const globalReverseEntry = useGlobalReverseEntry(
+    connection,
+    wallet?.publicKey
+  )
 
   const nameEntryData = useNameEntryData(
     secondaryConnection || connection,
@@ -55,8 +57,7 @@ export const NameEntryClaim = ({
   )
   const handleVerify = useHandleVerify(
     wallet,
-    cluster,
-    dev,
+    identity,
     accessToken,
     setAccessToken,
     setHandle
@@ -71,15 +72,13 @@ export const NameEntryClaim = ({
   const handleClaimTransaction = useHandleClaimTransaction(
     connection,
     wallet,
-    cluster,
-    handle,
-    dev
+    identity,
+    handle
   )
 
   const handleSetNamespaceDefault = useHandleSetNamespaceDefault(
     connection,
-    wallet,
-    cluster
+    wallet
   )
 
   useMemo(() => {
@@ -97,6 +96,36 @@ export const NameEntryClaim = ({
 
   return (
     <>
+      <div className="text-dark-6 mb-6 text-center text-2xl">
+        {appInfo?.name ? `${appInfo.name} uses` : 'Use'} Cardinal to link your{' '}
+        <strong>{identity.displayName}</strong> identity to your{' '}
+        <strong>Solana</strong> address.
+      </div>
+      {globalReverseEntry.data &&
+        globalReverseEntry.data.parsed.namespaceName === identity.name && (
+          <Alert
+            style={{ marginBottom: '20px', width: '100%' }}
+            message={
+              <div className="flex w-full flex-col text-center">
+                <div>
+                  <span className="font-semibold">
+                    {globalReverseEntry.data.parsed.namespaceName}
+                  </span>{' '}
+                  is configured as your{' '}
+                  <span className="font-semibold">default</span> global identity
+                </div>
+              </div>
+            }
+            type="info"
+            showIcon
+          />
+        )}
+      <ButtonLight
+        className="absolute right-8 z-10"
+        onClick={() => setVerifyIdentity(undefined)}
+      >
+        Manage linked accounts
+      </ButtonLight>
       <DetailsWrapper>
         <StepDetail
           disabled={!wallet?.publicKey || !connection}
@@ -107,8 +136,7 @@ export const NameEntryClaim = ({
               <div>{identity?.description.text}</div>
               <InitiateVerification
                 wallet={wallet}
-                appName={appName}
-                appTwitter={appTwitter}
+                identity={identity}
                 disabled={false}
                 callback={() => setVerificationInitiated(true)}
                 cluster={cluster}
@@ -134,7 +162,15 @@ export const NameEntryClaim = ({
           }
         />
         <StepDetail
-          disabled={!handle}
+          disabled={
+            verificationUrl &&
+            verificationUrl?.length === 0 &&
+            !(
+              handleVerify.isError ||
+              handleVerify.isSuccess ||
+              handleVerify.isLoading
+            )
+          }
           icon={<Verified />}
           title="Claim your handle"
           description={
@@ -143,7 +179,7 @@ export const NameEntryClaim = ({
                 You will receive a non-tradeable NFT to prove you own your
                 Twitter handle.
               </div>
-              {handle && verificationUrl?.length !== 0 && (
+              {verificationUrl && verificationUrl?.length !== 0 && (
                 <div
                   style={{
                     display: 'flex',
@@ -152,7 +188,7 @@ export const NameEntryClaim = ({
                     paddingTop: '20px',
                   }}
                 >
-                  <HandleNFT handle={handle} cluster={cluster} dev={dev} />
+                  <HandleNFT identity={identity} handle={handle} />
                   <div
                     style={{
                       padding: '10px',
@@ -169,7 +205,7 @@ export const NameEntryClaim = ({
                           wordBreak: 'break-word',
                           justifyContent: 'center',
                         }}
-                        message={<div>{`Error: ${handleVerify.error}`}</div>}
+                        message={<div>{`${handleVerify.error}`}</div>}
                         type="error"
                         showIcon
                       />
@@ -180,6 +216,7 @@ export const NameEntryClaim = ({
                           height: 'auto',
                           wordBreak: 'break-word',
                           justifyContent: 'center',
+                          textAlign: 'center',
                         }}
                         message={
                           <>
@@ -195,7 +232,7 @@ export const NameEntryClaim = ({
                       />
                     )}
                     {nameEntryData.isFetching || handleRevoke.isLoading ? (
-                      <div className="mb-2 h-8 min-w-full animate-pulse rounded-lg bg-gray-200"></div>
+                      <div className="mb-2 h-8 w-3/4 animate-pulse rounded-lg bg-gray-200"></div>
                     ) : (
                       alreadyOwned &&
                       handleVerify.isSuccess &&
@@ -230,7 +267,7 @@ export const NameEntryClaim = ({
                                 it as your default, visit the{' '}
                                 <span
                                   className="cursor-pointer text-blue-500"
-                                  onClick={() => setShowManage(true)}
+                                  onClick={() => setVerifyIdentity(undefined)}
                                 >
                                   manage
                                 </span>{' '}

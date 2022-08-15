@@ -9,12 +9,13 @@ import { useRouter } from 'next/router'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
 import { useMemo, useState } from 'react'
 
-const Claim = () => {
+const Home = () => {
   const wallet = useWallet()
   const router = useRouter()
   const [address, setAddress] = useState<PublicKey>()
   const { connection } = useEnvironmentCtx()
-  const { identity } = useWalletIdentity()
+  const { identities } = useWalletIdentity()
+  const identity = identities.length === 1 ? identities[0] : undefined
   const { addressId } = router.query
 
   useMemo(async () => {
@@ -30,20 +31,20 @@ const Claim = () => {
     const tryAddress = tryPublicKey(addressId)
     if (tryAddress) {
       setAddress(tryAddress)
-    } else {
+    } else if (identity) {
       const nameEntry = await getNameEntry(
         connection,
-        identity.name,
+        identity?.name,
         firstParam(addressId)
       )
-      nameEntry.parsed.data && setAddress(nameEntry.parsed.data as PublicKey)
+      nameEntry.parsed.data && setAddress(nameEntry.parsed.data)
     }
   }, [wallet.connected, wallet.publicKey, addressId, router])
 
   return (
     <div
-      className={`fixed h-full w-full`}
-      style={{ background: identity.colors.primary }}
+      className={`fixed h-full w-full bg-dark-4`}
+      style={{ background: identity?.colors.primary }}
     >
       <Header />
       <div style={{ marginTop: '10vh' }}>
@@ -72,4 +73,4 @@ const Claim = () => {
   )
 }
 
-export default Claim
+export default Home

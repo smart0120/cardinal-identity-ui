@@ -14,12 +14,13 @@
     "incremental": true,
     "baseUrl": ".",
     //
-    "strict": false,
+    "strict": true,
     "noImplicitOverride": true,
     "noUncheckedIndexedAccess": true,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
-    "noErrorTruncation": true
+    "noErrorTruncation": true,
+    "jsxImportSource": "@emotion/react"
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]

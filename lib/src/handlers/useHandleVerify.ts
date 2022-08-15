@@ -3,10 +3,11 @@ import type { AccountData } from '@cardinal/common'
 import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
 import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
-import type { Cluster, PublicKey } from '@solana/web3.js'
+import type { PublicKey } from '@solana/web3.js'
 import { useMutation } from 'react-query'
-import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
+import type { Identity } from '../common/Identities'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { apiBase } from '../utils/constants'
 import { tracer, withTrace } from '../utils/trace'
 import { discordCodeFromUrl, handleFromTweetUrl } from '../utils/verification'
@@ -22,14 +23,12 @@ export interface HandleSetParam {
 
 export const useHandleVerify = (
   wallet: Wallet,
-  cluster: Cluster,
-  dev: boolean,
+  identity: Identity,
   accessToken: string,
   setAccessToken: (handle: string) => void,
   setHandle: (handle: string) => void
 ) => {
-  const { identity } = useWalletIdentity()
-
+  const { dev, cluster } = useWalletIdentity()
   return useMutation(
     [wallet.publicKey.toString()],
     async ({

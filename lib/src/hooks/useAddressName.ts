@@ -12,7 +12,7 @@ import { tracer, withTrace } from '../utils/trace'
 export const useAddressName = (
   connection: Connection,
   address: PublicKey | undefined,
-  namespaceName: string
+  namespaceName?: string
 ) => {
   return useQuery<string | undefined>(
     ['useAddressName', address?.toString(), namespaceName],

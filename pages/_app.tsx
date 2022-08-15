@@ -5,6 +5,7 @@ import { WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import { getWalletAdapters } from '@solana/wallet-adapter-wallets'
 import { WalletIdentityProvider } from 'lib/src'
+import type { Identity } from 'lib/src/common/Identities'
 import type { AppProps } from 'next/app'
 import {
   EnvironmentProvider,
@@ -18,11 +19,11 @@ const App = ({
   pageProps,
   identity,
   cluster,
-}: AppProps & { identity: string; cluster: string }) => (
+}: AppProps & { cluster: string; identity: Identity }) => (
   <EnvironmentProvider defaultCluster={cluster}>
     <WalletProvider wallets={getWalletAdapters()}>
       <WalletModalProvider>
-        <WalletIdentityProvider identityKey={identity}>
+        <WalletIdentityProvider identities={identity ? [identity] : undefined}>
           <Component {...pageProps} />
         </WalletIdentityProvider>
       </WalletModalProvider>

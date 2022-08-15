@@ -32,40 +32,40 @@ const ShareIcon = styled.div`
 `
 
 export const Profile: React.FC<Props> = ({ address }: Props) => {
-  const { identity, show } = useWalletIdentity()
+  const { identities, show } = useWalletIdentity()
+  const identity = identities.length === 1 ? identities[0] : undefined
   const wallet = useWallet()
   const { connection, environment } = useEnvironmentCtx()
   const addressStr = address.toString()
-  const addressName = useAddressName(connection, address, identity.name)
-  const addressImage = useAddressImage(
+  const addressName = useAddressName(connection, address, identity?.name)
+  const addressImage = useAddressImage(connection, address)
+  const globalReverseEntry = useGlobalReverseEntry(
     connection,
-    address,
-    environment.label === 'devnet'
+    wallet.publicKey ?? undefined
   )
-  const globalReverseEntry = useGlobalReverseEntry(connection, wallet.publicKey)
 
   return (
     <div
+      className="bg-dark-3"
       style={{
         padding: '1.5rem',
         borderRadius: '1rem',
-        // boxShadow: '0 0 80px 50px rgba(255, 255, 255, 0.3)',
         boxShadow: '0 4px 34px rgb(0 0 0 / 30%)',
-        background: identity.colors.secondary,
+        background: identity?.colors.secondary,
       }}
     >
-      {identity.name !== 'default' && (
+      {identity && (
         <div style={{ marginBottom: '30px' }}>
           {addressName.isFetching ? (
             <Alert message={'Loading'} type="warning" />
           ) : addressName.data ? (
             <Alert
-              message={`Succesfully linked ${identity.displayName}`}
+              message={`Succesfully linked ${identity?.displayName}`}
               type="success"
             />
           ) : (
             <Alert
-              message={`${identity.displayName} not linked`}
+              message={`${identity?.displayName} not linked`}
               type="warning"
             />
           )}
@@ -92,7 +92,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
               width: '156px',
               borderRadius: '50%',
               background: '#fff',
-              backgroundImage: `linear-gradient(84.06deg, ${identity.colors.primary}, ${identity.colors.primary})`,
+              backgroundImage: `linear-gradient(84.06deg, ${identity?.colors.primary}, ${identity?.colors.primary})`,
               // boxShadow: '0 5px 10px 0 rgb(97 83 202 / 30%)',
               padding: '5px',
               display: 'flex',
@@ -180,7 +180,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           </span>
           <AddressLink address={address} />
         </div>
-        {identity.name === 'default' && !!globalReverseEntry.data && (
+        {identity && !!globalReverseEntry.data && (
           <div
             style={{
               display: 'flex',
@@ -193,8 +193,8 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
               disabled={address?.toString() !== wallet?.publicKey?.toString()}
               className="rounded-md px-3 py-1 text-sm text-black"
               style={{
-                background: identity.colors.buttonColor,
-                color: identity.colors.secondaryFontColor,
+                background: identity?.colors.buttonColor,
+                color: identity?.colors.secondaryFontColor,
                 opacity:
                   address?.toString() !== wallet?.publicKey?.toString()
                     ? 0.5
@@ -223,7 +223,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
             cluster={environment.label}
           />
         </div>
-        {identity.name !== 'default' && (
+        {identity && (
           <button
             disabled={address?.toString() !== wallet?.publicKey?.toString()}
             className="rounded-md px-3 py-1 text-xs text-white"
@@ -236,12 +236,11 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
                   ? new Connection(environment.secondary)
                   : connection,
                 dev: environment.label === 'devnet',
-                showManage: true,
               })
             }
             style={{
-              background: identity.colors.buttonColor,
-              color: identity.colors.secondaryFontColor,
+              background: identity?.colors.buttonColor,
+              color: identity?.colors.secondaryFontColor,
               opacity:
                 address?.toString() !== wallet?.publicKey?.toString() ? 0.5 : 1,
             }}

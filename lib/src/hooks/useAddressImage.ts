@@ -1,8 +1,8 @@
 import { breakName } from '@cardinal/namespaces'
 import type { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
-import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { tryGetImageUrl } from '../utils/format'
 import { tracer, withTrace } from '../utils/trace'
 import { useAddressName } from './useAddressName'
@@ -10,12 +10,12 @@ import { useAddressName } from './useAddressName'
 export const useAddressImage = (
   connection: Connection,
   address: PublicKey | undefined,
-  dev?: boolean
+  namespaceName?: string
 ) => {
-  const { identity } = useWalletIdentity()
-  const addressName = useAddressName(connection, address, identity.name)
+  const { dev } = useWalletIdentity()
+  const addressName = useAddressName(connection, address, namespaceName)
   return useQuery<string | undefined>(
-    ['useAddressImage', address?.toString(), identity.name, addressName.data],
+    ['useAddressImage', address?.toString(), namespaceName, addressName.data],
     async () => {
       const [reverseEntryNamespaceName, reverseEntryHandle] = addressName.data
         ? breakName(addressName.data)
@@ -24,9 +24,9 @@ export const useAddressImage = (
         const imageUrl = await withTrace(
           () =>
             tryGetImageUrl(
-              identity.name === 'default'
+              namespaceName === 'default'
                 ? reverseEntryNamespaceName
-                : identity.name,
+                : namespaceName,
               reverseEntryHandle,
               dev || false
             ),

@@ -1,5 +1,5 @@
 import { Button } from '../common/Button'
-import { Identity } from '../common/Identities'
+import type { Identity } from '../common/Identities'
 import type { ShowParams } from '../providers/WalletIdentityProvider'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
@@ -26,11 +26,11 @@ export const ConnectButton: React.FC<Props> = ({
   wallet,
   onClose,
   disabled,
-  showManage,
   forceIdentity,
   ...buttonProps
 }: Props) => {
-  const { show, identity, setIdentity } = useWalletIdentity()
+  const { show, identities } = useWalletIdentity()
+  const identity = identities.length === 1 ? identities[0] : undefined
   return (
     <Button
       bgColor={forceIdentity?.colors.primary || identity?.colors.primary}
@@ -38,39 +38,30 @@ export const ConnectButton: React.FC<Props> = ({
       disabled={disabled}
       {...buttonProps}
       onClick={() => {
-        if (!forceIdentity) {
-          !disabled &&
-            show({
-              wallet,
-              connection,
-              cluster,
-              secondaryConnection,
-              dev,
-              onClose,
-              showManage,
-            })
-        } else {
-          setIdentity(forceIdentity)
-        }
+        !disabled &&
+          show({
+            wallet,
+            connection,
+            cluster,
+            secondaryConnection,
+            dev,
+            onClose,
+            verifyIdentity: identity?.name,
+          })
       }}
     >
-      {(forceIdentity && forceIdentity.name !== 'default') ||
-      identity.name !== 'default' ? (
-        <>
-          <div style={{ width: '14px' }} className="align-middle">
-            <img
-              className="text-white "
-              alt={`${forceIdentity?.name || identity?.name}-icon`}
-              src={forceIdentity?.icon || identity?.icon}
-            />
-          </div>
-          <span className="ml-2">
-            Link {forceIdentity?.displayName || 'Profile'}
-          </span>
-        </>
-      ) : (
-        <>Link your identities</>
+      {identity && (
+        <div style={{ width: '14px' }} className="align-middle">
+          <img
+            className="text-white "
+            alt={`${forceIdentity?.name || identity?.name}-icon`}
+            src={forceIdentity?.icon || identity?.icon}
+          />
+        </div>
       )}
+      <span className="ml-2">
+        Link {forceIdentity?.displayName || 'Profile'}
+      </span>
     </Button>
   )
 }

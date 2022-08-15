@@ -6,8 +6,9 @@ import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, Connection, PublicKey } from '@solana/web3.js'
 import { sendAndConfirmRawTransaction, Transaction } from '@solana/web3.js'
 import { useMutation, useQueryClient } from 'react-query'
-import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
+import type { Identity } from '../common/Identities'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { apiBase } from '../utils/constants'
 import { tracer, withTrace } from '../utils/trace'
 
@@ -23,12 +24,11 @@ export interface HandleSetParam {
 export const useHandleClaimTransaction = (
   connection: Connection,
   wallet: Wallet,
-  cluster: Cluster,
-  handle: string,
-  dev: boolean
+  identity: Identity,
+  handle: string
 ) => {
   const queryClient = useQueryClient()
-  const { identity } = useWalletIdentity()
+  const { dev, cluster } = useWalletIdentity()
 
   return useMutation(
     [wallet.publicKey.toString()],

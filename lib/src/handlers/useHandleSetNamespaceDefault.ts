@@ -30,9 +30,9 @@ export interface HandleSetParam {
 
 export const useHandleSetNamespaceDefault = (
   connection: Connection,
-  wallet: Wallet,
-  cluster = 'mainnet'
+  wallet: Wallet
 ) => {
+  const { cluster } = useWalletIdentity()
   const queryClient = useQueryClient()
   const { identity } = useWalletIdentity()
   const globalReverseEntry = useGlobalReverseEntry(

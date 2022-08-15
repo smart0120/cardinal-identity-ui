@@ -1,4 +1,4 @@
-export type IdentityName = 'twitter' | 'discord' | 'default'
+export type IdentityName = 'twitter' | 'discord'
 
 export type Identity = {
   name: IdentityName
@@ -18,22 +18,9 @@ export type Identity = {
   }
 }
 
-export const identities: { [key: string]: Identity } = {
-  default: {
-    name: 'default',
-    displayName: 'Default',
-    description: {
-      header: 'Verify your social media accounts',
-      text: 'Link your social media',
-    },
-    colors: {
-      primary: '#1a1b20',
-      secondary: '#ffffff',
-      buttonColor: '#f0f1f3',
-      primaryFontColor: '#ffffff',
-      secondaryFontColor: '#697b89',
-    },
-  },
+export const IDENTITIES: {
+  [key in IdentityName]: Identity
+} = {
   twitter: {
     name: 'twitter',
     icon: './icons/twitter-icon.png',

@@ -1,23 +1,30 @@
 import type { Wallet } from '@saberhq/solana-contrib'
+import * as Sentry from '@sentry/browser'
 import type { Cluster, Connection } from '@solana/web3.js'
-import React, { Dispatch, SetStateAction, useContext, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
-import * as Sentry from '@sentry/browser'
 
 import { ClaimCard } from '..'
-import { identities, Identity } from '../common/Identities'
+import type { Identity, IdentityName } from '../common/Identities'
+import { IDENTITIES } from '../common/Identities'
 import { Modal } from '../modal'
 import { withSleep } from '../utils/transactions'
 
 const SENTRY_DSN =
   'https://109718d85e0640f0b5f7160e2602b5f0@o1340959.ingest.sentry.io/6625303'
 
+export type AppInfo = {
+  name: string
+  twitter?: string
+}
+
 export type ShowParams = {
   connection: Connection
   cluster: Cluster
   wallet: Wallet
-  showManage?: boolean
+  verifyIdentity?: IdentityName
+  identities?: Identity[]
   onClose?: () => void
   secondaryConnection?: Connection
   dev?: boolean
@@ -25,8 +32,8 @@ export type ShowParams = {
 
 export interface WalletIdentity {
   show: (arg: ShowParams) => void
-  identity: Identity
-  setIdentity: Dispatch<SetStateAction<Identity>>
+  identities: Identity[]
+  appInfo?: AppInfo | null
   handle?: string
   wallet?: Wallet
   connection?: Connection
@@ -41,33 +48,28 @@ export const WalletIdentityContext = React.createContext<WalletIdentity | null>(
 )
 
 interface Props {
-  identityKey?: string
-  appName?: string
-  appTwitter?: string
-  flows?: 'discord' | 'twitter'[]
+  appInfo?: AppInfo
+  identities?: Identity[]
   children: React.ReactNode
 }
 
 const QUERY_CLIENT = new QueryClient()
 
 export const WalletIdentityProvider: React.FC<Props> = ({
-  identityKey,
-  appName,
-  appTwitter,
+  appInfo,
+  identities: defaultIdentities = Object.values(IDENTITIES),
   children,
 }: Props) => {
   const [wallet, setWallet] = useState<Wallet>()
   const [connection, setConnection] = useState<Connection>()
   const [secondaryConnection, setSecondaryConnection] = useState<Connection>()
-  const [showManageDefault, setShowManageDefault] = useState<boolean>(false)
   const [cluster, setCluster] = useState<Cluster | undefined>(undefined)
   const [dev, setDev] = useState<boolean | undefined>(undefined)
   const [onClose, setOnClose] = useState<(() => void) | undefined>()
   const [showIdentityModal, setShowIdentityModal] = useState<boolean>(false)
   const [handle, setHandle] = useState<string | undefined>(undefined)
-  const [identity, setIdentity] = useState<Identity>(
-    identities[identityKey!] || identities['default']!
-  )
+  const [identities, setIdentities] = useState(defaultIdentities)
+  const [defaultVerifyIdentity, setDefaultVerifyIdentity] = useState<Identity>()
 
   Sentry.init({
     dsn: SENTRY_DSN,
@@ -84,7 +86,8 @@ export const WalletIdentityProvider: React.FC<Props> = ({
           secondaryConnection,
           dev,
           onClose,
-          showManage: showManageDefault,
+          identities,
+          verifyIdentity,
         }) => {
           setWallet(wallet)
           setConnection(connection)
@@ -93,7 +96,8 @@ export const WalletIdentityProvider: React.FC<Props> = ({
           setDev(dev)
           onClose && setOnClose(() => onClose)
           setShowIdentityModal(true)
-          setShowManageDefault(showManageDefault || false)
+          identities && setIdentities(identities)
+          setDefaultVerifyIdentity(IDENTITIES[verifyIdentity])
           Sentry.configureScope((scope) => {
             scope.setUser({
               username: wallet.publicKey?.toString(),
@@ -104,12 +108,13 @@ export const WalletIdentityProvider: React.FC<Props> = ({
         },
         handle,
         wallet,
+        identities,
         connection,
+        appInfo,
+        secondaryConnection,
         cluster,
         dev,
         showIdentityModal,
-        identity,
-        setIdentity,
       }}
     >
       <QueryClientProvider client={QUERY_CLIENT}>
@@ -123,15 +128,10 @@ export const WalletIdentityProvider: React.FC<Props> = ({
           darkenOverlay={true}
         >
           <ClaimCard
-            dev={dev}
-            cluster={cluster}
             wallet={wallet}
             connection={connection}
             secondaryConnection={secondaryConnection}
-            appName={appName}
-            namespaceName={identity.name}
-            appTwitter={appTwitter}
-            showManage={showManageDefault}
+            defaultVerifyIdentity={defaultVerifyIdentity}
             onComplete={(handle: string) => {
               setHandle(handle)
               withSleep(() => {

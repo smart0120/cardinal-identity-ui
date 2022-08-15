@@ -1,10 +1,8 @@
 import styled from '@emotion/styled'
 import darken from 'polished/lib/color/darken'
 import React, { useEffect, useState } from 'react'
-import { identities } from '../common/Identities'
-import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
-import { CloseIcon, BackIcon } from './icons'
+import { CloseIcon } from './icons'
 
 export interface ModalProps {
   children: React.ReactNode
@@ -24,7 +22,6 @@ export const Modal: React.FC<ModalProps> = ({
   hideOtheridentity = false,
 }: ModalProps) => {
   const [mounted, setMounted] = useState(true)
-  const { identity, setIdentity } = useWalletIdentity()
   useEffect(() => {
     !isOpen
       ? setTimeout(() => {
@@ -54,23 +51,9 @@ export const Modal: React.FC<ModalProps> = ({
             <div
               className="flex-between flex w-full"
               style={{
-                justifyContent:
-                  hideOtheridentity || identity.name === 'default'
-                    ? 'flex-end'
-                    : 'space-between',
+                justifyContent: 'flex-end',
               }}
             >
-              {hideOtheridentity || identity.name === 'default' ? (
-                <div />
-              ) : (
-                <ButtonIcon
-                  onClick={(e) => {
-                    setIdentity(identities['default']!)
-                  }}
-                >
-                  <BackIcon />
-                </ButtonIcon>
-              )}
               {hideCloseButton ? (
                 <div />
               ) : (

@@ -1,32 +1,23 @@
 import type { Wallet } from '@saberhq/solana-contrib'
-import { Button } from '../common/Button'
-import { Identity } from '../common/Identities'
 
+import { Button } from '../common/Button'
+import type { Identity } from '../common/Identities'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
 export const InitiateVerification = ({
   wallet,
-  appName,
-  appTwitter,
+  identity,
   disabled,
   callback,
   cluster,
 }: {
   wallet?: Wallet
-  appTwitter?: string | undefined
-  appName?: string | undefined
+  identity: Identity
   disabled: boolean
   callback?: () => void
   cluster?: string | undefined
 }) => {
-  const { identity } = useWalletIdentity()
-  const link = useGenerateLink(
-    identity,
-    wallet?.publicKey?.toString(),
-    appName,
-    appTwitter,
-    cluster
-  )
+  const link = useGenerateLink(identity, wallet?.publicKey?.toString(), cluster)
   return (
     <a
       href={link}
@@ -60,12 +51,12 @@ export const InitiateVerification = ({
 const useGenerateLink = (
   identity: Identity,
   pubkey: string | undefined,
-  appName: string | undefined,
-  appTwitter: string | undefined,
   cluster?: string | undefined
 ): string => {
+  const { appInfo } = useWalletIdentity()
   if (!pubkey) return ''
   let link = ''
+  const tweetAt = appInfo?.twitter ?? appInfo?.name
   switch (identity.name) {
     case 'twitter': {
       link = [
@@ -73,7 +64,7 @@ const useGenerateLink = (
         encodeURIComponent(
           [
             `Claiming my Twitter handle as a @Solana NFT${
-              appTwitter || appName ? ` on ${appTwitter || appName}` : ''
+              tweetAt ? ` on ${tweetAt}` : ''
             } using @cardinal_labs protocol and linking it to my address ${pubkey}\n\n`,
             `Verify and claim yours at https://twitter.cardinal.so${
               cluster === 'devnet' ? '?cluster=devnet' : ''
