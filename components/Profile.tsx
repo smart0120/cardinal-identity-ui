@@ -37,8 +37,16 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
   const wallet = useWallet()
   const { connection, environment } = useEnvironmentCtx()
   const addressStr = address.toString()
-  const addressName = useAddressName(connection, address, identity?.name)
-  const addressImage = useAddressImage(connection, address, identity?.name)
+  const addressName = useAddressName(
+    connection,
+    address,
+    identity?.name ? [identity.name] : undefined
+  )
+  const addressImage = useAddressImage(
+    connection,
+    address,
+    identity?.name ? [identity.name] : undefined
+  )
   const globalReverseEntry = useGlobalReverseEntry(
     connection,
     wallet.publicKey ?? undefined
