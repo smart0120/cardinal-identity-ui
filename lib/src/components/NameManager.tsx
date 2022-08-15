@@ -20,7 +20,6 @@ import { TransactionLink } from '../common/TransactionLink'
 import { useHandleSetGlobalDefault } from '../handlers/useHandleSetGlobalDefault'
 import { useHandleSetNamespaceDefault } from '../handlers/useHandleSetNamespaceDefault'
 import { useHandleUnlink } from '../handlers/useHandleUnlink'
-import { useAddressName } from '../hooks/useAddressName'
 import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
 import { useNamespaceReverseEntries } from '../hooks/useNamespaceReverseEntries'
 import { useNamespaceReverseEntry } from '../hooks/useNamespaceReverseEntry'
@@ -56,7 +55,6 @@ export const NameEntryRow = ({
   setError: (e: string | undefined) => void
   setSuccess: (e: ReactElement) => void
 }) => {
-  const { identities } = useWalletIdentity()
   const userNamesForNamespace = useUserNamesForNamespace(
     connection,
     wallet.publicKey
@@ -66,12 +64,6 @@ export const NameEntryRow = ({
     connection,
     namespaceName,
     wallet.publicKey
-  )
-
-  const addressName = useAddressName(
-    connection,
-    wallet.publicKey,
-    namespaceName
   )
 
   const handleUnlink = useHandleUnlink(
@@ -87,8 +79,7 @@ export const NameEntryRow = ({
 
   const namespaceReverseEntries = useNamespaceReverseEntries(
     connection,
-    wallet.publicKey,
-    identities.map((idn) => idn.name)
+    wallet.publicKey
   )
 
   useEffect(() => {
@@ -139,7 +130,6 @@ export const NameEntryRow = ({
                         userNamesForNamespace.remove()
                         namespaceReverseEntry.refetch()
                         globalReverseEntry.refetch()
-                        addressName.refetch()
                         setSuccess(
                           <div className="flex w-full flex-col text-center">
                             <div>
@@ -241,7 +231,6 @@ export const NameEntryRow = ({
                   onSuccess: (txid) => {
                     userNamesForNamespace.remove()
                     globalReverseEntry.refetch()
-                    addressName.refetch()
                     namespaceReverseEntries.refetch()
                     setSuccess(
                       <div className="flex w-full flex-col text-center">
@@ -307,8 +296,7 @@ export const NameManager = ({
 
   const namespaceReverseEntries = useNamespaceReverseEntries(
     connection,
-    wallet.publicKey,
-    identities.map((idn) => idn.name)
+    wallet.publicKey
   )
   const userNamesForNamespace = useUserNamesForNamespace(
     connection,

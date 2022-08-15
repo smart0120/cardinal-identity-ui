@@ -9,12 +9,12 @@ import { useAddressName } from './useAddressName'
 export const useAddressImage = (
   connection: Connection,
   address: PublicKey | undefined,
-  namespaceName?: string
+  namespaceNames?: string[]
 ) => {
   const { dev } = useWalletIdentity()
-  const addressName = useAddressName(connection, address, namespaceName)
+  const addressName = useAddressName(connection, address, namespaceNames)
   return useQuery<string | undefined>(
-    ['useAddressImage', address?.toString(), namespaceName, addressName.data],
+    ['useAddressImage', address?.toString(), addressName.data],
     async () => {
       if (addressName.data) {
         const [reverseEntryHandle, reverseEntryNamespaceName] = addressName.data
@@ -28,8 +28,6 @@ export const useAddressImage = (
           tracer({ name: 'useAddressImage' })
         )
         return imageUrl
-      } else {
-        return undefined
       }
     },
     {

@@ -1,69 +1,45 @@
-import {
-  findNamespaceId,
-  getGlobalReverseNameEntry,
-  getReverseNameEntryForNamespace,
-} from '@cardinal/namespaces'
 import type { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
 
-import { tracer, withTrace } from '../utils/trace'
+import { useGlobalReverseEntry } from './useGlobalReverseEntry'
+import { useNamespaceReverseEntries } from './useNamespaceReverseEntries'
 
 export const useAddressName = (
   connection: Connection,
   address: PublicKey | undefined,
-  namespaceName?: string
+  namespaceNames?: string[]
 ) => {
+  const namespaceReverseEntries = useNamespaceReverseEntries(
+    connection,
+    address,
+    namespaceNames
+  )
+  const globalReverseEntry = useGlobalReverseEntry(connection, address)
   return useQuery<[string, string] | undefined>(
-    ['useAddressName', address?.toString(), namespaceName],
+    [
+      'useAddressName',
+      address?.toString(),
+      namespaceReverseEntries.data?.map((i) => i.pubkey.toString()),
+    ],
     async () => {
       if (!address || !connection) return
-      const n = await tryGetNameForNamespace(connection, address, namespaceName)
-      return n ? n : undefined
+      if (globalReverseEntry.data) {
+        return [
+          globalReverseEntry.data?.parsed.entryName,
+          globalReverseEntry.data?.parsed.namespaceName,
+        ]
+      }
+      const reverseEntryMatch = namespaceReverseEntries.data?.find((r) => [
+        r.parsed.entryName,
+        r.parsed.namespaceName,
+      ])
+      if (reverseEntryMatch) {
+        return [
+          reverseEntryMatch?.parsed.entryName,
+          reverseEntryMatch?.parsed.namespaceName,
+        ]
+      }
     },
     { refetchOnMount: false, refetchOnWindowFocus: false }
   )
-}
-
-export async function tryGetNameForNamespace(
-  connection: Connection,
-  pubkey: PublicKey,
-  namespaceName: string | undefined
-): Promise<[string, string] | undefined> {
-  const trace = tracer({ name: 'tryGetNameForNamespace' })
-  if (namespaceName) {
-    try {
-      const [namespaceId] = await findNamespaceId(namespaceName)
-      const namespaceReverseEntry = await withTrace(
-        () => getReverseNameEntryForNamespace(connection, pubkey, namespaceId),
-        trace,
-        { op: 'getReverseNameEntryForNamespace' }
-      )
-      trace?.finish()
-      return [
-        namespaceReverseEntry.parsed.entryName,
-        namespaceReverseEntry.parsed.namespaceName,
-      ]
-    } catch (e) {}
-  }
-
-  if (!namespaceName) {
-    try {
-      console.log('No reverse entry for namespace found falling back to global')
-      const globalReverseEntry = await withTrace(
-        () => getGlobalReverseNameEntry(connection, pubkey),
-        trace,
-        { op: 'getGlobalReverseNameEntry' }
-      )
-      if (globalReverseEntry.parsed) {
-        trace?.finish()
-        return [
-          globalReverseEntry.parsed.entryName,
-          globalReverseEntry.parsed.namespaceName,
-        ]
-      }
-    } catch (e) {}
-  }
-
-  trace?.finish()
-  return undefined
 }

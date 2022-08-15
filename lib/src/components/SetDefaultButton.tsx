@@ -10,7 +10,6 @@ import { Tooltip } from '../common/Tooltip'
 import { useHandleSetGlobalDefault } from '../handlers/useHandleSetGlobalDefault'
 import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
 import { useNamespaceReverseEntries } from '../hooks/useNamespaceReverseEntries'
-import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
 export interface Props {
   connection: Connection
@@ -24,11 +23,9 @@ export const SetDefaultButton = ({
   identity,
   setError,
 }: Props) => {
-  const { identities } = useWalletIdentity()
   const namespaceReverseEntries = useNamespaceReverseEntries(
     connection,
-    wallet.publicKey,
-    identities.map((idn) => idn.name)
+    wallet.publicKey
   )
   const globalReverseEntry = useGlobalReverseEntry(connection, wallet.publicKey)
   const handleSetGlobalDefault = useHandleSetGlobalDefault(connection, wallet)
