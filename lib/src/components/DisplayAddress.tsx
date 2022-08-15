@@ -1,8 +1,7 @@
 import type { Connection, PublicKey } from '@solana/web3.js'
 
 import { useAddressName } from '../hooks/useAddressName'
-import { useWalletIdentity } from '../providers/WalletIdentityProvider'
-import { formatShortAddress, formatIdentityLink } from '../utils/format'
+import { formatIdentityLink, formatShortAddress } from '../utils/format'
 
 type Props = {
   connection: Connection

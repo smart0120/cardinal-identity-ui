@@ -17,26 +17,20 @@ const WalletButton = styled(WalletMultiButton)`
   }
 `
 
-export const Header = ({ title }: { title?: string }) => {
+export const Header = () => {
   const { environment } = useEnvironmentCtx()
   return (
     <div className="flex flex-row justify-between p-10">
       <div className="flex flex-row">
         <div className="my-auto flex flex-col">
           <LogoTitled className="inline-block h-6" />
-          {/* <img
-            className="h-[40px]"
-            style={{ position: 'relative', top: '10px' }}
-            src="/assets/cardinal-titled.png"
-            alt="Cardinal logo"
-          /> */}
         </div>
         <div className="absolute top-[70px] left-[210px] text-[10px] italic text-white">
           <span
             className="mr-2 rounded-md px-[7px] py-1"
             style={{ background: '#FFFFFF30', transform: 'translateY(90%)' }}
           >
-            alpha
+            identity
           </span>
           {environment.label !== 'mainnet-beta' && (
             <span
@@ -48,7 +42,6 @@ export const Header = ({ title }: { title?: string }) => {
           )}
         </div>
       </div>
-      {/* {title && <div className="center">{title}</div>} */}
       <div className="flex flex-row">
         <WalletButton />
       </div>
