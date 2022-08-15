@@ -46,8 +46,7 @@ const Template: ComponentStory<LinkTwitterModalControls> = ({ ...args }) => {
       <WalletProvider wallets={[]}>
         <WalletModalProvider>
           <WalletIdentityProvider
-            appName="App Name"
-            appTwitter="@cardinal_labs"
+            appInfo={{ name: 'App Name', twitter: '@cardinal_labs' }}
           >
             <div
               style={{
@@ -72,7 +71,6 @@ const Template: ComponentStory<LinkTwitterModalControls> = ({ ...args }) => {
                 }}
                 style={args.style}
                 disabled={args.disabled}
-                showManage={args.showManage}
               />
             </div>
           </WalletIdentityProvider>
