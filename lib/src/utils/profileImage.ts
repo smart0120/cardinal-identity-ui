@@ -1,6 +1,17 @@
 import { capitalizeFirstLetter } from '@cardinal/common'
 
-import { IDENTITIES, isKnownIdentity } from '../common/Identities'
+import { getIdentity, IDENTITIES, isKnownIdentity } from '../common/Identities'
+
+export async function getImageUrl(
+  namespace: string,
+  name: string,
+  dev?: boolean
+): Promise<string | undefined> {
+  const identity = getIdentity(namespace)
+  return identity?.profileImage
+    ? identity.profileImage(name, dev)
+    : `data:image/svg+xml;utf8,${profileImage(namespace, name)}`
+}
 
 export const profileImage = (identityName: string, name: string) => {
   const identity = isKnownIdentity(identityName)

@@ -2,7 +2,7 @@ import type { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
 
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
-import { getImageUrl } from '../utils/format'
+import { getImageUrl } from '../utils/profileImage'
 import { tracer, withTrace } from '../utils/trace'
 import { useAddressName } from './useAddressName'
 

@@ -2,8 +2,6 @@ import { shortenAddress } from '@cardinal/namespaces'
 import { PublicKey } from '@solana/web3.js'
 
 import { getIdentity } from '../common/Identities'
-import { apiBase } from './constants'
-import { profileImage } from './profileImage'
 
 export const formatIdentityLink = (
   handle: string | undefined,
@@ -52,23 +50,4 @@ export const formatShortAddress = (address: PublicKey | undefined) => {
       {shortenAddress(address.toString())}
     </a>
   )
-}
-
-export async function getImageUrl(
-  namespace: string,
-  name: string,
-  dev?: boolean
-): Promise<string | undefined> {
-  if (namespace === 'twitter') {
-    const response = await fetch(
-      `${apiBase(
-        dev
-      )}/${namespace}/proxy?url=https://api.twitter.com/2/users/by&usernames=${name}&user.fields=profile_image_url`
-    )
-    const json = (await response.json()) as {
-      data: { profile_image_url: string }[]
-    }
-    return json?.data[0]?.profile_image_url.replace('_normal', '') as string
-  }
-  return `data:image/svg+xml;utf8,${profileImage(namespace, name)}`
 }

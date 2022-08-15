@@ -1,5 +1,7 @@
 import type { SVGProps } from 'react'
 
+import { apiBase } from '../utils/constants'
+
 export type IdentityName = 'twitter' | 'discord'
 
 export function isKnownIdentity(string?: string): string is IdentityName {
@@ -20,6 +22,10 @@ export type Identity = {
   name: IdentityName
   icon: (p?: IconProps) => React.ReactNode
   nameLink: (entryName?: string) => string
+  profileImage?: (
+    entryName?: string,
+    dev?: boolean
+  ) => Promise<string | undefined>
   namePrefix?: string
   displayName?: string
   verification?: 'Verification' | 'Tweet'
@@ -60,6 +66,17 @@ export const IDENTITIES: {
       </svg>
     ),
     nameLink: (n) => `https://twitter.com/${n}`,
+    profileImage: async (name, dev) => {
+      const response = await fetch(
+        `${apiBase(
+          dev
+        )}/twitter/proxy?url=https://api.twitter.com/2/users/by&usernames=${name}&user.fields=profile_image_url`
+      )
+      const json = (await response.json()) as {
+        data: { profile_image_url: string }[]
+      }
+      return json?.data[0]?.profile_image_url.replace('_normal', '') as string
+    },
     namePrefix: '@',
     displayName: 'Twitter',
     verification: 'Tweet',
