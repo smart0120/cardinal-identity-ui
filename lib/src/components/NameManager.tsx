@@ -1,7 +1,5 @@
 import type { AccountData } from '@cardinal/common'
-import { getQueryParam } from '@cardinal/common'
 import type { ReverseEntryData } from '@cardinal/namespaces'
-import { breakName } from '@cardinal/namespaces'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Connection } from '@solana/web3.js'
 import type { ReactElement } from 'react'
@@ -28,17 +26,8 @@ import { useUserNamesForNamespace } from '../hooks/useUserNamesForNamespace'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { handleError } from '../utils/errors'
 import { formatIdentityLink } from '../utils/format'
+import { isReverseEntry, nameFromMint } from '../utils/nameUtils'
 import { SetDefaultButton } from './SetDefaultButton'
-
-export const nameFromMint = (name: string, uri: string): [string, string] => {
-  if (uri.includes('name')) {
-    return [name, decodeURIComponent(getQueryParam(uri, 'name') || '')]
-  }
-  return [
-    breakName(name || '')[0],
-    decodeURIComponent(breakName(name || '')[1]),
-  ]
-}
 
 export const NameEntryRow = ({
   connection,
@@ -94,79 +83,24 @@ export const NameEntryRow = ({
         style={{ fontSize: '14px' }}
       >
         {formatIdentityLink(
-          nameFromMint(
+          ...nameFromMint(
             userTokenData.metaplexData?.parsed.data.name || '',
             userTokenData.metaplexData?.parsed.data.uri || ''
-          )[1],
-          namespaceName
+          )
         )}
-        {namespaceReverseEntry.data &&
-          namespaceReverseEntry.data.parsed.entryName ===
-            nameFromMint(
-              userTokenData.metaplexData?.parsed.data.name || '',
-              userTokenData.metaplexData?.parsed.data.uri || ''
-            )[1] && <AiFillStar />}
+        {isReverseEntry(userTokenData, namespaceReverseEntry.data) && (
+          <AiFillStar />
+        )}
       </div>
       <div className="flex items-center gap-2">
-        {!userTokenData.certificate &&
-          (!namespaceReverseEntry.data ||
-            (namespaceReverseEntry.data &&
-              namespaceReverseEntry.data.parsed.entryName !==
-                nameFromMint(
-                  userTokenData.metaplexData?.parsed.data.name || '',
-                  userTokenData.metaplexData?.parsed.data.uri || ''
-                )[1])) && (
-            <Tooltip title={'Set handle as you default twitter identity'}>
-              <ButtonLight
-                onClick={() => {
-                  // set default namespace reverse entry
-                  handleSetNamespacesDefault.mutate(
-                    {
-                      namespaceName: userTokenData.identity.name,
-                      tokenData: userTokenData,
-                    },
-                    {
-                      onSuccess: (txid) => {
-                        userNamesForNamespace.remove()
-                        namespaceReverseEntry.refetch()
-                        globalReverseEntry.refetch()
-                        setSuccess(
-                          <div className="flex w-full flex-col text-center">
-                            <div>
-                              Succesfully set handle as default twitter
-                              identity.
-                            </div>
-                            <div>
-                              Changes will be reflected{' '}
-                              <TransactionLink txid={txid} />
-                            </div>
-                          </div>
-                        )
-                      },
-                      onError: (e) =>
-                        notify({
-                          message: `Failed Transaction`,
-                          description: e as string,
-                        }),
-                    }
-                  )
-                }}
-              >
-                {handleSetNamespacesDefault.isLoading ? (
-                  <LoadingSpinner height="12px" fill="#000" />
-                ) : (
-                  <AiFillStar />
-                )}
-              </ButtonLight>
-            </Tooltip>
-          )}
-        {userTokenData.certificate && (
-          <Tooltip title={'Set handle as you default twitter identity'}>
+        {!isReverseEntry(userTokenData, namespaceReverseEntry.data) && (
+          <Tooltip
+            title={`Set handle as you default ${namespaceName} identity`}
+          >
             <ButtonLight
               onClick={() =>
                 handleSetNamespacesDefault.mutate(
                   {
-                    namespaceName: userTokenData.identity.name,
                     tokenData: userTokenData,
                   },
                   {
@@ -176,7 +110,8 @@ export const NameEntryRow = ({
                       setSuccess(
                         <div className="flex w-full flex-col text-center">
                           <div>
-                            Succesfully updated handle to new identity version.
+                            Succesfully set handle as default {namespaceName}
+                            identity.
                           </div>
                           <div>
                             Changes will be reflected{' '}
@@ -202,6 +137,7 @@ export const NameEntryRow = ({
             </ButtonLight>
           </Tooltip>
         )}
+
         <Tooltip title={'Unlink Handle'}>
           <ButtonLight
             className="flex items-center gap-1"
@@ -237,12 +173,11 @@ export const NameEntryRow = ({
                         <div>
                           Succesfully unlinked{' '}
                           {formatIdentityLink(
-                            nameFromMint(
+                            ...nameFromMint(
                               userTokenData.metaplexData?.parsed.data.name ||
                                 '',
                               userTokenData.metaplexData?.parsed.data.uri || ''
-                            )[1],
-                            namespaceName
+                            )
                           )}
                           .
                         </div>
@@ -461,24 +396,15 @@ export const NameManager = ({
   )
 }
 
-export function sortOnReverseEntry(
+export const sortOnReverseEntry = (
   userTokenData: UserTokenData,
   globalReverseEntry: AccountData<ReverseEntryData> | undefined,
   namespaceReverseEntry: AccountData<ReverseEntryData>[] | undefined
-): number {
-  const entryName = nameFromMint(
-    userTokenData.metaplexData?.parsed.data.name || '',
-    userTokenData.metaplexData?.parsed.data.uri || ''
-  )[1]
-  if (globalReverseEntry?.parsed?.entryName === entryName) {
-    return -1
-  }
-  if (
-    namespaceReverseEntry
-      ?.map((reverseEntry) => reverseEntry?.parsed.entryName)
-      .includes(entryName)
-  ) {
-    return -1
-  }
-  return 1
-}
+): number =>
+  isReverseEntry(userTokenData, globalReverseEntry)
+    ? -1
+    : namespaceReverseEntry?.some((reverseEntry) =>
+        isReverseEntry(userTokenData, reverseEntry)
+      )
+    ? -1
+    : 1

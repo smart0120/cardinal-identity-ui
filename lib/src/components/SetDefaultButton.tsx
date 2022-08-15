@@ -52,12 +52,11 @@ export const SetDefaultButton = ({
               foundReverseEntry.parsed.entryName
             )
             handleSetGlobalDefault.mutate({
-              tokenData: { nameEntryData: nameEntry },
+              entryName: foundReverseEntry.parsed.entryName,
               namespaceName: identity.name,
+              mint: nameEntry.parsed.mint,
             })
-            globalReverseEntry.refetch()
           }
-          globalReverseEntry.refetch()
         }}
         className="flex flex-row items-center gap-1"
       >

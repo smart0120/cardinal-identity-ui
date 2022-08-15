@@ -1,23 +1,20 @@
 import { withRevokeCertificateV2 } from '@cardinal/certificates'
-import { AccountData } from '@cardinal/common'
+import type { AccountData } from '@cardinal/common'
+import { tryPublicKey } from '@cardinal/common'
+import type { ReverseEntryData } from '@cardinal/namespaces'
 import {
-  ReverseEntryData,
   withInvalidateExpiredNameEntry,
+  withInvalidateExpiredReverseEntry,
 } from '@cardinal/namespaces'
-import { withInvalidateExpiredReverseEntry } from '@cardinal/namespaces'
 import * as namespaces from '@cardinal/namespaces'
+import { withInvalidate } from '@cardinal/token-manager'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Connection } from '@solana/web3.js'
-import {
-  PublicKey,
-  sendAndConfirmRawTransaction,
-  Transaction,
-} from '@solana/web3.js'
+import { sendAndConfirmRawTransaction, Transaction } from '@solana/web3.js'
 import { useMutation, useQueryClient } from 'react-query'
 
-import { nameFromMint } from '../components/NameManager'
 import type { UserTokenData } from '../hooks/useUserNamesForNamespace'
-import { withInvalidate } from '@cardinal/token-manager'
+import { nameFromToken } from '../utils/nameUtils'
 import { tracer, withTrace } from '../utils/trace'
 
 export const useHandleUnlink = (
@@ -80,13 +77,9 @@ export async function handleUnlink(
 ): Promise<Transaction> {
   const [namespaceId] = await namespaces.findNamespaceId(params.namespaceName)
   const transaction = new Transaction()
-  const entryMint = new PublicKey(
-    params.userTokenData.metaplexData?.parsed.mint!
-  )
-  const [, entryName] = nameFromMint(
-    params.userTokenData.metaplexData?.parsed.data.name!,
-    params.userTokenData.metaplexData?.parsed.data.uri!
-  )
+  const entryMint = tryPublicKey(params.userTokenData.metaplexData?.parsed.mint)
+  if (!entryMint) throw new Error('Failed to get mint')
+  const [, entryName] = nameFromToken(params.userTokenData)
   if (params.userTokenData.certificate) {
     await withRevokeCertificateV2(connection, wallet, transaction, {
       certificateMint: entryMint,

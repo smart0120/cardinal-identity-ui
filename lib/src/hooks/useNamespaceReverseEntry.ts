@@ -1,11 +1,12 @@
 import type { AccountData } from '@cardinal/common'
+import type { ReverseEntryData } from '@cardinal/namespaces'
 import {
+  findNamespaceId,
   getReverseNameEntryForNamespace,
-  ReverseEntryData,
 } from '@cardinal/namespaces'
-import { findNamespaceId } from '@cardinal/namespaces'
 import type { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
+
 import { tracer, withTrace } from '../utils/trace'
 
 export const useNamespaceReverseEntry = (
