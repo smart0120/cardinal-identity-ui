@@ -67,7 +67,6 @@ export const WalletIdentityProvider: React.FC<Props> = ({
   const [dev, setDev] = useState<boolean | undefined>(undefined)
   const [onClose, setOnClose] = useState<(() => void) | undefined>()
   const [showIdentityModal, setShowIdentityModal] = useState<boolean>(false)
-  const [handle, setHandle] = useState<string | undefined>(undefined)
   const [identities, setIdentities] = useState(defaultIdentities)
   const [defaultVerifyIdentity, setDefaultVerifyIdentity] = useState<Identity>()
 
@@ -106,7 +105,6 @@ export const WalletIdentityProvider: React.FC<Props> = ({
             scope.setTag('wallet', wallet.publicKey?.toString())
           })
         },
-        handle,
         wallet,
         identities,
         connection,
@@ -132,8 +130,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
             connection={connection}
             secondaryConnection={secondaryConnection}
             defaultVerifyIdentity={defaultVerifyIdentity}
-            onComplete={(handle: string) => {
-              setHandle(handle)
+            onComplete={() => {
               withSleep(() => {
                 setShowIdentityModal(false)
                 onClose && onClose()
