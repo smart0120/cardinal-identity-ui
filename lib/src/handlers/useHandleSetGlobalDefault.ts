@@ -1,6 +1,7 @@
 import type { CertificateData } from '@cardinal/certificates'
 import type { AccountData } from '@cardinal/common'
-import { EntryData, withSetGlobalReverseEntry } from '@cardinal/namespaces'
+import type { EntryData } from '@cardinal/namespaces'
+import { withSetGlobalReverseEntry } from '@cardinal/namespaces'
 import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
 import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
@@ -9,7 +10,6 @@ import { PublicKey, Transaction } from '@solana/web3.js'
 import { useMutation, useQueryClient } from 'react-query'
 
 import { nameFromMint } from '../components/NameManager'
-
 import { tracer, withTrace } from '../utils/trace'
 import { executeTransaction } from '../utils/transactions'
 
