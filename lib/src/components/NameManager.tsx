@@ -110,7 +110,7 @@ export const NameEntryRow = ({
                       setSuccess(
                         <div className="flex w-full flex-col text-center">
                           <div>
-                            Succesfully set handle as default {namespaceName}
+                            Succesfully set handle as default {namespaceName}{' '}
                             identity.
                           </div>
                           <div>
