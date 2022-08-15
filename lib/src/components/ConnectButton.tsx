@@ -1,5 +1,4 @@
 import { Button } from '../common/Button'
-import type { Identity } from '../common/Identities'
 import type { ShowParams } from '../providers/WalletIdentityProvider'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 

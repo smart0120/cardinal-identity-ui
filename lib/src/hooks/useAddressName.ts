@@ -2,6 +2,7 @@ import type { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
 
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
+import { nameFromReverseEntry } from '../utils/nameUtils'
 import { useGlobalReverseEntry } from './useGlobalReverseEntry'
 import { useNamespaceReverseEntries } from './useNamespaceReverseEntries'
 
@@ -23,7 +24,7 @@ export const useAddressName = (
       'useAddressName',
       address?.toString(),
       namespaceReverseEntries.data?.map((i) => i.pubkey.toString()),
-      globalReverseEntry.data?.pubkey.toString(),
+      nameFromReverseEntry(globalReverseEntry.data)?.join(),
     ],
     async () => {
       if (!address || !connection) return
