@@ -352,7 +352,10 @@ export const NameManager = ({
             <div key={identity.name} className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="bg-dark-6 flex h-5 w-5 items-center justify-center rounded-full px-1">
+                  <div
+                    className="bg-dark-6 flex h-5 w-5 items-center justify-center rounded-full px-1"
+                    style={{ background: identity.colors.primary }}
+                  >
                     <img
                       className="w-full"
                       src={identity.icon}
@@ -360,7 +363,7 @@ export const NameManager = ({
                     />
                   </div>
                   <div className="text-sm font-semibold text-black">
-                    Manage {identity.displayName}
+                    {identity.displayName}
                   </div>
                 </div>
                 <div className="flex flex-row gap-1">
