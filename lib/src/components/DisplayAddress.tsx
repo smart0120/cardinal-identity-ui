@@ -19,8 +19,7 @@ export const DisplayAddress: React.FC<Props> = ({
   style,
   loader,
 }: Props) => {
-  const { identity } = useWalletIdentity()
-  const addressName = useAddressName(connection, address, identity.name)
+  const addressName = useAddressName(connection, address)
   return addressName.isLoading ? (
     loader ?? (
       <div
@@ -38,7 +37,7 @@ export const DisplayAddress: React.FC<Props> = ({
       }}
     >
       {addressName.data?.includes('@')
-        ? formatIdentityLink(addressName.data, identity.name)
+        ? formatIdentityLink(addressName.data[0], addressName.data[1])
         : addressName.data || formatShortAddress(address)}
     </div>
   )

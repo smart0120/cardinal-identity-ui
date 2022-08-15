@@ -108,9 +108,7 @@ export const NameEntryClaim = ({
             message={
               <div className="flex w-full flex-col text-center">
                 <div>
-                  <span className="font-semibold">
-                    {globalReverseEntry.data.parsed.namespaceName}
-                  </span>{' '}
+                  <span className="font-semibold">{identity.displayName}</span>{' '}
                   is configured as your{' '}
                   <span className="font-semibold">default</span> global identity
                 </div>

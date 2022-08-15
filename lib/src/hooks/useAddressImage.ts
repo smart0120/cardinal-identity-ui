@@ -17,9 +17,7 @@ export const useAddressImage = (
   return useQuery<string | undefined>(
     ['useAddressImage', address?.toString(), namespaceName, addressName.data],
     async () => {
-      const [reverseEntryNamespaceName, reverseEntryHandle] = addressName.data
-        ? breakName(addressName.data)
-        : []
+      const [reverseEntryHandle, reverseEntryNamespaceName] = addressName.data
       if (reverseEntryHandle) {
         const imageUrl = await withTrace(
           () =>

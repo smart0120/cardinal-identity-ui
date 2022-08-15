@@ -87,8 +87,6 @@ export async function handleUnlink(
     params.userTokenData.metaplexData?.parsed.data.name!,
     params.userTokenData.metaplexData?.parsed.data.uri!
   )
-  console.log(entryName)
-
   if (params.userTokenData.certificate) {
     await withRevokeCertificateV2(connection, wallet, transaction, {
       certificateMint: entryMint,

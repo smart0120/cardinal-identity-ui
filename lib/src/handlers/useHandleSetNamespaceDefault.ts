@@ -34,7 +34,6 @@ export const useHandleSetNamespaceDefault = (
 ) => {
   const { cluster } = useWalletIdentity()
   const queryClient = useQueryClient()
-  const { identity } = useWalletIdentity()
   const globalReverseEntry = useGlobalReverseEntry(
     connection,
     wallet?.publicKey
@@ -42,9 +41,11 @@ export const useHandleSetNamespaceDefault = (
 
   return useMutation(
     async ({
+      namespaceName,
       tokenData,
       forceMigrate,
     }: {
+      namespaceName: string
       tokenData?: HandleSetParam
       forceMigrate?: boolean
     }): Promise<string> => {
@@ -76,7 +77,7 @@ export const useHandleSetNamespaceDefault = (
             transaction,
             connection,
             wallet,
-            identity.name,
+            namespaceName,
             entryName,
             newMintId || entryMint
           ),
@@ -86,12 +87,12 @@ export const useHandleSetNamespaceDefault = (
 
       if (
         globalReverseEntry.data &&
-        globalReverseEntry.data.parsed.namespaceName === identity.name
+        globalReverseEntry.data.parsed.namespaceName === namespaceName
       ) {
         await withTrace(
           () =>
             withSetGlobalReverseEntry(transaction, connection, wallet, {
-              namespaceName: identity.name,
+              namespaceName: namespaceName,
               entryName: entryName,
               mintId: newMintId || entryMint,
             }),

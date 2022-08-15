@@ -18,7 +18,8 @@ export const TwitterBackground = styled.div`
 const TwitterHome = () => {
   const wallet = useWallet()
   const router = useRouter()
-  const { identity } = useWalletIdentity()
+  const { identities } = useWalletIdentity()
+  const identity = identities.length === 1 ? identities[0] : undefined
   const dev = router.query['cluster'] === 'devnet'
 
   useEffect(() => {
@@ -29,7 +30,6 @@ const TwitterHome = () => {
       if (dev) {
         url.searchParams.append('cluster', 'devnet')
       }
-      url.searchParams.append('identity', identity.name)
       router.push(url, undefined, {
         shallow: true,
       })
@@ -38,8 +38,8 @@ const TwitterHome = () => {
 
   return (
     <div
-      className={`fixed h-full w-full`}
-      style={{ background: identity.colors.primary }}
+      className={`fixed h-full w-full bg-dark-4`}
+      style={{ background: identity?.colors.primary }}
     >
       <Header />
       <div style={{ marginTop: '10vh' }}>

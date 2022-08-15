@@ -1,6 +1,5 @@
 import {
   findNamespaceId,
-  formatName,
   getGlobalReverseNameEntry,
   getReverseNameEntryForNamespace,
 } from '@cardinal/namespaces'
@@ -14,12 +13,12 @@ export const useAddressName = (
   address: PublicKey | undefined,
   namespaceName?: string
 ) => {
-  return useQuery<string | undefined>(
+  return useQuery<string[] | undefined>(
     ['useAddressName', address?.toString(), namespaceName],
     async () => {
       if (!address || !connection) return
       const n = await tryGetNameForNamespace(connection, address, namespaceName)
-      return n ? n[0] : undefined
+      return n ? n : undefined
     },
     { refetchOnMount: false, refetchOnWindowFocus: false }
   )
@@ -40,10 +39,7 @@ export async function tryGetNameForNamespace(
     )
     trace?.finish()
     return [
-      formatName(
-        namespaceReverseEntry.parsed.namespaceName,
-        namespaceReverseEntry.parsed.entryName
-      ),
+      namespaceReverseEntry.parsed.entryName,
       namespaceReverseEntry.parsed.namespaceName,
     ]
   } catch (e) {}
@@ -59,10 +55,7 @@ export async function tryGetNameForNamespace(
       if (globalReverseEntry.parsed) {
         trace?.finish()
         return [
-          formatName(
-            globalReverseEntry.parsed.namespaceName,
-            globalReverseEntry.parsed.entryName
-          ),
+          globalReverseEntry.parsed.entryName,
           globalReverseEntry.parsed.namespaceName,
         ]
       }

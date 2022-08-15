@@ -14,7 +14,6 @@ interface Props
     ShowParams {
   disabled?: boolean
   variant?: 'primary' | 'secondary'
-  forceIdentity?: Identity
 }
 
 export const ConnectButton: React.FC<Props> = ({
@@ -26,14 +25,13 @@ export const ConnectButton: React.FC<Props> = ({
   wallet,
   onClose,
   disabled,
-  forceIdentity,
   ...buttonProps
 }: Props) => {
   const { show, identities } = useWalletIdentity()
   const identity = identities.length === 1 ? identities[0] : undefined
   return (
     <Button
-      bgColor={forceIdentity?.colors.primary || identity?.colors.primary}
+      bgColor={identity?.colors.primary || '#000'}
       variant={variant}
       disabled={disabled}
       {...buttonProps}
@@ -54,14 +52,12 @@ export const ConnectButton: React.FC<Props> = ({
         <div style={{ width: '14px' }} className="align-middle">
           <img
             className="text-white "
-            alt={`${forceIdentity?.name || identity?.name}-icon`}
-            src={forceIdentity?.icon || identity?.icon}
+            alt={`${identity?.name}-icon`}
+            src={identity?.icon}
           />
         </div>
       )}
-      <span className="ml-2">
-        Link {forceIdentity?.displayName || 'Profile'}
-      </span>
+      <span className="ml-2">Link {identity?.displayName || 'Profile'}</span>
     </Button>
   )
 }

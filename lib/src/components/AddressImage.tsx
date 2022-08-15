@@ -24,7 +24,7 @@ export const AddressImage = ({
   loader?: React.ReactElement
   style?: React.CSSProperties
 }) => {
-  const addressImage = useAddressImage(connection, address, dev)
+  const addressImage = useAddressImage(connection, address)
   return !addressImage.isFetched ? (
     loader ?? (
       <div

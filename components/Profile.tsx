@@ -91,9 +91,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
               height: '156px',
               width: '156px',
               borderRadius: '50%',
-              background: '#fff',
               backgroundImage: `linear-gradient(84.06deg, ${identity?.colors.primary}, ${identity?.colors.primary})`,
-              // boxShadow: '0 5px 10px 0 rgb(97 83 202 / 30%)',
               padding: '5px',
               display: 'flex',
               justifyContent: 'center',
@@ -153,29 +151,20 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
             <FaUserAlt style={{ fontSize: '100px', color: '#FFF' }} />
           </div>
         )}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            textAlign: 'center',
-          }}
-        >
-          <span style={{ fontSize: '16px' }}>
-            {addressName.isFetching ? (
-              <div
-                style={{ height: '24px', width: '120px' }}
-                className="animate-pulse rounded-md bg-gray-200"
-              />
-            ) : (
-              addressName.data && (
-                <div style={{ display: 'flex', gap: '5px' }}>
-                  {formatIdentityLink(addressName.data, identity?.name) ||
-                    formatShortAddress(address)}
-                </div>
-              )
-            )}
-          </span>
+        <div className="flex flex-col justify-center text-center">
+          {addressName.isFetching ? (
+            <div
+              style={{ height: '24px', width: '120px' }}
+              className="animate-pulse rounded-md bg-gray-200"
+            />
+          ) : (
+            addressName.data && (
+              <div className="flex justify-center gap-2">
+                {formatIdentityLink(addressName.data[0], addressName.data[1]) ||
+                  formatShortAddress(address)}
+              </div>
+            )
+          )}
           <AddressLink address={address} />
         </div>
         {identity && !!globalReverseEntry.data && (

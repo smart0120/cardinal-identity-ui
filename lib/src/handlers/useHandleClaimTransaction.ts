@@ -104,7 +104,6 @@ export async function handleClaim(
     }
   )
   const json = await response.json()
-  console.log(json)
   if (response.status !== 200 || json.error) throw new Error(json.error)
   const transactions = json.transactions as string[]
   return transactions.map((tx) =>

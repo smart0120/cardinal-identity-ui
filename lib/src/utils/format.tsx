@@ -17,7 +17,7 @@ export const formatIdentityLink = (
         target="_blank"
         rel="noreferrer"
       >
-        {handle}
+        @{handle}
       </a>
     )
   } else if (namespace === 'discord') {
