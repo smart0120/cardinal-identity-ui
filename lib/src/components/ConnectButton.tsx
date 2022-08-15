@@ -57,7 +57,7 @@ export const ConnectButton: React.FC<Props> = ({
           />
         </div>
       )}
-      <span className="ml-2">Link {identity?.displayName || 'Profile'}</span>
+      <span className="ml-2">Link {identity?.displayName || 'profile'}</span>
     </Button>
   )
 }

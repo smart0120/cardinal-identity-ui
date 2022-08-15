@@ -12,6 +12,7 @@ import {
   useAddressName,
   useWalletIdentity,
 } from 'lib/src'
+import { ButtonLight } from 'lib/src/common/Button'
 import { useGlobalReverseEntry } from 'lib/src/hooks/useGlobalReverseEntry'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
 import { FaShare, FaUserAlt } from 'react-icons/fa'
@@ -170,46 +171,46 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           )}
           <AddressLink address={address} />
         </div>
-        <div className="mt-5">
-          <ConnectButton
-            disabled={address?.toString() !== wallet?.publicKey?.toString()}
-            dev={environment.label === 'devnet'}
-            wallet={wallet as Wallet}
-            connection={connection}
-            secondaryConnection={
-              environment.secondary
-                ? new Connection(environment.secondary)
-                : connection
-            }
-            onClose={addressName.refetch}
-            cluster={environment.label}
-          />
-        </div>
         {identity && (
-          <button
-            disabled={address?.toString() !== wallet?.publicKey?.toString()}
-            className="rounded-md px-3 py-1 text-xs text-white"
-            onClick={() =>
-              show({
-                wallet: wallet as Wallet,
-                connection: connection,
-                cluster: environment.label,
-                secondaryConnection: environment.secondary
+          <div className="mt-5">
+            <ConnectButton
+              disabled={address?.toString() !== wallet?.publicKey?.toString()}
+              dev={environment.label === 'devnet'}
+              wallet={wallet as Wallet}
+              connection={connection}
+              secondaryConnection={
+                environment.secondary
                   ? new Connection(environment.secondary)
-                  : connection,
-                dev: environment.label === 'devnet',
-              })
-            }
-            style={{
-              background: identity?.colors.buttonColor,
-              color: identity?.colors.secondaryFontColor,
-              opacity:
-                address?.toString() !== wallet?.publicKey?.toString() ? 0.5 : 1,
-            }}
-          >
-            Manage Profiles
-          </button>
+                  : connection
+              }
+              onClose={addressName.refetch}
+              cluster={environment.label}
+            />
+          </div>
         )}
+        <ButtonLight
+          className="text-xs"
+          onClick={() =>
+            address?.toString() === wallet?.publicKey?.toString() &&
+            show({
+              wallet: wallet as Wallet,
+              connection: connection,
+              cluster: environment.label,
+              secondaryConnection: environment.secondary
+                ? new Connection(environment.secondary)
+                : connection,
+              dev: environment.label === 'devnet',
+            })
+          }
+          style={{
+            background: identity?.colors.buttonColor,
+            color: identity?.colors.secondaryFontColor,
+            opacity:
+              address?.toString() !== wallet?.publicKey?.toString() ? 0.5 : 1,
+          }}
+        >
+          Manage Profiles
+        </ButtonLight>
       </div>
     </div>
   )

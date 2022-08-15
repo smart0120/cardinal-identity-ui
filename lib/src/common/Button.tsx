@@ -73,7 +73,7 @@ export const ButtonLight = styled.div`
   background: #eee;
   color: #777;
   cursor: pointer;
-  transition: 0.1s all;
+  transition: 0.2s all;
   &:hover {
     background: #ddd;
   }

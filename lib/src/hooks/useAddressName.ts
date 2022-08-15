@@ -23,6 +23,7 @@ export const useAddressName = (
       'useAddressName',
       address?.toString(),
       namespaceReverseEntries.data?.map((i) => i.pubkey.toString()),
+      globalReverseEntry.data?.pubkey.toString(),
     ],
     async () => {
       if (!address || !connection) return
@@ -46,6 +47,11 @@ export const useAddressName = (
         ]
       }
     },
-    { refetchOnMount: false, refetchOnWindowFocus: false }
+    {
+      enabled:
+        globalReverseEntry.isFetched && namespaceReverseEntries.isFetched,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+    }
   )
 }
