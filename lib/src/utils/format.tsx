@@ -1,6 +1,7 @@
 import { shortenAddress } from '@cardinal/namespaces'
 import { PublicKey } from '@solana/web3.js'
 
+import { getIdentity } from '../common/Identities'
 import { apiBase } from './constants'
 import { profileImage } from './profileImage'
 
@@ -9,24 +10,14 @@ export const formatIdentityLink = (
   namespace: string | undefined
 ) => {
   if (!handle || !namespace) return <></>
-  if (namespace === 'twitter') {
-    return (
-      <div
-        className="cursor-pointer"
-        onClick={() => window.open(`https://twitter.com/${handle}`)}
-        style={{ color: '#177ddc' }}
-      >
-        @{handle}
-      </div>
-    )
-  }
   return (
     <div
       className="cursor-pointer"
-      onClick={() => window.open('https://discord.com/channels/@me')}
+      onClick={() => window.open(getIdentity(namespace)?.nameLink(handle))}
       style={{ color: '#177ddc' }}
     >
-      {decodeURIComponent(handle)}
+      {getIdentity(namespace)?.namePrefix}
+      {handle}
     </div>
   )
 }

@@ -7,17 +7,20 @@ export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
 }
 
-export const AddressLink = ({ children, address }: Props) => {
+export const AddressLink = ({ children, address, ...props }: Props) => {
   const { cluster } = useWalletIdentity()
   if (!address) return children
   return (
-    <a
-      href={`https://explorer.solana.com/address/${address.toString()}?cluster=${cluster}`}
-      target="_blank"
-      rel="noopener noreferrer"
+    <div
+      onClick={() =>
+        window.open(
+          `https://explorer.solana.com/address/${address.toString()}?cluster=${cluster}`
+        )
+      }
       className="cursor-pointer"
+      {...props}
     >
       {children}
-    </a>
+    </div>
   )
 }

@@ -1,3 +1,5 @@
+import { getIdentity } from './Identities'
+
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   handle?: string
   namespace?: string
@@ -5,28 +7,13 @@ export interface Props extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const NameLink = ({ handle, namespace, children }: Props) => {
-  if (!handle || !namespace) return children
-  if (namespace === 'twitter') {
-    return (
-      <a
-        href={`https://twitter.com/${handle}`}
-        onClick={() => window.open(`https://twitter.com/${handle}`)}
-        target="_blank"
-        rel="noreferrer"
-      >
-        {children}
-      </a>
-    )
-  } else if (namespace === 'discord') {
-    return (
-      <a
-        href={`https://discord.com/channels/@me`}
-        onClick={() => window.open('https://discord.com/channels/@me')}
-        target="_blank"
-        rel="noreferrer"
-      >
-        {children}
-      </a>
-    )
-  }
+  return (
+    <div
+      className={`cursor-pointer`}
+      onClick={() => window.open(getIdentity(namespace)?.nameLink(handle))}
+      style={{ color: '#177ddc' }}
+    >
+      {children}
+    </div>
+  )
 }

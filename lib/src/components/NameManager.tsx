@@ -304,7 +304,6 @@ export const NameManager = ({
               <div className="my-1 h-[1px] bg-gray-200"></div>
               {!userNamesForNamespace.isFetched ||
               !globalReverseEntry.isFetched ? (
-                // !namespaceReverseEntry.isFetched ? (
                 <>
                   <div className="h-6 w-full animate-pulse rounded-lg bg-gray-200"></div>
                   <div className="h-6 w-full animate-pulse rounded-lg bg-gray-200"></div>
