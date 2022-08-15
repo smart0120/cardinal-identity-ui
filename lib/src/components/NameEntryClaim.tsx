@@ -7,7 +7,6 @@ import { Alert } from '../common/Alert'
 import { ButtonLight } from '../common/Button'
 import type { Identity } from '../common/Identities'
 import { useHandleClaimTransaction } from '../handlers/useHandleClaimTransaction'
-import { useHandleRevoke } from '../handlers/useHandleRevoke'
 import { useHandleSetNamespaceDefault } from '../handlers/useHandleSetNamespaceDefault'
 import { useHandleVerify } from '../handlers/useHandleVerify'
 import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
@@ -35,7 +34,7 @@ export const NameEntryClaim = ({
   connection: Connection
   secondaryConnection?: Connection
   onComplete?: (arg0: string) => void
-  setVerifyIdentity: (arg0: Identity) => void
+  setVerifyIdentity: (arg0: Identity | undefined) => void
 }) => {
   const { dev, cluster, appInfo } = useWalletIdentity()
   const [verificationUrl, setVerificationUrl] = useState<string | undefined>(
@@ -61,13 +60,6 @@ export const NameEntryClaim = ({
     accessToken,
     setAccessToken,
     setHandle
-  )
-  const handleRevoke = useHandleRevoke(
-    wallet,
-    cluster,
-    dev,
-    handle,
-    accessToken
   )
   const handleClaimTransaction = useHandleClaimTransaction(
     connection,
@@ -229,12 +221,11 @@ export const NameEntryClaim = ({
                         showIcon
                       />
                     )}
-                    {nameEntryData.isFetching || handleRevoke.isLoading ? (
+                    {nameEntryData.isFetching ? (
                       <div className="mb-2 h-8 w-3/4 animate-pulse rounded-lg bg-gray-200"></div>
                     ) : (
                       alreadyOwned &&
-                      handleVerify.isSuccess &&
-                      !handleRevoke.isSuccess && (
+                      handleVerify.isSuccess && (
                         <>
                           <Alert
                             style={{
@@ -279,23 +270,6 @@ export const NameEntryClaim = ({
                                 handle from them.
                               </div>
                             </>
-                          )}
-                          {handleRevoke.error && (
-                            <Alert
-                              style={{
-                                marginTop: '10px',
-                                height: 'auto',
-                                wordBreak: 'break-word',
-                                justifyContent: 'center',
-                              }}
-                              message={
-                                <div>{`Error: ${handleError(
-                                  handleRevoke.error
-                                )}`}</div>
-                              }
-                              type="error"
-                              showIcon
-                            />
                           )}
                         </>
                       )

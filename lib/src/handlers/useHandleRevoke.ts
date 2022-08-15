@@ -3,9 +3,10 @@ import type { AccountData } from '@cardinal/common'
 import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
 import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
-import type { Cluster, PublicKey } from '@solana/web3.js'
-import { useWalletIdentity } from '../providers/WalletIdentityProvider'
+import type { PublicKey } from '@solana/web3.js'
 import { useMutation, useQueryClient } from 'react-query'
+
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { apiBase } from '../utils/constants'
 import { tracer, withTrace } from '../utils/trace'
 
@@ -18,14 +19,8 @@ export interface HandleSetParam {
   certificate?: AccountData<CertificateData> | null
 }
 
-export const useHandleRevoke = (
-  wallet: Wallet,
-  cluster: Cluster,
-  dev: boolean,
-  handle: string,
-  accessToken: string
-) => {
-  const { identity } = useWalletIdentity()
+export const useHandleRevoke = (wallet: Wallet) => {
+  const { cluster, dev } = useWalletIdentity()
   const queryClient = useQueryClient()
   return useMutation(
     async ({
