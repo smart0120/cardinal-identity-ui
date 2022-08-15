@@ -13,7 +13,7 @@ import {
   useWalletIdentity,
 } from 'lib/src'
 import { ButtonLight } from 'lib/src/common/Button'
-import { useGlobalReverseEntry } from 'lib/src/hooks/useGlobalReverseEntry'
+import { IDENTITIES, isKnownIdentity } from 'lib/src/common/Identities'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
 import { FaShare, FaUserAlt } from 'react-icons/fa'
 
@@ -47,10 +47,6 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
     connection,
     address,
     identity?.name ? [identity.name] : undefined
-  )
-  const globalReverseEntry = useGlobalReverseEntry(
-    connection,
-    wallet.publicKey ?? undefined
   )
 
   return (
@@ -92,11 +88,15 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
         ) : addressImage.data ? (
           <div
             style={{
-              position: 'relative',
               height: '156px',
               width: '156px',
               borderRadius: '50%',
-              backgroundImage: `linear-gradient(84.06deg, ${identity?.colors.primary}, ${identity?.colors.primary})`,
+              background: `${
+                identity?.colors.primary ??
+                (addressImage.data[1] &&
+                  isKnownIdentity(addressImage.data[1]) &&
+                  IDENTITIES[addressImage.data[1]].colors.primary)
+              }`,
               padding: '5px',
               display: 'flex',
               justifyContent: 'center',
@@ -111,7 +111,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
                 border: '4px solid white',
               }}
               alt={`profile-${addressStr}`}
-              src={addressImage.data}
+              src={addressImage.data[0]}
             />
             <ShareIcon
               onClick={() => {

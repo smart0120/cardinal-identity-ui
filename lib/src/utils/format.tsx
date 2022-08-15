@@ -68,7 +68,7 @@ export const formatShortAddress = (address: PublicKey | undefined) => {
   )
 }
 
-export async function tryGetImageUrl(
+export async function getImageUrl(
   namespace: string,
   name: string,
   dev?: boolean
@@ -85,11 +85,4 @@ export async function tryGetImageUrl(
     return json?.data[0]?.profile_image_url.replace('_normal', '') as string
   }
   return `data:image/svg+xml;utf8,${profileImage(namespace, name)}`
-  // return encodeURI(
-  //   `https://${
-  //     dev ? 'dev-nft' : 'nft'
-  //   }.cardinal.so/img/?text=@${encodeURIComponent(
-  //     name
-  //   )}.${namespace}&proxy=true${dev ? `&cluster=devnet` : ''}`
-  // )
 }

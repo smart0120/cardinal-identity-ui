@@ -2,7 +2,7 @@ import type { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
 
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
-import { tryGetImageUrl } from '../utils/format'
+import { getImageUrl } from '../utils/format'
 import { tracer, withTrace } from '../utils/trace'
 import { useAddressName } from './useAddressName'
 
@@ -13,17 +13,16 @@ export const useAddressImage = (
 ) => {
   const { dev } = useWalletIdentity()
   const addressName = useAddressName(connection, address, namespaceNames)
-  return useQuery<string | undefined>(
+  return useQuery<[string, string] | undefined>(
     ['useAddressImage', address?.toString(), addressName.data],
     async () => {
       if (addressName.data) {
         const [reverseEntryName, reverseEntryNamespaceName] = addressName.data
         const imageUrl = await withTrace(
-          () =>
-            tryGetImageUrl(reverseEntryNamespaceName, reverseEntryName, dev),
+          () => getImageUrl(reverseEntryNamespaceName, reverseEntryName, dev),
           tracer({ name: 'useAddressImage' })
         )
-        return imageUrl
+        return imageUrl ? [imageUrl, addressName.data[1]] : undefined
       }
     },
     {

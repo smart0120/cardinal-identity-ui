@@ -39,7 +39,7 @@ export const AddressImage = ({
         borderRadius: '50%',
       }}
       alt={`profile-${address?.toString()}`}
-      src={addressImage.data}
+      src={addressImage.data[0]}
     />
   ) : (
     placeholder ?? (
