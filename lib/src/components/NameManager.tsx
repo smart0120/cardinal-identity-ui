@@ -1,13 +1,13 @@
 import type { AccountData } from '@cardinal/common'
 import { getQueryParam } from '@cardinal/common'
 import type { ReverseEntryData } from '@cardinal/namespaces'
-import { breakName, getNameEntry } from '@cardinal/namespaces'
+import { breakName } from '@cardinal/namespaces'
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Connection } from '@solana/web3.js'
 import type { ReactElement } from 'react'
 import { useEffect, useState } from 'react'
 import { AiFillStar } from 'react-icons/ai'
-import { BiGlobe, BiUnlink } from 'react-icons/bi'
+import { BiUnlink } from 'react-icons/bi'
 import { FaPlus } from 'react-icons/fa'
 
 import { Alert } from '../common/Alert'
@@ -29,6 +29,7 @@ import { useUserNamesForNamespace } from '../hooks/useUserNamesForNamespace'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { handleError } from '../utils/errors'
 import { formatIdentityLink } from '../utils/format'
+import { SetDefaultButton } from './SetDefaultButton'
 
 export const nameFromMint = (name: string, uri: string): [string, string] => {
   if (uri.includes('name')) {
@@ -367,50 +368,12 @@ export const NameManager = ({
                   </div>
                 </div>
                 <div className="flex flex-row gap-1">
-                  {globalReverseEntry.data &&
-                    globalReverseEntry.data.parsed.namespaceName !==
-                      identity.name && (
-                      <Tooltip
-                        title={`Set ${identity.displayName} as your default identity`}
-                      >
-                        <ButtonLight
-                          onClick={async () => {
-                            const foundReverseEntry =
-                              namespaceReverseEntries.data?.find(
-                                (tk) =>
-                                  tk.parsed.namespaceName === identity.name
-                              )
-                            if (!foundReverseEntry) {
-                              setTopError(
-                                'You must set a default handle for the identity before setting it global'
-                              )
-                              return
-                            } else {
-                              setTopError('')
-                              const nameEntry = await getNameEntry(
-                                connection,
-                                identity.name,
-                                foundReverseEntry.parsed.entryName
-                              )
-                              handleSetGlobalDefault.mutate({
-                                tokenData: { nameEntryData: nameEntry },
-                                namespaceName: identity.name,
-                              })
-                              globalReverseEntry.refetch()
-                            }
-                          }}
-                          className="flex flex-row items-center gap-1"
-                        >
-                          {handleSetGlobalDefault.isLoading ? (
-                            <LoadingSpinner height="12px" fill="#000" />
-                          ) : (
-                            <>
-                              <BiGlobe className="text-[12px]" /> Set Default
-                            </>
-                          )}
-                        </ButtonLight>
-                      </Tooltip>
-                    )}
+                  <SetDefaultButton
+                    connection={connection}
+                    wallet={wallet}
+                    identity={identity}
+                    setError={setTopError}
+                  />
                   <ButtonLight
                     onClick={() => setVerifyIdentity(identity)}
                     className="flex flex-row items-center gap-1"
