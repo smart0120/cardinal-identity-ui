@@ -8,7 +8,7 @@ import { ReactQueryDevtools } from 'react-query/devtools'
 import { ClaimCard } from '..'
 import type { Identity, IdentityName } from '../common/Identities'
 import { IDENTITIES } from '../common/Identities'
-import { Modal } from '../modal'
+import { Modal } from '../common/Modal'
 import { withSleep } from '../utils/transactions'
 
 const SENTRY_DSN =
@@ -97,7 +97,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
           onClose && setOnClose(() => onClose)
           setShowIdentityModal(true)
           identities && setIdentities(identities)
-          setDefaultVerifyIdentity(IDENTITIES[verifyIdentity])
+          verifyIdentity && setDefaultVerifyIdentity(IDENTITIES[verifyIdentity])
           Sentry.configureScope((scope) => {
             scope.setUser({
               username: wallet.publicKey?.toString(),
@@ -119,13 +119,13 @@ export const WalletIdentityProvider: React.FC<Props> = ({
     >
       <QueryClientProvider client={QUERY_CLIENT}>
         <Modal
+          className="bg-white"
           isOpen={showIdentityModal}
           onDismiss={() => {
             setShowIdentityModal(false)
             QUERY_CLIENT.invalidateQueries()
             onClose && onClose()
           }}
-          darkenOverlay={true}
         >
           <ClaimCard
             wallet={wallet}

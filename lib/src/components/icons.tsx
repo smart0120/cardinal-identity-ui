@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 
 export const SolanaIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
@@ -34,7 +34,33 @@ export const SolanaIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
       </linearGradient>
     </defs>
   </svg>
-);
+)
+
+export const CloseIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <path
+      d="M18 6L6 18"
+      stroke="currentcolor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M6 6L18 18"
+      stroke="currentcolor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+)
 
 export const ConnectDots: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
@@ -53,7 +79,7 @@ export const ConnectDots: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     <circle cx="29.5" cy="9.5" r="2.5" fill="#DEDEDE" />
     <circle cx="46.5" cy="9.5" r="2.5" fill="#DEDEDE" />
   </svg>
-);
+)
 
 export const LockIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
@@ -77,7 +103,7 @@ export const LockIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     />
     <ellipse cx="8.88892" cy="10.3334" rx="1.22223" ry="1.22223" fill="black" />
   </svg>
-);
+)
 
 export const BoltIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
@@ -95,7 +121,7 @@ export const BoltIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
       strokeWidth="0.925714"
     />
   </svg>
-);
+)
 
 export const Megaphone: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
@@ -120,7 +146,7 @@ export const Megaphone: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
       />
     </g>
   </svg>
-);
+)
 
 export const Link: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
@@ -135,7 +161,7 @@ export const Link: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
       fill="#000"
     />
   </svg>
-);
+)
 
 export const Verified: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
@@ -152,4 +178,4 @@ export const Verified: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
       fillRule="evenodd"
     />
   </svg>
-);
+)

@@ -22,11 +22,11 @@ export const ClaimCard = ({
   defaultVerifyIdentity,
   onComplete,
 }: ClaimCardProps) => {
-  const [verifyIdentity, setVerifyIdentity] = useState<Identity>(
+  const [verifyIdentity, setVerifyIdentity] = useState<Identity | undefined>(
     defaultVerifyIdentity
   )
   return (
-    <div className="relative mx-auto h-full min-h-[200px] w-full px-5">
+    <div className="relative mx-auto h-full min-h-[200px] w-full rounded-xl px-5 text-xs">
       <div className="relative px-2 pb-8 md:px-8 md:pt-2">
         <>
           {!wallet?.publicKey || !connection ? (

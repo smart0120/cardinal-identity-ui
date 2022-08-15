@@ -36,7 +36,7 @@ export const NameEntryClaim = ({
   onComplete?: (arg0: string) => void
   setVerifyIdentity: (arg0: Identity | undefined) => void
 }) => {
-  const { dev, cluster, appInfo } = useWalletIdentity()
+  const { cluster, appInfo } = useWalletIdentity()
   const [verificationUrl, setVerificationUrl] = useState<string | undefined>(
     undefined
   )
