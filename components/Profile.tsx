@@ -46,31 +46,27 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
 
   return (
     <div
-      className="bg-dark-3"
+      className="rounded-2xl bg-light-0 p-6"
       style={{
-        padding: '1.5rem',
-        borderRadius: '1rem',
         boxShadow: '0 4px 34px rgb(0 0 0 / 30%)',
         background: identity?.colors.secondary,
       }}
     >
-      {identity && (
-        <div style={{ marginBottom: '30px' }}>
-          {addressName.isFetching ? (
-            <Alert message={'Loading'} type="warning" />
-          ) : addressName.data ? (
-            <Alert
-              message={`Succesfully linked ${identity?.displayName}`}
-              type="success"
-            />
-          ) : (
-            <Alert
-              message={`${identity?.displayName} not linked`}
-              type="warning"
-            />
-          )}
-        </div>
-      )}
+      <div className="mb-8">
+        {addressName.isFetching ? (
+          <Alert message={'Loading'} type="warning" />
+        ) : addressName.data ? (
+          <Alert
+            message={`Succesfully linked ${addressName.data[1]}`}
+            type="success"
+          />
+        ) : (
+          <Alert
+            message={`${identity?.displayName ?? 'Identity'} not linked`}
+            type="warning"
+          />
+        )}
+      </div>
       <div
         style={{
           display: 'flex',
@@ -158,12 +154,11 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
               className="animate-pulse rounded-md bg-gray-200"
             />
           ) : (
-            addressName.data && (
-              <div className="flex justify-center gap-2">
-                {formatIdentityLink(addressName.data[0], addressName.data[1]) ||
-                  formatShortAddress(address)}
-              </div>
-            )
+            <div className="flex justify-center gap-2">
+              {addressName.data
+                ? formatIdentityLink(addressName.data[0], addressName.data[1])
+                : formatShortAddress(address)}
+            </div>
           )}
           <AddressLink address={address} />
         </div>

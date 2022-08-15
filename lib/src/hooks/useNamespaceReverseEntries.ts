@@ -7,15 +7,15 @@ import {
 import type { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
 
-export const useBatchedNamespaceReverseEntries = (
+export const useNamespaceReverseEntries = (
   connection: Connection,
-  namespaceNames: string[],
-  pubkey: PublicKey | undefined
+  address: PublicKey | undefined,
+  namespaceNames: string[]
 ) => {
   return useQuery<AccountData<ReverseEntryData>[] | undefined>(
-    ['useBatchedNamespaceReverseEntries', namespaceNames, pubkey?.toString()],
+    ['useNamespaceReverseEntries', namespaceNames, address?.toString()],
     async () => {
-      if (!pubkey || !connection) return
+      if (!address || !connection) return
       const namespaceIds = await Promise.all(
         namespaceNames.map(async (nm) => findNamespaceId(nm))
       )
@@ -25,7 +25,7 @@ export const useBatchedNamespaceReverseEntries = (
         | undefined
       )[] = await Promise.all(
         namespaceIds.map((nm) =>
-          getReverseNameEntryForNamespace(connection, pubkey, nm[0]).catch(
+          getReverseNameEntryForNamespace(connection, address, nm[0]).catch(
             (e) => undefined
           )
         )

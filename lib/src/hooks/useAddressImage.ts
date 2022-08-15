@@ -1,4 +1,3 @@
-import { breakName } from '@cardinal/namespaces'
 import type { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
 
@@ -17,8 +16,8 @@ export const useAddressImage = (
   return useQuery<string | undefined>(
     ['useAddressImage', address?.toString(), namespaceName, addressName.data],
     async () => {
-      const [reverseEntryHandle, reverseEntryNamespaceName] = addressName.data
-      if (reverseEntryHandle) {
+      if (addressName.data) {
+        const [reverseEntryHandle, reverseEntryNamespaceName] = addressName.data
         const imageUrl = await withTrace(
           () =>
             tryGetImageUrl(

@@ -13,7 +13,7 @@ export const useAddressName = (
   address: PublicKey | undefined,
   namespaceName?: string
 ) => {
-  return useQuery<string[] | undefined>(
+  return useQuery<[string, string] | undefined>(
     ['useAddressName', address?.toString(), namespaceName],
     async () => {
       if (!address || !connection) return
@@ -27,22 +27,24 @@ export const useAddressName = (
 export async function tryGetNameForNamespace(
   connection: Connection,
   pubkey: PublicKey,
-  namespaceName: string
-): Promise<string[] | undefined> {
+  namespaceName: string | undefined
+): Promise<[string, string] | undefined> {
   const trace = tracer({ name: 'tryGetNameForNamespace' })
-  try {
-    const [namespaceId] = await findNamespaceId(namespaceName)
-    const namespaceReverseEntry = await withTrace(
-      () => getReverseNameEntryForNamespace(connection, pubkey, namespaceId),
-      trace,
-      { op: 'getReverseNameEntryForNamespace' }
-    )
-    trace?.finish()
-    return [
-      namespaceReverseEntry.parsed.entryName,
-      namespaceReverseEntry.parsed.namespaceName,
-    ]
-  } catch (e) {}
+  if (namespaceName) {
+    try {
+      const [namespaceId] = await findNamespaceId(namespaceName)
+      const namespaceReverseEntry = await withTrace(
+        () => getReverseNameEntryForNamespace(connection, pubkey, namespaceId),
+        trace,
+        { op: 'getReverseNameEntryForNamespace' }
+      )
+      trace?.finish()
+      return [
+        namespaceReverseEntry.parsed.entryName,
+        namespaceReverseEntry.parsed.namespaceName,
+      ]
+    } catch (e) {}
+  }
 
   if (!namespaceName) {
     try {

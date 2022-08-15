@@ -21,8 +21,8 @@ import { useHandleSetGlobalDefault } from '../handlers/useHandleSetGlobalDefault
 import { useHandleSetNamespaceDefault } from '../handlers/useHandleSetNamespaceDefault'
 import { useHandleUnlink } from '../handlers/useHandleUnlink'
 import { useAddressName } from '../hooks/useAddressName'
-import { useBatchedNamespaceReverseEntries } from '../hooks/useBatchedNamespaceReverseEntries'
 import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
+import { useNamespaceReverseEntries } from '../hooks/useNamespaceReverseEntries'
 import { useNamespaceReverseEntry } from '../hooks/useNamespaceReverseEntry'
 import type { UserTokenData } from '../hooks/useUserNamesForNamespace'
 import { useUserNamesForNamespace } from '../hooks/useUserNamesForNamespace'
@@ -84,10 +84,10 @@ export const NameEntryRow = ({
     wallet
   )
 
-  const batchedNamespaceReverseEntries = useBatchedNamespaceReverseEntries(
+  const namespaceReverseEntries = useNamespaceReverseEntries(
     connection,
-    identities.map((idn) => idn.name),
-    wallet.publicKey
+    wallet.publicKey,
+    identities.map((idn) => idn.name)
   )
 
   useEffect(() => {
@@ -241,7 +241,7 @@ export const NameEntryRow = ({
                     userNamesForNamespace.remove()
                     globalReverseEntry.refetch()
                     addressName.refetch()
-                    batchedNamespaceReverseEntries.refetch()
+                    namespaceReverseEntries.refetch()
                     setSuccess(
                       <div className="flex w-full flex-col text-center">
                         <div>
@@ -304,10 +304,10 @@ export const NameManager = ({
     wallet
   )
 
-  const batchedNamespaceReverseEntries = useBatchedNamespaceReverseEntries(
+  const namespaceReverseEntries = useNamespaceReverseEntries(
     connection,
-    identities.map((idn) => idn.name),
-    wallet.publicKey
+    wallet.publicKey,
+    identities.map((idn) => idn.name)
   )
   const userNamesForNamespace = useUserNamesForNamespace(
     connection,
@@ -373,7 +373,7 @@ export const NameManager = ({
                         <ButtonLight
                           onClick={async () => {
                             const foundReverseEntry =
-                              batchedNamespaceReverseEntries.data?.find(
+                              namespaceReverseEntries.data?.find(
                                 (tk) =>
                                   tk.parsed.namespaceName === identity.name
                               )
@@ -440,7 +440,7 @@ export const NameManager = ({
                       sortOnReverseEntry(
                         userTokenData,
                         globalReverseEntry.data,
-                        batchedNamespaceReverseEntries.data
+                        namespaceReverseEntries.data
                       )
                     )
                     ?.map((userTokenData) => (

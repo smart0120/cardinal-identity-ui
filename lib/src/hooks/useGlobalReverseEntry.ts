@@ -1,4 +1,5 @@
 import type { AccountData } from '@cardinal/common'
+import { tryGetAccount } from '@cardinal/common'
 import type { ReverseEntryData } from '@cardinal/namespaces'
 import { getGlobalReverseNameEntry } from '@cardinal/namespaces'
 import type { Connection, PublicKey } from '@solana/web3.js'
@@ -15,10 +16,11 @@ export const useGlobalReverseEntry = (
     async () => {
       if (!pubkey || !connection) return
       const reverseEntry = await withTrace(
-        () => getGlobalReverseNameEntry(connection, pubkey),
+        () =>
+          tryGetAccount(() => getGlobalReverseNameEntry(connection, pubkey)),
         tracer({ name: 'getGlobalReverseNameEntry' })
       )
-      return reverseEntry || undefined
+      return reverseEntry ?? undefined
     },
     {
       enabled: !!connection || !!pubkey,

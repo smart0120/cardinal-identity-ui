@@ -6,10 +6,10 @@ export const Alert = ({ message, type }: { message: string; type: string }) => {
   const identity = identities.length === 1 ? identities[0] : undefined
   return (
     <div
-      className="flex items-center justify-center rounded-lg py-2 text-center text-xs"
+      className="flex items-center justify-center rounded-lg bg-light-1 py-2 text-center text-xs text-light-4 text-light-2"
       style={{
-        background: identity?.colors.buttonColor || '#ffffff',
-        color: identity?.colors.secondaryFontColor || '#ffffff',
+        background: identity?.colors.buttonColor,
+        color: identity?.colors.secondaryFontColor,
       }}
     >
       {type === 'success' && <FaCheck />}
