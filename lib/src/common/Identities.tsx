@@ -147,7 +147,7 @@ export const IDENTITIES: {
     ),
     nameLink: () => `https://discord.com/channels/@me`,
     verificationUrl: () =>
-      `https://discord.com/oauth2/authorize?response_type=code&client_id=992004845101916191&scope=identify&state=15773059ghq9183habn&redirect_uri=http://localhost:3000/verification?identity=discord&prompt=consent`,
+      `https://discord.com/oauth2/authorize?response_type=code&client_id=992004845101916191&scope=identify&state=15773059ghq9183habn&redirect_uri=https://discord.cardinal.so/verification&prompt=consent`,
     verifierUrl: (address, proof, accessToken, cluster, dev) => {
       const urlParams = new URLSearchParams(proof)
       const code = urlParams.get('code')
