@@ -43,7 +43,7 @@ export const Modal: React.FC<Props> = ({
         `}
         className={`${className} my-[10vh] h-fit w-[560px] max-w-[98vw] rounded-xl transition-all `}
       >
-        <div className="text-dark-4 flex w-full cursor-pointer items-center justify-end px-4 pt-4">
+        <div className="text-dark-4 hover:text-medium-4 flex w-full cursor-pointer items-center justify-end px-4 pt-4 transition">
           <CloseIcon onClick={() => onDismiss()} />
         </div>
         {children}

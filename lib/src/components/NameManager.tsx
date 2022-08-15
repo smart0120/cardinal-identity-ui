@@ -162,7 +162,7 @@ export const NameEntryRow = ({
                 }}
               >
                 {handleSetNamespacesDefault.isLoading ? (
-                  <LoadingSpinner height="15px" fill="#000" />
+                  <LoadingSpinner height="12px" fill="#000" />
                 ) : (
                   <AiFillStar />
                 )}
@@ -204,7 +204,7 @@ export const NameEntryRow = ({
               }
             >
               {handleSetNamespacesDefault.isLoading ? (
-                <LoadingSpinner height="15px" fill="#000" />
+                <LoadingSpinner height="12px" fill="#000" />
               ) : (
                 <AiFillStar />
               )}
@@ -273,7 +273,7 @@ export const NameEntryRow = ({
             }
           >
             {handleUnlink.isLoading ? (
-              <LoadingSpinner height="15px" fill="#000" />
+              <LoadingSpinner height="12px" fill="#000" />
             ) : (
               <>
                 <BiUnlink />
@@ -402,7 +402,7 @@ export const NameManager = ({
                           className="flex flex-row items-center gap-1"
                         >
                           {handleSetGlobalDefault.isLoading ? (
-                            <LoadingSpinner height="15px" fill="#000" />
+                            <LoadingSpinner height="12px" fill="#000" />
                           ) : (
                             <>
                               <BiGlobe className="text-[12px]" /> Set Default
@@ -424,8 +424,8 @@ export const NameManager = ({
               !globalReverseEntry.isFetched ? (
                 // !namespaceReverseEntry.isFetched ? (
                 <>
-                  <div className="h-8 w-full animate-pulse rounded-lg bg-gray-200"></div>
-                  <div className="h-8 w-full animate-pulse rounded-lg bg-gray-200"></div>
+                  <div className="h-6 w-full animate-pulse rounded-lg bg-gray-200"></div>
+                  <div className="h-6 w-full animate-pulse rounded-lg bg-gray-200"></div>
                 </>
               ) : userNamesForNamespace.data?.filter(
                   (userTokenData) =>
