@@ -86,7 +86,7 @@ const TxContainer = styled.div`
 
 export function ToastContainer() {
   return (
-    <Toaster position="top-right">
+    <Toaster position="bottom-right">
       {(t) => (
         <ToastBar
           toast={t}
