@@ -154,7 +154,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           </div>
         )}
         <ButtonLight
-          className="text-xs"
+          disabled={address?.toString() !== wallet?.publicKey?.toString()}
           onClick={() =>
             address?.toString() === wallet?.publicKey?.toString() &&
             show({
@@ -167,12 +167,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
               dev: environment.label === 'devnet',
             })
           }
-          style={{
-            background: identity?.colors.buttonColor,
-            color: identity?.colors.secondaryFontColor,
-            opacity:
-              address?.toString() !== wallet?.publicKey?.toString() ? 0.5 : 1,
-          }}
+          background={identity?.colors.buttonColor}
         >
           Manage Profiles
         </ButtonLight>

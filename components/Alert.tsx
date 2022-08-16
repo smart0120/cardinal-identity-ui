@@ -1,4 +1,5 @@
 import { useWalletIdentity } from 'lib/src'
+import { lighten } from 'polished'
 import { FaCheck, FaExclamation } from 'react-icons/fa'
 
 export const Alert = ({ message, type }: { message: string; type: string }) => {
@@ -9,7 +10,9 @@ export const Alert = ({ message, type }: { message: string; type: string }) => {
       className="flex items-center justify-center rounded-lg bg-light-1 py-2 text-center text-xs text-light-4"
       style={{
         background: identity?.colors.buttonColor,
-        color: identity?.colors.secondaryFontColor,
+        color: identity?.colors.buttonColor
+          ? lighten(0.5, identity?.colors.buttonColor)
+          : undefined,
       }}
     >
       {type === 'success' && <FaCheck />}

@@ -1,4 +1,4 @@
-import { Button } from '../common/Button'
+import { ButtonLight } from '../common/Button'
 import type { ShowParams } from '../providers/WalletIdentityProvider'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
@@ -16,7 +16,6 @@ interface Props
 }
 
 export const ConnectButton: React.FC<Props> = ({
-  variant = 'primary',
   dev,
   cluster,
   connection,
@@ -24,16 +23,14 @@ export const ConnectButton: React.FC<Props> = ({
   wallet,
   onClose,
   disabled,
-  ...buttonProps
 }: Props) => {
   const { show, identities } = useWalletIdentity()
   const identity = identities.length === 1 ? identities[0] : undefined
   return (
-    <Button
-      bgColor={identity?.colors.primary || '#000'}
-      variant={variant}
+    <ButtonLight
+      className="px-[14px] py-[6px]"
+      background={identity?.colors.primary}
       disabled={disabled}
-      {...buttonProps}
       onClick={() => {
         !disabled &&
           show({
@@ -49,6 +46,6 @@ export const ConnectButton: React.FC<Props> = ({
     >
       {!!identity && identity.icon({ variant: 'light', width: 14, height: 14 })}
       <span className="ml-2">Link {identity?.displayName || 'profile'}</span>
-    </Button>
+    </ButtonLight>
   )
 }

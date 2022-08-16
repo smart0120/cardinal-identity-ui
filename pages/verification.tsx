@@ -1,7 +1,7 @@
 import Tooltip from '@mui/material/Tooltip'
 import { Header } from 'common/Header'
 import { useWalletIdentity } from 'lib/src'
-import { Button } from 'lib/src/common/Button'
+import { ButtonLight } from 'lib/src/common/Button'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { IoCheckmarkCircleOutline } from 'react-icons/io5'
@@ -32,7 +32,7 @@ const Verification = () => {
       <div style={{ marginTop: '10vh' }}>
         <div
           style={{
-            width: '350px',
+            width: '380px',
             margin: '0px auto',
           }}
         >
@@ -41,7 +41,6 @@ const Verification = () => {
               padding: '1.5rem',
               borderRadius: '1rem',
               boxShadow: '0 4px 34px rgb(0 0 0 / 8%)',
-              height: '320px',
               background: identity?.colors.secondary,
               color: identity?.colors.primaryFontColor,
             }}
@@ -51,22 +50,21 @@ const Verification = () => {
                 <div className="flex flex-row justify-center text-2xl font-semibold">
                   Congrats!
                 </div>
-                <div className="text-md mt-2 flex flex-row justify-center text-center font-semibold">
+                <div className="text-md mt-2 flex flex-row justify-center text-center">
                   You have successfully verified your {identity?.displayName}{' '}
-                  account!
+                  account
                 </div>
                 <div
                   className="text-md mt-5 flex flex-row justify-center rounded-lg p-5 text-center font-medium"
                   style={{ background: identity?.colors.buttonColor }}
                 >
-                  Now copy this page&apos;s URL and paste it in the previous
-                  page to claim your handle as a non-transferable NFT
+                  Copy this page&apos;s URL and paste it in the previous page to
+                  claim your handle as a non-transferable Solana NFT
                 </div>
                 <Tooltip placement="top" title="Copy to clipboard">
                   <div className="mt-5 flex flex-row justify-center">
-                    <Button
-                      bgColor={identity?.colors.primary}
-                      variant={'primary'}
+                    <ButtonLight
+                      background={identity?.colors.primary}
                       onClick={() => {
                         navigator.clipboard.writeText(window.location.href)
                         setLinkCopied(true)
@@ -76,7 +74,7 @@ const Verification = () => {
                         <IoCheckmarkCircleOutline className="text-lg" />
                       )}
                       <span>Copy URL</span>
-                    </Button>
+                    </ButtonLight>
                   </div>
                 </Tooltip>
               </>

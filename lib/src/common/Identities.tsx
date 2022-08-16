@@ -48,7 +48,6 @@ export type Identity = {
     secondary?: string
     buttonColor?: string
     primaryFontColor?: string
-    secondaryFontColor?: string
   }
 }
 
@@ -122,7 +121,6 @@ export const IDENTITIES: {
       secondary: '#FFFFFF',
       buttonColor: '#f0f1f3',
       primaryFontColor: '#ffffff',
-      secondaryFontColor: '#697b89',
     },
   },
   discord: {
