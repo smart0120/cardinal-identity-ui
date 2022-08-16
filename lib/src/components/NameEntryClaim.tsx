@@ -6,13 +6,11 @@ import { useMemo, useState } from 'react'
 import { Alert } from '../common/Alert'
 import { ButtonLight } from '../common/Button'
 import type { Identity } from '../common/Identities'
-import { useHandleClaimTransaction } from '../handlers/useHandleClaimTransaction'
-import { useHandleSetNamespaceDefault } from '../handlers/useHandleSetNamespaceDefault'
+import { useHandleClaim } from '../handlers/useHandleClaim'
 import { useHandleVerify } from '../handlers/useHandleVerify'
 import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
 import { useNameEntryData } from '../hooks/useNameEntryData'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
-import { handleError } from '../utils/errors'
 import { formatIdentityLink, formatShortAddress } from '../utils/format'
 import { ButtonWithFooter } from './ButtonWithFooter'
 import { HandleNFT } from './HandleNFT'
@@ -36,7 +34,7 @@ export const NameEntryClaim = ({
   onComplete?: (arg0: string) => void
   setVerifyIdentity: (arg0: Identity | undefined) => void
 }) => {
-  const { appInfo } = useWalletIdentity()
+  const { appInfo, setMessage } = useWalletIdentity()
   const [proof, setProof] = useState<string | undefined>(undefined)
   const [handle, setHandle] = useState<string>()
   const [accessToken, setAccessToken] = useState<string>()
@@ -59,16 +57,11 @@ export const NameEntryClaim = ({
     setAccessToken,
     setHandle
   )
-  const handleClaimTransaction = useHandleClaimTransaction(
+  const handleClaimTransaction = useHandleClaim(
     connection,
     wallet,
     identity,
     handle
-  )
-
-  const handleSetNamespaceDefault = useHandleSetNamespaceDefault(
-    connection,
-    wallet
   )
 
   useMemo(() => {
@@ -76,6 +69,7 @@ export const NameEntryClaim = ({
       handleVerify.mutate({ proof: proof })
     } else if (proof?.length === 0) {
       handleClaimTransaction.reset()
+      setMessage(undefined)
     }
   }, [wallet.publicKey.toString(), proof, verificationInitiated])
 
@@ -277,42 +271,9 @@ export const NameEntryClaim = ({
             </>
           }
         />
-        {handleClaimTransaction.error && (
-          <Alert
-            style={{
-              height: 'auto',
-              wordBreak: 'break-word',
-              justifyContent: 'center',
-            }}
-            message={
-              <div>{`Error: ${handleError(handleClaimTransaction.error)}`}</div>
-            }
-            type="error"
-            showIcon
-          />
-        )}
-        {handleSetNamespaceDefault.error && (
-          <Alert
-            style={{
-              height: 'auto',
-              wordBreak: 'break-word',
-              justifyContent: 'center',
-            }}
-            message={
-              <div>{`Error: ${handleError(
-                handleSetNamespaceDefault.error
-              )}`}</div>
-            }
-            type="error"
-            showIcon
-          />
-        )}
       </DetailsWrapper>
       <ButtonWithFooter
-        loading={
-          handleClaimTransaction.isLoading ||
-          handleSetNamespaceDefault.isLoading
-        }
+        loading={handleClaimTransaction.isLoading}
         complete={handleClaimTransaction.isSuccess}
         disabled={
           !handleVerify.isSuccess ||

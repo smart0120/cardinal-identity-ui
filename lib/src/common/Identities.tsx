@@ -36,6 +36,13 @@ export type Identity = {
     cluster?: Cluster,
     dev?: boolean
   ) => string
+  claimUrl: (
+    handle: string,
+    proof: string,
+    accessToken?: string,
+    cluster?: Cluster,
+    dev?: boolean
+  ) => string
   namePrefix?: string
   displayName?: string
   verification?: 'Verification' | 'Tweet'
@@ -109,6 +116,14 @@ export const IDENTITIES: {
         cluster && `&cluster=${cluster}`
       }`
     },
+    claimUrl: (handle, proof, _accessToken, cluster, dev) => {
+      const tweetId = proof.split('/')[5]?.split('?')[0]
+      return `${apiBase(
+        dev
+      )}/twitter/claim?tweetId=${tweetId}&handle=${handle}${
+        cluster && `&cluster=${cluster}`
+      }`
+    },
     namePrefix: '@',
     displayName: 'Twitter',
     verification: 'Tweet',
@@ -147,11 +162,15 @@ export const IDENTITIES: {
     verificationUrl: () =>
       `https://discord.com/oauth2/authorize?response_type=code&client_id=992004845101916191&scope=identify&state=15773059ghq9183habn&redirect_uri=https://discord.cardinal.so/verification&prompt=consent`,
     verifierUrl: (address, proof, accessToken, cluster, dev) => {
-      const urlParams = new URLSearchParams(proof)
-      const code = urlParams.get('code')
+      const code = new URL(proof).searchParams.get('code')
       return `${apiBase(
         dev
       )}/discord/verify?publicKey=${address}&code=${code}&accessToken=${
+        accessToken ?? ''
+      }${cluster && `&cluster=${cluster}`}`
+    },
+    claimUrl: (handle, _proof, accessToken, cluster, dev) => {
+      return `${apiBase(dev)}/discord/claim?handle=${handle}&accessToken=${
         accessToken ?? ''
       }${cluster && `&cluster=${cluster}`}`
     },

@@ -77,15 +77,20 @@ export const useHandleUnlink = (
         userTokenData &&
           txid &&
           setMessage(
-            <div className="flex w-full flex-col text-center">
-              <div>
-                Succesfully unlinked{' '}
-                {formatIdentityLink(...nameFromToken(userTokenData))}.
-              </div>
-              <div>
-                Changes will be reflected <TransactionLink txid={txid} />
-              </div>
-            </div>
+            <Alert
+              type="success"
+              message={
+                <div className="flex w-full flex-col text-center">
+                  <div>
+                    Succesfully unlinked{' '}
+                    {formatIdentityLink(...nameFromToken(userTokenData))}.
+                  </div>
+                  <div>
+                    Changes will be reflected <TransactionLink txid={txid} />
+                  </div>
+                </div>
+              }
+            />
           )
       },
       onError: (e) => {

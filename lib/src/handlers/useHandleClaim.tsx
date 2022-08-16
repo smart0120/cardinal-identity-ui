@@ -3,13 +3,14 @@ import type { AccountData } from '@cardinal/common'
 import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
 import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
-import type { Cluster, Connection, PublicKey } from '@solana/web3.js'
+import type { Connection, PublicKey } from '@solana/web3.js'
 import { sendAndConfirmRawTransaction, Transaction } from '@solana/web3.js'
 import { useMutation, useQueryClient } from 'react-query'
 
+import { Alert } from '../common/Alert'
 import type { Identity } from '../common/Identities'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
-import { apiBase } from '../utils/constants'
+import { handleError } from '../utils/errors'
 import { tracer, withTrace } from '../utils/trace'
 
 export interface HandleSetParam {
@@ -21,12 +22,13 @@ export interface HandleSetParam {
   certificate?: AccountData<CertificateData> | null
 }
 
-export const useHandleClaimTransaction = (
+export const useHandleClaim = (
   connection: Connection,
   wallet: Wallet,
   identity: Identity,
   handle: string | undefined
 ) => {
+  const { setMessage } = useWalletIdentity()
   const queryClient = useQueryClient()
   const { dev, cluster } = useWalletIdentity()
 
@@ -41,20 +43,41 @@ export const useHandleClaimTransaction = (
     }): Promise<string> => {
       if (!proof) throw new Error('No verification url provided')
       const trace = tracer({ name: 'useHandleClaim' })
-      const transactions = await withTrace(
+
+      if (!handle) throw new Error('Missing handle')
+      const claimUrl = identity.claimUrl(
+        handle,
+        proof,
+        accessToken,
+        cluster,
+        dev
+      )
+
+      // get response
+      const response = await withTrace(
         () =>
-          handleClaim(
-            wallet,
-            cluster,
-            identity.name,
-            handle,
-            proof,
-            accessToken,
-            dev
-          ),
+          fetch(claimUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              account: wallet.publicKey.toString(),
+            }),
+          }),
         trace,
         { op: 'handleClaim' }
       )
+
+      // handle response
+      const json = await response.json()
+      if (response.status !== 200 || json.error) {
+        throw new Error(json.error ?? json.message)
+      }
+
+      const encodedTxs = json.transactions as string[]
+      const transactions = encodedTxs.map((tx) =>
+        Transaction.from(Buffer.from(decodeURIComponent(tx), 'base64'))
+      )
+
       if (!transactions) return ''
       let txId = ''
       await wallet.signAllTransactions(transactions)
@@ -73,40 +96,21 @@ export const useHandleClaimTransaction = (
     },
     {
       onSuccess: () => queryClient.invalidateQueries(),
+      onError: async (e) => {
+        setMessage(
+          <Alert
+            message={handleError(e, `${e}`)}
+            type="error"
+            style={{
+              margin: '10px 0px',
+              height: 'auto',
+              wordBreak: 'break-word',
+              justifyContent: 'center',
+              textAlign: 'center',
+            }}
+          />
+        )
+      },
     }
-  )
-}
-
-export async function handleClaim(
-  wallet: Wallet,
-  cluster: Cluster | undefined,
-  namespace: string,
-  handle: string | undefined,
-  tweetId: string | undefined,
-  accessToken: string | undefined,
-  dev: boolean | undefined
-): Promise<Transaction[] | null> {
-  if (!handle || !tweetId) return null
-  const response = await fetch(
-    `${apiBase(
-      dev
-    )}/${namespace}/claim?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${encodeURIComponent(
-      handle
-    )}&accessToken=${accessToken}${
-      cluster === 'devnet' ? `&cluster=${cluster}` : ''
-    }`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        account: wallet.publicKey.toString(),
-      }),
-    }
-  )
-  const json = await response.json()
-  if (response.status !== 200 || json.error) throw new Error(json.error)
-  const transactions = json.transactions as string[]
-  return transactions.map((tx) =>
-    Transaction.from(Buffer.from(decodeURIComponent(tx), 'base64'))
   )
 }
