@@ -169,6 +169,7 @@ export const NameManager = ({
   )
   const globalReverseEntry = useGlobalReverseEntry(connection, wallet.publicKey)
 
+  console.log(identities)
   return (
     <div>
       <div className="text-dark-6 mb-6 text-center text-2xl">

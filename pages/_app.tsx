@@ -6,7 +6,8 @@ import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import { getWalletAdapters } from '@solana/wallet-adapter-wallets'
 import { ToastContainer } from 'common/Notification'
 import { WalletIdentityProvider } from 'lib/src'
-import type { Identity } from 'lib/src/common/Identities'
+import type { IdentityName } from 'lib/src/common/Identities'
+import { IDENTITIES } from 'lib/src/common/Identities'
 import type { AppProps } from 'next/app'
 import {
   EnvironmentProvider,
@@ -18,13 +19,15 @@ require('@solana/wallet-adapter-react-ui/styles.css')
 const App = ({
   Component,
   pageProps,
-  identity,
+  identityName,
   cluster,
-}: AppProps & { cluster: string; identity: Identity }) => (
+}: AppProps & { cluster: string; identityName: IdentityName }) => (
   <EnvironmentProvider defaultCluster={cluster}>
     <WalletProvider wallets={getWalletAdapters()}>
       <WalletModalProvider>
-        <WalletIdentityProvider identities={identity ? [identity] : undefined}>
+        <WalletIdentityProvider
+          identities={identityName ? [IDENTITIES[identityName]] : undefined}
+        >
           <>
             <ToastContainer />
             <Component {...pageProps} />

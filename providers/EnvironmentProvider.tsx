@@ -1,7 +1,7 @@
 import { firstParam } from '@cardinal/common'
 import type { Cluster } from '@solana/web3.js'
 import { Connection } from '@solana/web3.js'
-import type { Identity } from 'lib/src/common/Identities'
+import type { IdentityName } from 'lib/src/common/Identities'
 import { IDENTITIES } from 'lib/src/common/Identities'
 import type { NextPageContext } from 'next'
 import { useRouter } from 'next/router'
@@ -11,7 +11,7 @@ export const getInitialProps = async ({
   ctx,
 }: {
   ctx: NextPageContext
-}): Promise<{ cluster: string; identity?: Identity }> => {
+}): Promise<{ cluster: string; identityName?: IdentityName }> => {
   const identityName = Object.values(IDENTITIES)
     .map((i) => i.name)
     .find((i) => (ctx.query.identity || ctx.req?.headers.host)?.includes(i))
@@ -22,7 +22,7 @@ export const getInitialProps = async ({
     : ctx.query.cluster || process.env.BASE_CLUSTER
   return {
     cluster: firstParam(cluster),
-    identity: identityName ? IDENTITIES[identityName] : undefined,
+    identityName,
   }
 }
 
