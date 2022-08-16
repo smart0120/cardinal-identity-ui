@@ -49,7 +49,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
       }}
     >
       <div className="mb-8">
-        {addressName.isFetching ? (
+        {!addressName.isFetched ? (
           <Alert message={'Loading'} type="warning" />
         ) : addressName.data ? (
           <Alert
@@ -64,7 +64,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
         )}
       </div>
       <div className="flex flex-col items-center gap-4">
-        {addressImage.isFetching ? (
+        {!addressImage.isFetched ? (
           <div
             className="animate-pulse bg-gray-200"
             style={{ height: '156px', width: '156px', borderRadius: '50%' }}
@@ -129,7 +129,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           </div>
         )}
         <div className="flex flex-col justify-center text-center">
-          {addressName.isFetching ? (
+          {!addressName.isFetched ? (
             <div className="h-6  w-28 animate-pulse rounded-md bg-gray-200" />
           ) : (
             <DisplayAddress connection={connection} address={address} />
