@@ -123,7 +123,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
     >
       <QueryClientProvider client={QUERY_CLIENT}>
         <Modal
-          className="bg-white"
+          className="text-dark-6 bg-white"
           isOpen={showIdentityModal}
           onDismiss={() => {
             setShowIdentityModal(false)

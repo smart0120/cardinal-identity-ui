@@ -8,6 +8,7 @@ export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   connection: Connection
   address: PublicKey | undefined
   dark?: boolean
+  size?: number
   hideIcon?: boolean
   disableLink?: boolean
   style?: React.CSSProperties
@@ -18,6 +19,7 @@ export const DisplayAddress: React.FC<Props> = ({
   connection,
   address,
   dark = false,
+  size = 14,
   style,
   loader,
   hideIcon,
@@ -31,16 +33,20 @@ export const DisplayAddress: React.FC<Props> = ({
   return addressName.isLoading ? (
     loader ?? (
       <div
-        className="h-5 w-24 animate-pulse rounded-md"
-        style={{ backgroundColor: dark ? '#555' : '#DDD' }}
+        className="animate-pulse rounded-md"
+        style={{
+          backgroundColor: dark ? '#555' : '#DDD',
+          height: size * 1.5,
+          width: size * 7,
+        }}
       />
     )
   ) : (
     <div
       className="flex items-center gap-1"
       style={{
-        display: 'flex',
         color: dark ? 'white' : 'black',
+        fontSize: size,
         ...style,
       }}
       {...props}
@@ -51,7 +57,7 @@ export const DisplayAddress: React.FC<Props> = ({
       {!hideIcon &&
         identity &&
         identity.icon &&
-        identity.icon({ variant: 'colored', width: 18, height: 18 })}
+        identity.icon({ variant: 'colored', width: size, height: size })}
     </div>
   )
 }

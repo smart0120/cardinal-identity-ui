@@ -47,6 +47,7 @@ export const ProfileSmall = ({
       <div>
         <div className={`text-${dark ? 'white' : 'black'}`}>
           <DisplayAddress
+            size={16}
             style={{ pointerEvents: 'none' }}
             connection={connection}
             address={address || undefined}
