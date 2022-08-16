@@ -4,10 +4,14 @@ import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   address?: PublicKey
-  children: React.ReactNode
+  children: React.ReactElement
 }
 
-export const AddressLink = ({ children, address, ...props }: Props) => {
+export const AddressLink: React.FC<Props> = ({
+  children,
+  address,
+  ...props
+}: Props) => {
   const { cluster } = useWalletIdentity()
   if (!address) return children
   return (

@@ -1,9 +1,5 @@
-import type { CertificateData } from '@cardinal/certificates'
-import type { AccountData } from '@cardinal/common'
-import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
-import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
-import type { Connection, PublicKey } from '@solana/web3.js'
+import type { Connection } from '@solana/web3.js'
 import { sendAndConfirmRawTransaction, Transaction } from '@solana/web3.js'
 import { useMutation, useQueryClient } from 'react-query'
 
@@ -12,15 +8,6 @@ import type { Identity } from '../common/Identities'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { handleError } from '../utils/errors'
 import { tracer, withTrace } from '../utils/trace'
-
-export interface HandleSetParam {
-  metaplexData?: {
-    pubkey: PublicKey
-    parsed: metaplex.MetadataData
-  } | null
-  tokenManager?: AccountData<TokenManagerData>
-  certificate?: AccountData<CertificateData> | null
-}
 
 export const useHandleClaim = (
   connection: Connection,

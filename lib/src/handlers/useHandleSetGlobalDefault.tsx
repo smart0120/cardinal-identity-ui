@@ -11,12 +11,6 @@ import { handleError } from '../utils/errors'
 import { tracer, withTrace } from '../utils/trace'
 import { executeTransaction } from '../utils/transactions'
 
-export interface HandleSetParam {
-  namespaceName: string
-  entryName: string
-  mint: PublicKey
-}
-
 export const useHandleSetGlobalDefault = (
   connection: Connection,
   wallet: Wallet
@@ -28,7 +22,11 @@ export const useHandleSetGlobalDefault = (
       entryName,
       namespaceName,
       mint,
-    }: HandleSetParam): Promise<{ txid: string; namespaceName: string }> => {
+    }: {
+      namespaceName: string
+      entryName: string
+      mint: PublicKey
+    }): Promise<{ txid: string; namespaceName: string }> => {
       const transaction = new Transaction()
       const trace = tracer({ name: 'useHandleSetGlobalDefault' })
       await withTrace(
