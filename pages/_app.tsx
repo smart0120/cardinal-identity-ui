@@ -4,6 +4,7 @@ import 'tailwindcss/tailwind.css'
 import { WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import { getWalletAdapters } from '@solana/wallet-adapter-wallets'
+import { ToastContainer } from 'common/Notification'
 import { WalletIdentityProvider } from 'lib/src'
 import type { Identity } from 'lib/src/common/Identities'
 import type { AppProps } from 'next/app'
@@ -24,7 +25,10 @@ const App = ({
     <WalletProvider wallets={getWalletAdapters()}>
       <WalletModalProvider>
         <WalletIdentityProvider identities={identity ? [identity] : undefined}>
-          <Component {...pageProps} />
+          <>
+            <ToastContainer />
+            <Component {...pageProps} />
+          </>
         </WalletIdentityProvider>
       </WalletModalProvider>
     </WalletProvider>

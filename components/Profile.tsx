@@ -105,7 +105,6 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
                 navigator.clipboard.writeText(window.location.href)
                 notify({
                   message: 'Share link copied',
-                  placement: 'bottom-right',
                 })
               }}
               style={{
