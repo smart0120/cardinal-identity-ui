@@ -10,7 +10,7 @@ export const formatIdentityLink = (
   if (!handle || !namespace) return <></>
   return (
     <div
-      className="cursor-pointer"
+      className="inline-block cursor-pointer"
       onClick={() => window.open(getIdentity(namespace)?.nameLink(handle))}
       style={{ color: '#177ddc' }}
     >

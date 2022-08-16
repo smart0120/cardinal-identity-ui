@@ -170,9 +170,10 @@ export const IDENTITIES: {
       }${cluster && `&cluster=${cluster}`}`
     },
     claimUrl: (handle, _proof, accessToken, cluster, dev) => {
-      return `${apiBase(dev)}/discord/claim?handle=${handle}&accessToken=${
-        accessToken ?? ''
-      }${cluster && `&cluster=${cluster}`}`
+      console.log(accessToken)
+      return `${apiBase(dev)}/discord/claim?handle=${encodeURIComponent(
+        handle
+      )}&accessToken=${accessToken ?? ''}${cluster && `&cluster=${cluster}`}`
     },
     displayName: 'Discord',
     verification: 'Verification',

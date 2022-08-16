@@ -30,36 +30,34 @@ export const ClaimCard = ({
   return (
     <div className="relative mx-auto h-full min-h-[200px] w-full rounded-xl px-5 text-xs">
       <div className="relative px-2 pb-8 md:px-8 md:pt-2">
-        <>
-          {!wallet?.publicKey || !connection ? (
-            <div className="m-12 flex items-center justify-center text-2xl">
-              Connect wallet to continue
-            </div>
-          ) : verifyIdentity ? (
-            <NameEntryClaim
-              identity={verifyIdentity}
-              wallet={wallet}
-              connection={connection}
-              secondaryConnection={secondaryConnection}
-              setVerifyIdentity={(i) => {
-                setVerifyIdentity(i)
-                setMessage(undefined)
-              }}
-              onComplete={onComplete}
-            />
-          ) : (
-            <NameManager
-              connection={connection}
-              wallet={wallet}
-              setVerifyIdentity={(i) => {
-                setVerifyIdentity(i)
-                setMessage(undefined)
-              }}
-            />
-          )}
-          {message && <div className="mb-4">{message}</div>}
-          <PoweredByFooter />
-        </>
+        {!wallet?.publicKey || !connection ? (
+          <div className="m-12 flex items-center justify-center text-2xl">
+            Connect wallet to continue
+          </div>
+        ) : verifyIdentity ? (
+          <NameEntryClaim
+            identity={verifyIdentity}
+            wallet={wallet}
+            connection={connection}
+            secondaryConnection={secondaryConnection}
+            setVerifyIdentity={(i) => {
+              setVerifyIdentity(i)
+              setMessage(undefined)
+            }}
+            onComplete={onComplete}
+          />
+        ) : (
+          <NameManager
+            connection={connection}
+            wallet={wallet}
+            setVerifyIdentity={(i) => {
+              setVerifyIdentity(i)
+              setMessage(undefined)
+            }}
+          />
+        )}
+        {message && <div className="mb-4">{message}</div>}
+        <PoweredByFooter />
       </div>
     </div>
   )

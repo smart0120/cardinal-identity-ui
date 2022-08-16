@@ -125,15 +125,18 @@ export async function handleUnlink(
   if (!entryMint) throw new Error('Failed to get mint')
   const [entryName] = nameFromToken(params.userTokenData)
   if (params.userTokenData.certificate) {
+    console.log('Revoking certificate')
     await withRevokeCertificateV2(connection, wallet, transaction, {
       certificateMint: entryMint,
       revokeRecipient: namespaceId,
     })
   } else if (params.userTokenData.tokenManager) {
+    console.log('Invalidating token manager')
     // invalidate token manager
     await withInvalidate(transaction, connection, wallet, entryMint)
   }
   if (params.namespaceReverseEntry) {
+    console.log('Invalidating expired namespace reverse entry')
     await withInvalidateExpiredReverseEntry(transaction, connection, wallet, {
       namespaceName: params.namespaceName,
       mintId: entryMint,
@@ -142,6 +145,7 @@ export async function handleUnlink(
     })
   }
   if (params.globalReverseNameEntryData) {
+    console.log('Invalidating expired global reverse entry')
     await withInvalidateExpiredReverseEntry(transaction, connection, wallet, {
       namespaceName: params.namespaceName,
       mintId: entryMint,
@@ -149,6 +153,7 @@ export async function handleUnlink(
       reverseEntryId: params.globalReverseNameEntryData.pubkey,
     })
   }
+  console.log('Invalidating expired name entry')
   await withInvalidateExpiredNameEntry(transaction, connection, wallet, {
     namespaceName: params.namespaceName,
     mintId: entryMint,
