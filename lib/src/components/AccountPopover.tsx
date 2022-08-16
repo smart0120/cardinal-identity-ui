@@ -1,6 +1,5 @@
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, Connection } from '@solana/web3.js'
-import { rgba } from 'polished'
 import React from 'react'
 import { FaPowerOff, FaTwitter } from 'react-icons/fa'
 
@@ -42,7 +41,6 @@ export const AccountPopover = ({
                 dark={dark}
                 connection={connection}
                 address={wallet.publicKey}
-                dev={environment === 'devnet'}
               />
             </div>
           </div>

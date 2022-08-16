@@ -1,29 +1,21 @@
 import { firstParam } from '@cardinal/common'
 import { getNameEntry } from '@cardinal/namespaces'
-import styled from '@emotion/styled'
 import { useWallet } from '@solana/wallet-adapter-react'
 import type { PublicKey } from '@solana/web3.js'
 import { Header } from 'common/Header'
 import { PlaceholderProfile, Profile } from 'components/Profile'
-import { tryPublicKey } from 'lib/src'
+import { tryPublicKey, useWalletIdentity } from 'lib/src'
 import { useRouter } from 'next/router'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
 import { useMemo, useState } from 'react'
 
-export const TwitterBackground = styled.div`
-  z-index: -1;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  position: fixed;
-  background: #1da1f2;
-`
-
-const TwitterClaim = () => {
+const Home = () => {
   const wallet = useWallet()
   const router = useRouter()
   const [address, setAddress] = useState<PublicKey>()
   const { connection } = useEnvironmentCtx()
+  const { identities } = useWalletIdentity()
+  const identity = identities.length === 1 ? identities[0] : undefined
   const { addressId } = router.query
 
   useMemo(async () => {
@@ -39,44 +31,35 @@ const TwitterClaim = () => {
     const tryAddress = tryPublicKey(addressId)
     if (tryAddress) {
       setAddress(tryAddress)
-    } else {
+    } else if (identity) {
       const nameEntry = await getNameEntry(
         connection,
-        'twitter',
+        identity?.name,
         firstParam(addressId)
       )
-      nameEntry.parsed.data && setAddress(nameEntry.parsed.data as PublicKey)
+      nameEntry.parsed.data && setAddress(nameEntry.parsed.data)
     }
   }, [wallet.connected, wallet.publicKey, addressId, router])
 
   return (
-    <>
+    <div
+      className={`fixed h-full w-full bg-dark-4`}
+      style={{ background: identity?.colors.primary }}
+    >
       <Header />
       <div style={{ marginTop: '10vh' }}>
         {address ? (
-          <div
-            style={{
-              width: '320px',
-              margin: '0px auto',
-            }}
-          >
+          <div className="mx-auto w-80">
             <Profile address={address} />
           </div>
         ) : (
-          <div
-            style={{
-              padding: '20px',
-              width: '320px',
-              margin: '0px auto',
-            }}
-          >
+          <div className="mx-auto w-80">
             <PlaceholderProfile />
           </div>
         )}
       </div>
-      <TwitterBackground />
-    </>
+    </div>
   )
 }
 
-export default TwitterClaim
+export default Home

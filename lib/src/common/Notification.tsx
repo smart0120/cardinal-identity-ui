@@ -1,6 +1,6 @@
 import { contrastColorMode } from '@cardinal/common'
 import styled from '@emotion/styled'
-import { Cluster } from '@solana/web3.js'
+import type { Cluster } from '@solana/web3.js'
 import { lighten } from 'polished'
 import React from 'react'
 import toast, { resolveValue, ToastBar, Toaster } from 'react-hot-toast'

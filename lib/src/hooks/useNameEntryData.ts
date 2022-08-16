@@ -9,13 +9,13 @@ import * as splToken from '@solana/spl-token'
 import type { Connection, TokenAccountBalancePair } from '@solana/web3.js'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
+
 import { tracer, withTrace } from '../utils/trace'
 
 export type NameEntryData = {
   nameEntry: AccountData<EntryData>
   certificate?: AccountData<CertificateData>
   metaplexData?: AccountData<metaplex.MetadataData>
-  arweaveData?: AccountData<any>
   largestHolders: TokenAccountBalancePair[]
   owner: PublicKey | undefined
   isOwnerPDA: boolean
@@ -52,19 +52,6 @@ export async function getNameEntryData(
     trace,
     { op: 'getAccounts' }
   )
-  let json
-  try {
-    json =
-      metaplexData.data.data.uri &&
-      (await withTrace(() =>
-        fetch(metaplexData.data.data.uri).then((r) => r.json())
-      ),
-      trace,
-      { op: 'getMetadata' })
-  } catch (e) {
-    console.log('Failed to get json', json)
-  }
-
   const largestHolders = await withTrace(
     () => connection.getTokenLargestAccounts(mint),
     trace,
@@ -103,7 +90,6 @@ export async function getNameEntryData(
     nameEntry,
     certificate: certificate ?? undefined,
     metaplexData: { pubkey: metaplexData.pubkey, parsed: metaplexData.data },
-    arweaveData: { pubkey: metaplexId, parsed: json },
     largestHolders: largestHolders.value,
     owner: largestTokenAccount?.owner,
     isOwnerPDA,

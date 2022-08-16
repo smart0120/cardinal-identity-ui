@@ -1,9 +1,30 @@
 import { firstParam } from '@cardinal/common'
 import type { Cluster } from '@solana/web3.js'
 import { Connection } from '@solana/web3.js'
+import type { IdentityName } from 'lib/src/common/Identities'
+import { IDENTITIES } from 'lib/src/common/Identities'
 import type { NextPageContext } from 'next'
 import { useRouter } from 'next/router'
 import React, { useContext, useMemo, useState } from 'react'
+
+export const getInitialProps = async ({
+  ctx,
+}: {
+  ctx: NextPageContext
+}): Promise<{ cluster: string; identityName?: IdentityName }> => {
+  const identityName = Object.values(IDENTITIES)
+    .map((i) => i.name)
+    .find((i) => (ctx.query.identity || ctx.req?.headers.host)?.includes(i))
+  const cluster = ctx.req?.headers.host?.includes('dev')
+    ? 'devnet'
+    : (ctx.query.project || ctx.query.host)?.includes('test')
+    ? 'testnet'
+    : ctx.query.cluster || process.env.BASE_CLUSTER
+  return {
+    cluster: firstParam(cluster),
+    identityName,
+  }
+}
 
 export interface Environment {
   label: Cluster
@@ -36,22 +57,6 @@ export const ENVIRONMENTS: Environment[] = [
 
 const EnvironmentContext: React.Context<null | EnvironmentContextValues> =
   React.createContext<null | EnvironmentContextValues>(null)
-
-export const getInitialProps = async ({
-  ctx,
-}: {
-  ctx: NextPageContext
-}): Promise<{ cluster: string }> => {
-  const host = ctx.req?.headers.host || ctx.query.host
-  const cluster = host?.includes('dev')
-    ? 'devnet'
-    : (ctx.query.project || ctx.query.host)?.includes('test')
-    ? 'testnet'
-    : ctx.query.cluster || process.env.BASE_CLUSTER
-  return {
-    cluster: firstParam(cluster),
-  }
-}
 
 export function EnvironmentProvider({
   children,

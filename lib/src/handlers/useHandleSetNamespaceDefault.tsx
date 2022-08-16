@@ -1,66 +1,54 @@
-import type { CertificateData } from '@cardinal/certificates'
-import type { AccountData } from '@cardinal/common'
+import { tryPublicKey } from '@cardinal/common'
 import {
   withSetGlobalReverseEntry,
   withSetNamespaceReverseEntry,
 } from '@cardinal/namespaces'
-import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
-import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
-import { Connection } from '@solana/web3.js'
-import {
-  PublicKey,
-  sendAndConfirmRawTransaction,
-  Transaction,
-} from '@solana/web3.js'
+import type { Connection, PublicKey } from '@solana/web3.js'
+import { sendAndConfirmRawTransaction, Transaction } from '@solana/web3.js'
 import { useMutation, useQueryClient } from 'react-query'
 
-import { nameFromMint } from '../components/NameManager'
+import { Alert } from '../common/Alert'
+import { TransactionLink } from '../common/TransactionLink'
 import { useGlobalReverseEntry } from '../hooks/useGlobalReverseEntry'
+import type { UserTokenData } from '../hooks/useUserNamesForNamespace'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { handleError } from '../utils/errors'
+import { nameFromToken } from '../utils/nameUtils'
 import { tracer, withTrace } from '../utils/trace'
 import { handleMigrate } from './handleMigrate'
 
-export interface HandleSetParam {
-  metaplexData?: AccountData<metaplex.MetadataData>
-  tokenManager?: AccountData<TokenManagerData>
-  certificate?: AccountData<CertificateData> | null
-}
-
 export const useHandleSetNamespaceDefault = (
   connection: Connection,
-  wallet: Wallet,
-  namespaceName: string,
-  cluster = 'mainnet'
+  wallet: Wallet
 ) => {
+  const { cluster, setMessage } = useWalletIdentity()
   const queryClient = useQueryClient()
   const globalReverseEntry = useGlobalReverseEntry(
     connection,
-    namespaceName,
     wallet?.publicKey
   )
 
   return useMutation(
     async ({
       tokenData,
-      forceMigrate,
     }: {
-      tokenData?: HandleSetParam
-      forceMigrate?: boolean
-    }): Promise<string> => {
-      if (!tokenData) return ''
+      tokenData?: Pick<
+        UserTokenData,
+        'certificate' | 'tokenManager' | 'metaplexData' | 'identity'
+      >
+    }): Promise<{ txid: string; namespaceName: string } | undefined> => {
+      if (!tokenData) return undefined
       let newMintId: PublicKey | undefined
       let transactions: Transaction[] = []
-      const entryMint = new PublicKey(tokenData.metaplexData?.parsed.mint!)
-      const [, entryName] = nameFromMint(
-        tokenData.metaplexData?.parsed.data.name || '',
-        tokenData.metaplexData?.parsed.data.uri || ''
-      )
+      const entryMint = tryPublicKey(tokenData.metaplexData?.parsed.mint)
+      if (!entryMint) return undefined
+      const [entryName, namespaceName] = nameFromToken(tokenData)
       const trace = tracer({ name: 'useGlobalReverseEntry' })
-      if (tokenData.certificate || forceMigrate) {
+      if (tokenData.certificate) {
         console.log('Type certificate, migrating ...')
         const response = await withTrace(
-          () => handleMigrate(wallet, entryName, cluster),
+          () => handleMigrate(wallet, entryName, namespaceName, cluster),
           trace,
           { op: 'handleMigrate' }
         )
@@ -105,11 +93,11 @@ export const useHandleSetNamespaceDefault = (
       ).blockhash
       transactions.push(transaction)
 
-      let txId = ''
+      const txid = ''
       await wallet.signAllTransactions(transactions)
       for (let i = 0; i < transactions.length; i++) {
         const tx = transactions[i]!
-        let txId = ''
+        let txid = ''
         try {
           const id = await withTrace(
             () =>
@@ -120,7 +108,7 @@ export const useHandleSetNamespaceDefault = (
             { op: `sendTransaction ${i}/${transactions.length}` }
           )
           if (i === transactions.length - 1) {
-            txId = id
+            txid = id
           }
         } catch (e) {
           const errorMessage = handleError(e, `${e}`)
@@ -128,10 +116,42 @@ export const useHandleSetNamespaceDefault = (
         }
       }
       trace?.finish()
-      return txId
+      return { txid, namespaceName }
     },
     {
-      onSuccess: () => queryClient.invalidateQueries(),
+      onSuccess: (result) => {
+        result &&
+          setMessage(
+            <Alert
+              type="success"
+              message={
+                <div className="flex w-full flex-col text-center">
+                  <div>
+                    Succesfully set handle as default {result.namespaceName}{' '}
+                    identity.
+                  </div>
+                  <div>
+                    Changes will be reflected{' '}
+                    <TransactionLink txid={result.txid} />
+                  </div>
+                </div>
+              }
+            />
+          )
+        queryClient.invalidateQueries()
+      },
+      onError: () => {
+        setMessage(
+          <Alert
+            type="error"
+            message={
+              <div className="flex w-full flex-col text-center">
+                Failed to set namespace default
+              </div>
+            }
+          />
+        )
+      },
     }
   )
 }

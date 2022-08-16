@@ -1,19 +1,22 @@
 import { shortenAddress } from '@cardinal/namespaces'
 import { PublicKey } from '@solana/web3.js'
 
-import { apiBase, TWITTER_NAMESPACE_NAME } from './constants'
+import { getIdentity } from '../common/Identities'
 
-export const formatTwitterLink = (handle: string | undefined) => {
-  if (!handle) return <></>
+export const formatIdentityLink = (
+  handle: string | undefined,
+  namespace: string | undefined
+) => {
+  if (!handle || !namespace) return <></>
   return (
-    <a
-      href={`https://twitter.com/${handle}`}
+    <div
+      className="inline-block cursor-pointer"
+      onClick={() => window.open(getIdentity(namespace)?.nameLink(handle))}
       style={{ color: '#177ddc' }}
-      target="_blank"
-      rel="noreferrer"
     >
+      {getIdentity(namespace)?.namePrefix}
       {handle}
-    </a>
+    </div>
   )
 }
 
@@ -47,62 +50,4 @@ export const formatShortAddress = (address: PublicKey | undefined) => {
       {shortenAddress(address.toString())}
     </a>
   )
-}
-
-export async function tryGetImageUrl(
-  namespace: string,
-  name: string,
-  dev?: boolean
-): Promise<string | undefined> {
-  try {
-    if (namespace === TWITTER_NAMESPACE_NAME) {
-      const response = await fetch(
-        `${apiBase(
-          dev
-        )}/namespaces/twitter/proxy?url=https://api.twitter.com/2/users/by&usernames=${name}&user.fields=profile_image_url`
-      )
-      const json = (await response.json()) as {
-        data: { profile_image_url: string }[]
-      }
-      return json?.data[0]?.profile_image_url.replace('_normal', '') as string
-    }
-  } catch (e) {
-    console.log(e)
-    return undefined
-  }
-}
-
-export async function tryGetProfile(
-  handle: string,
-  dev?: boolean
-): Promise<
-  | { profile_image_url: string; username: string; id: string; name: string }
-  | undefined
-> {
-  try {
-    const response = await fetch(
-      `${apiBase(
-        dev
-      )}/namespaces/twitter/proxy?url=https://api.twitter.com/2/users/by&usernames=${handle}&user.fields=profile_image_url`
-    )
-    const json = (await response.json()) as {
-      data: {
-        profile_image_url: string
-        username: string
-        id: string
-        name: string
-      }[]
-    }
-    return {
-      profile_image_url: json?.data[0]?.profile_image_url.replace(
-        '_normal',
-        ''
-      ) as string,
-      username: json?.data[0]?.username as string,
-      id: json?.data[0]?.id as string,
-      name: json?.data[0]?.name as string,
-    }
-  } catch (e) {
-    return undefined
-  }
 }

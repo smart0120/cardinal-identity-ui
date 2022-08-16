@@ -7,7 +7,6 @@ export const AddressImage = ({
   connection,
   address,
   style,
-  dev = false,
   height = '150px',
   width = '150px',
   dark = false,
@@ -16,7 +15,6 @@ export const AddressImage = ({
 }: {
   connection: Connection
   address: PublicKey | undefined
-  dev?: boolean
   height?: string
   width?: string
   dark?: boolean
@@ -24,7 +22,7 @@ export const AddressImage = ({
   loader?: React.ReactElement
   style?: React.CSSProperties
 }) => {
-  const addressImage = useAddressImage(connection, address, dev)
+  const addressImage = useAddressImage(connection, address)
   return !addressImage.isFetched ? (
     loader ?? (
       <div
@@ -41,7 +39,7 @@ export const AddressImage = ({
         borderRadius: '50%',
       }}
       alt={`profile-${address?.toString()}`}
-      src={addressImage.data}
+      src={addressImage.data[0]}
     />
   ) : (
     placeholder ?? (

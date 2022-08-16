@@ -6,12 +6,16 @@ import { apiBase } from '../utils/constants'
 export const handleMigrate = async (
   wallet: Wallet,
   handle: string,
+  namespaceName: string,
   cluster = 'mainnet'
 ): Promise<{ mintId: PublicKey; transactions: Transaction[] } | undefined> => {
+  if (namespaceName !== 'twitter') {
+    throw new Error('Cannot migrate handle that is not twitter')
+  }
   const response = await fetch(
     `${apiBase(
       cluster === 'devnet'
-    )}/namespaces/twitter/migrate?publicKey=${wallet?.publicKey.toString()}&handle=${handle}&namespace=twitter${
+    )}/twitter/migrate?publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
       cluster === 'devnet' ? `&cluster=${cluster}` : ''
     }`,
     {

@@ -5,40 +5,75 @@ import { findNamespaceId } from '@cardinal/namespaces'
 import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
 import * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import * as spl from '@solana/spl-token'
-import type {
-  AccountInfo,
-  Connection,
-  ParsedAccountData,
-} from '@solana/web3.js'
+import type { Connection } from '@solana/web3.js'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from 'react-query'
 
+import type { Identity } from '../common/Identities'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { accountDataById } from '../utils/accounts'
-import { TWITTER_NAMESPACE_NAME } from '../utils/constants'
 import { tryPublicKey } from '../utils/format'
 import { tracer, withTrace } from '../utils/trace'
 
 export type UserTokenData = {
-  tokenAccount?: {
-    pubkey: PublicKey
-    account: AccountInfo<ParsedAccountData>
-  }
+  tokenAccount?: AccountData<ParsedTokenAccountData>
   metaplexData?: AccountData<metaplex.MetadataData>
   tokenManager?: AccountData<TokenManagerData>
   certificate?: AccountData<CertificateData> | null
+  identity: Identity
+}
+
+export const identityFromMetaplexData = (
+  metaplexData: AccountData<metaplex.MetadataData> | undefined,
+  identities: (Identity & { namespaceId: string })[]
+): (Identity & { namespaceId: string }) | undefined => {
+  return identities.find(
+    ({ namespaceId, name }) =>
+      metaplexData?.parsed?.data?.creators?.some(
+        (creator) =>
+          namespaceId === creator.address.toString() && creator.verified
+      ) ||
+      (metaplexData?.parsed?.data?.symbol === 'NAME' &&
+        metaplexData?.parsed?.data?.name.includes(name))
+  )
+}
+
+export type ParsedTokenAccountData = {
+  isNative: boolean
+  delegate: string
+  mint: string
+  owner: string
+  state: 'initialized' | 'frozen'
+  tokenAmount: {
+    amount: string
+    decimals: number
+    uiAmount: number
+    uiAmountString: string
+  }
 }
 
 export const useUserNamesForNamespace = (
   connection: Connection,
-  walletId: PublicKey | undefined,
-  namespaceName: string
+  walletId: PublicKey | undefined
 ) => {
+  const { identities } = useWalletIdentity()
   return useQuery<UserTokenData[]>(
-    ['useUserNamesForNamespace', walletId?.toString()],
+    [
+      'useUserNamesForNamespace',
+      walletId?.toString(),
+      identities.map((i) => i.name),
+    ],
     async () => {
       if (!walletId) return []
       const trace = tracer({ name: 'useUserNamesForNamespace' })
-      const [namespaceId] = await findNamespaceId(namespaceName)
+
+      const identityWithIds: (Identity & { namespaceId: string })[] =
+        await Promise.all(
+          identities.map(async (i) => ({
+            ...i,
+            namespaceId: (await findNamespaceId(i.name))[0].toString(),
+          }))
+        )
 
       const allTokenAccounts = await withTrace(
         () =>
@@ -54,6 +89,11 @@ export const useUserNamesForNamespace = (
             tokenAccount.account.data.parsed.info.tokenAmount.uiAmount > 0
         )
         .sort((a, b) => a.pubkey.toBase58().localeCompare(b.pubkey.toBase58()))
+        .map((tokenAccount) => ({
+          pubkey: tokenAccount.pubkey,
+          parsed: tokenAccount.account.data.parsed
+            .info as ParsedTokenAccountData,
+        }))
 
       // lookup metaplex data
       const metaplexIds = await withTrace(
@@ -63,7 +103,7 @@ export const useUserNamesForNamespace = (
               async (tokenAccount) =>
                 (
                   await metaplex.MetadataProgram.findMetadataAccount(
-                    new PublicKey(tokenAccount.account.data.parsed.info.mint)
+                    new PublicKey(tokenAccount.parsed.mint)
                   )
                 )[0]
             )
@@ -99,25 +139,16 @@ export const useUserNamesForNamespace = (
       )
 
       // filter by creators
-      tokenAccounts = tokenAccounts.filter(
-        (tokenAccount) =>
-          metaplexData[
-            tokenAccount.pubkey.toString()
-          ]?.parsed?.data?.creators?.some(
-            (creator) =>
-              creator.address.toString() === namespaceId.toString() &&
-              creator.verified
-          ) ||
-          (metaplexData[tokenAccount.pubkey.toString()]?.parsed?.data
-            ?.symbol === 'NAME' &&
-            metaplexData[
-              tokenAccount.pubkey.toString()
-            ]?.parsed?.data?.name.includes(TWITTER_NAMESPACE_NAME))
+      tokenAccounts = tokenAccounts.filter((tokenAccount) =>
+        identityFromMetaplexData(
+          metaplexData[tokenAccount.pubkey.toString()],
+          identityWithIds
+        )
       )
 
       // lookup delegates
       const delegateIds = tokenAccounts.map((tokenAccount) =>
-        tryPublicKey(tokenAccount.account.data.parsed.info.delegate)
+        tryPublicKey(tokenAccount.parsed.delegate)
       )
       const accountsById = await withTrace(
         () => accountDataById(connection, delegateIds),
@@ -125,9 +156,8 @@ export const useUserNamesForNamespace = (
         { op: 'getDelegates' }
       )
 
-      return tokenAccounts.map((tokenAccount, i) => {
-        const delegateData =
-          accountsById[tokenAccount.account.data.parsed.info.delegate]
+      return tokenAccounts.map((tokenAccount) => {
+        const delegateData = accountsById[tokenAccount.parsed.delegate]
 
         let tokenManagerData: AccountData<TokenManagerData> | undefined
         let certificateData: AccountData<CertificateData> | undefined
@@ -141,6 +171,10 @@ export const useUserNamesForNamespace = (
           metaplexData: metaplexData[tokenAccount.pubkey.toString()],
           tokenManager: tokenManagerData,
           certificate: certificateData,
+          identity: identityFromMetaplexData(
+            metaplexData[tokenAccount.pubkey.toString()],
+            identityWithIds
+          )!,
         }
       })
     },

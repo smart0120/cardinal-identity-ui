@@ -1,20 +1,18 @@
-import styled from '@emotion/styled'
+import { css } from '@emotion/react'
 import type { Wallet } from '@saberhq/solana-contrib'
 import { useWallet } from '@solana/wallet-adapter-react'
 import type { PublicKey } from '@solana/web3.js'
 import { Connection } from '@solana/web3.js'
 import { notify } from 'common/Notification'
 import {
-  ConnectTwitterButton,
-  formatShortAddress,
-  formatTwitterLink,
+  ConnectButton,
+  DisplayAddress,
   useAddressImage,
   useAddressName,
   useWalletIdentity,
 } from 'lib/src'
-import { TWITTER_NAMESPACE_NAME } from 'lib/src/utils/constants'
-import { add } from 'lodash'
-import { useRouter } from 'next/router'
+import { ButtonLight } from 'lib/src/common/Button'
+import { IDENTITIES, isKnownIdentity } from 'lib/src/common/Identities'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
 import { FaShare, FaUserAlt } from 'react-icons/fa'
 
@@ -25,56 +23,47 @@ interface Props {
   address: PublicKey
 }
 
-const ShareIcon = styled.div`
-  cursor: pointer;
-  transition: 0.1s all;
-  &: hover {
-    transform: scale(1.05);
-  }
-`
-
 export const Profile: React.FC<Props> = ({ address }: Props) => {
-  const { query } = useRouter()
-  const { show } = useWalletIdentity()
+  const { identities, show } = useWalletIdentity()
+  const identity = identities.length === 1 ? identities[0] : undefined
   const wallet = useWallet()
   const { connection, environment } = useEnvironmentCtx()
-  const dev = query['cluster'] === 'devnet'
   const addressStr = address.toString()
-  const addressName = useAddressName(connection, address)
+  const addressName = useAddressName(
+    connection,
+    address,
+    identity?.name ? [identity.name] : undefined
+  )
   const addressImage = useAddressImage(
     connection,
     address,
-    dev,
-    TWITTER_NAMESPACE_NAME
+    identity?.name ? [identity.name] : undefined
   )
 
   return (
     <div
+      className="rounded-2xl bg-light-0 p-6"
       style={{
-        padding: '1.5rem',
-        borderRadius: '1rem',
-        // boxShadow: '0 0 80px 50px rgba(255, 255, 255, 0.3)',
         boxShadow: '0 4px 34px rgb(0 0 0 / 30%)',
-        background: '#FFF',
+        background: identity?.colors.secondary,
       }}
     >
-      <div style={{ marginBottom: '30px' }}>
+      <div className="mb-8">
         {addressName.isFetching ? (
           <Alert message={'Loading'} type="warning" />
         ) : addressName.data ? (
-          <Alert message={'Succesfully linked Twitter'} type="success" />
+          <Alert
+            message={`Succesfully linked ${addressName.data[1]}`}
+            type="success"
+          />
         ) : (
-          <Alert message={'Twitter not linked'} type="warning" />
+          <Alert
+            message={`${identity?.displayName ?? 'Identity'} not linked`}
+            type="warning"
+          />
         )}
       </div>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '15px',
-          alignItems: 'center',
-        }}
-      >
+      <div className="flex flex-col items-center gap-4">
         {addressImage.isFetching ? (
           <div
             className="animate-pulse bg-gray-200"
@@ -82,115 +71,92 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           />
         ) : addressImage.data ? (
           <div
+            className="relative flex items-center justify-center rounded-full"
             style={{
-              position: 'relative',
               height: '156px',
               width: '156px',
-              borderRadius: '50%',
-              background: '#fff',
-              backgroundImage: 'linear-gradient(84.06deg, #23a6d5, #1da1f2)',
-              boxShadow: '0 5px 10px 0 rgb(97 83 202 / 30%)',
               padding: '5px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
+              background: `${
+                identity?.colors.primary ??
+                (addressImage.data[1] &&
+                  isKnownIdentity(addressImage.data[1]) &&
+                  IDENTITIES[addressImage.data[1]].colors.primary)
+              }`,
             }}
           >
             <img
+              className="rounded-full"
               style={{
                 height: '150px',
                 width: '150px',
-                borderRadius: '50%',
                 border: '4px solid white',
               }}
               alt={`profile-${addressStr}`}
-              src={addressImage.data}
-            ></img>
-            <ShareIcon
+              src={addressImage.data[0]}
+            />
+            <div
+              css={css`
+                &:hover {
+                  transform: scale(1.05);
+                }
+              `}
+              className="absolute -right-3 -bottom-1 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-border text-xs"
               onClick={() => {
                 navigator.clipboard.writeText(window.location.href)
                 notify({
                   message: 'Share link copied',
-                  placement: 'bottom-right',
                 })
               }}
               style={{
-                position: 'absolute',
-                fontSize: '12px',
-                right: '-10px',
-                bottom: '-5px',
                 color: 'rgb(101,119,134,1)',
-                width: '24px',
-                height: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: '50%',
                 background: 'rgba(100,116,139,0.1)',
               }}
             >
               <FaShare />
-            </ShareIcon>
+            </div>
           </div>
         ) : (
           <div
+            className="flex items-center justify-center rounded-full p-[10px] text-light-0"
             style={{
               height: '156px',
               width: '156px',
-              borderRadius: '50%',
               background: '#DDD',
               boxShadow: '0 5px 10px 0 rgb(97 83 202 / 30%)',
-              padding: '10px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
             }}
           >
-            <FaUserAlt style={{ fontSize: '100px', color: '#FFF' }} />
+            <FaUserAlt style={{ fontSize: '100px' }} />
           </div>
         )}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            textAlign: 'center',
-          }}
-        >
-          <span style={{ fontSize: '16px' }}>
-            {addressName.isFetching ? (
-              <div
-                style={{ height: '24px', width: '120px' }}
-                className="animate-pulse rounded-md bg-gray-200"
-              />
-            ) : (
-              <div style={{ display: 'flex', gap: '5px' }}>
-                {formatTwitterLink(addressName.data) ||
-                  formatShortAddress(address)}
-              </div>
-            )}
-          </span>
+        <div className="flex flex-col justify-center text-center">
+          {addressName.isFetching ? (
+            <div className="h-6  w-28 animate-pulse rounded-md bg-gray-200" />
+          ) : (
+            <DisplayAddress connection={connection} address={address} />
+          )}
           <AddressLink address={address} />
         </div>
-        <div className="mt-5">
-          <ConnectTwitterButton
-            disabled={address?.toString() !== wallet?.publicKey?.toString()}
-            dev={dev}
-            wallet={wallet as Wallet}
-            connection={connection}
-            secondaryConnection={
-              environment.secondary
-                ? new Connection(environment.secondary)
-                : connection
-            }
-            onClose={addressName.refetch}
-            cluster={environment.label}
-          />
-        </div>
-        <button
+        {identity && (
+          <div className="mt-5">
+            <ConnectButton
+              disabled={address?.toString() !== wallet?.publicKey?.toString()}
+              dev={environment.label === 'devnet'}
+              wallet={wallet as Wallet}
+              connection={connection}
+              secondaryConnection={
+                environment.secondary
+                  ? new Connection(environment.secondary)
+                  : connection
+              }
+              onClose={addressName.refetch}
+              cluster={environment.label}
+            />
+          </div>
+        )}
+        <ButtonLight
           disabled={address?.toString() !== wallet?.publicKey?.toString()}
-          className="rounded-md px-3 py-1 text-xs text-white"
           onClick={() =>
+            address?.toString() === wallet?.publicKey?.toString() &&
             show({
               wallet: wallet as Wallet,
               connection: connection,
@@ -198,20 +164,13 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
               secondaryConnection: environment.secondary
                 ? new Connection(environment.secondary)
                 : connection,
-              dev,
-              showManage: true,
+              dev: environment.label === 'devnet',
             })
           }
-          style={{
-            borderColor: '#657786',
-            background: '#64748b20',
-            color: '#657786',
-            opacity:
-              address?.toString() !== wallet?.publicKey?.toString() ? 0.5 : 1,
-          }}
+          background={identity?.colors.buttonColor}
         >
           Manage Profiles
-        </button>
+        </ButtonLight>
       </div>
     </div>
   )
@@ -220,33 +179,30 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
 export const PlaceholderProfile: React.FC = () => {
   return (
     <div
+      className="rounded-2xl bg-light-0 p-6"
       style={{
-        padding: '1.5rem',
-        borderRadius: '1rem',
         boxShadow: '0 4px 34px rgb(0 0 0 / 8%)',
-        background: '#FFF',
       }}
     >
-      <div style={{ marginBottom: '40px' }}>
+      <div className="mb-8">
         <Alert message={'Connect wallet to continue'} type="warning" />
       </div>
       <div className="flex flex-col items-center justify-center">
         <div
-          className="animate-pulse bg-gray-200"
+          className="animate-pulse rounded-full bg-gray-200"
           style={{
             height: '156px',
             width: '156px',
-            borderRadius: '50%',
             marginBottom: '15px',
           }}
         />
         <div
-          style={{ height: '24px', width: '120px', marginBottom: '5px' }}
-          className="animate-pulse rounded-md bg-gray-200"
+          style={{ marginBottom: '5px' }}
+          className="h-6 w-32 animate-pulse rounded-md bg-gray-200"
         />
         <div
-          style={{ height: '24px', width: '100px', marginBottom: '50px' }}
-          className="animate-pulse rounded-md bg-gray-200"
+          style={{ marginBottom: '33px' }}
+          className="h-6 w-28 animate-pulse rounded-md bg-gray-200"
         />
       </div>
     </div>

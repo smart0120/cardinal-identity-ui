@@ -3,10 +3,11 @@ import type { AccountData } from '@cardinal/common'
 import type { TokenManagerData } from '@cardinal/token-manager/dist/cjs/programs/tokenManager'
 import type * as metaplex from '@metaplex-foundation/mpl-token-metadata'
 import type { Wallet } from '@saberhq/solana-contrib'
-import type { Cluster, PublicKey } from '@solana/web3.js'
+import type { PublicKey } from '@solana/web3.js'
 import { useMutation } from 'react-query'
 
-import { apiBase } from '../utils/constants'
+import type { Identity } from '../common/Identities'
+import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { tracer, withTrace } from '../utils/trace'
 
 export interface HandleSetParam {
@@ -18,35 +19,42 @@ export interface HandleSetParam {
   certificate?: AccountData<CertificateData> | null
 }
 
+export type VerifyResponse = {
+  error?: string
+  handle?: string
+  accessToken?: string
+}
+
 export const useHandleVerify = (
   wallet: Wallet,
-  cluster: Cluster,
-  dev: boolean
+  identity: Identity,
+  accessToken: string | undefined,
+  setAccessToken: (handle: string | undefined) => void,
+  setHandle: (handle: string | undefined) => void
 ) => {
+  const { dev, cluster } = useWalletIdentity()
   return useMutation(
     [wallet.publicKey.toString()],
-    async ({
-      tweetId,
-      handle,
-    }: {
-      tweetId?: string
-      handle?: string
-    }): Promise<void> => {
-      if (!handle || !tweetId) return
+    async ({ proof }: { proof?: string }): Promise<void> => {
+      if (!proof || proof.length === 0) return
+
+      const verifierUrl = identity.verifierUrl(
+        wallet.publicKey.toString(),
+        proof,
+        accessToken,
+        cluster,
+        dev
+      )
       const response = await withTrace(
-        () =>
-          fetch(
-            `${apiBase(
-              dev
-            )}/namespaces/twitter/verify?tweetId=${tweetId}&publicKey=${wallet?.publicKey.toString()}&handle=${handle}${
-              cluster && `&cluster=${cluster}`
-            }`
-          ),
+        () => fetch(verifierUrl),
         tracer({ name: 'useHandleVerify' })
       )
-      const json = await response.json()
-      if (response.status !== 200) throw new Error(json.message)
-      console.log('Verification response: ', json)
+      const json = (await response.json()) as VerifyResponse
+      if (response.status !== 200) throw new Error(json.error)
+      console.log('Verification response: ', JSON.stringify(json))
+
+      setHandle(json.handle)
+      setAccessToken(json?.accessToken)
       return
     },
     {
