@@ -49,22 +49,11 @@ const Home = () => {
       <Header />
       <div style={{ marginTop: '10vh' }}>
         {address ? (
-          <div
-            style={{
-              width: '320px',
-              margin: '0px auto',
-            }}
-          >
+          <div className="mx-auto w-80">
             <Profile address={address} />
           </div>
         ) : (
-          <div
-            style={{
-              padding: '20px',
-              width: '320px',
-              margin: '0px auto',
-            }}
-          >
+          <div className="mx-auto w-80 p-5">
             <PlaceholderProfile />
           </div>
         )}

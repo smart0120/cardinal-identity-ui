@@ -1,4 +1,4 @@
-import styled from '@emotion/styled'
+import { css } from '@emotion/react'
 import type { Wallet } from '@saberhq/solana-contrib'
 import { useWallet } from '@solana/wallet-adapter-react'
 import type { PublicKey } from '@solana/web3.js'
@@ -22,14 +22,6 @@ import { Alert } from './Alert'
 interface Props {
   address: PublicKey
 }
-
-const ShareIcon = styled.div`
-  cursor: pointer;
-  transition: 0.1s all;
-  &: hover {
-    transform: scale(1.05);
-  }
-`
 
 export const Profile: React.FC<Props> = ({ address }: Props) => {
   const { identities, show } = useWalletIdentity()
@@ -71,14 +63,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           />
         )}
       </div>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '15px',
-          alignItems: 'center',
-        }}
-      >
+      <div className="flex flex-col items-center gap-4">
         {addressImage.isFetching ? (
           <div
             className="animate-pulse bg-gray-200"
@@ -100,16 +85,22 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
             }}
           >
             <img
+              className="rounded-full"
               style={{
                 height: '150px',
                 width: '150px',
-                borderRadius: '50%',
                 border: '4px solid white',
               }}
               alt={`profile-${addressStr}`}
               src={addressImage.data[0]}
             />
-            <ShareIcon
+            <div
+              css={css`
+                &:hover {
+                  transform: scale(1.05);
+                }
+              `}
+              className="absolute -right-3 -bottom-1 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-border text-xs"
               onClick={() => {
                 navigator.clipboard.writeText(window.location.href)
                 notify({
@@ -118,38 +109,24 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
                 })
               }}
               style={{
-                position: 'absolute',
-                fontSize: '12px',
-                right: '-10px',
-                bottom: '-5px',
                 color: 'rgb(101,119,134,1)',
-                width: '24px',
-                height: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: '50%',
                 background: 'rgba(100,116,139,0.1)',
               }}
             >
               <FaShare />
-            </ShareIcon>
+            </div>
           </div>
         ) : (
           <div
+            className="flex items-center justify-center rounded-full p-[10px] text-light-0"
             style={{
               height: '156px',
               width: '156px',
-              borderRadius: '50%',
               background: '#DDD',
               boxShadow: '0 5px 10px 0 rgb(97 83 202 / 30%)',
-              padding: '10px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
             }}
           >
-            <FaUserAlt style={{ fontSize: '100px', color: '#FFF' }} />
+            <FaUserAlt style={{ fontSize: '100px' }} />
           </div>
         )}
         <div className="flex flex-col justify-center text-center">
@@ -218,11 +195,10 @@ export const PlaceholderProfile: React.FC = () => {
       </div>
       <div className="flex flex-col items-center justify-center">
         <div
-          className="animate-pulse bg-gray-200"
+          className="animate-pulse rounded-full bg-gray-200"
           style={{
             height: '156px',
             width: '156px',
-            borderRadius: '50%',
             marginBottom: '15px',
           }}
         />
