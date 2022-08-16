@@ -1,6 +1,6 @@
 # Cardinal Identity UI
 
-This repository houses the UI and associated components for integrating identity tokens into dApps. It also maintains a deployment for our on-chain Twitter linking flow https://twitter.cardinal.so.
+This repository houses the UI and associated components for integrating identity tokens into dApps. It also maintains a deployment for our on-chain Twitter linking flow https://twitter.cardinal.so with more flows coming soon.
 
 Use this repo to link identity tokens to your wallet, or drop the UI components into your app to implement global identity and enhance its UX.
 
