@@ -9,15 +9,13 @@ export const TransactionLink = ({
 }) => {
   const { cluster } = useWalletIdentity()
   return (
-    <a
-      className="cursor-pointer text-blue-500"
-      target={`_blank`}
+    <div
+      className="inline-block cursor-pointer text-blue-500"
       onClick={() =>
         window.open(`https://explorer.solana.com/tx/${txid}?cluster=${cluster}`)
       }
-      href={`https://explorer.solana.com/tx/${txid}?cluster=${cluster}`}
     >
       {text}
-    </a>
+    </div>
   )
 }

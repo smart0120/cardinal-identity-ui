@@ -16,6 +16,7 @@ module.exports = {
         border: 'rgba(221, 218, 218, 0.2)',
         secondary: '#7EFFE8',
         blue: '#49DEFF',
+        'blue-500': 'rgb(59 130 246)',
         accent: '#CE81F4',
         glow: '#7560FF',
         accent: '#FFA500',
