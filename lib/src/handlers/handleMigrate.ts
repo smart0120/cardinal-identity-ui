@@ -29,16 +29,9 @@ export const handleMigrate = async (
   const json = await response.json()
   if (response.status !== 200 || json.error) throw new Error(json.error)
   const { transactions, mintId } = json
-  const [revokeTransaction, migrateTransaction] = transactions as string[]
-  const revokeBuffer = Buffer.from(
-    decodeURIComponent(revokeTransaction!),
-    'base64'
+  const serializedTransactions = transactions as string[]
+  const txs = serializedTransactions.map((tx) =>
+    Transaction.from(Buffer.from(decodeURIComponent(tx), 'base64'))
   )
-  const migrateBuffer = Buffer.from(
-    decodeURIComponent(migrateTransaction!),
-    'base64'
-  )
-  const revokeTx = Transaction.from(revokeBuffer)
-  const migrateTx = Transaction.from(migrateBuffer)
-  return { mintId: new PublicKey(mintId), transactions: [revokeTx, migrateTx] }
+  return { mintId: new PublicKey(mintId), transactions: txs }
 }

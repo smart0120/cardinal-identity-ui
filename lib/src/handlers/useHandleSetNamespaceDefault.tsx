@@ -4,7 +4,7 @@ import {
   withSetNamespaceReverseEntry,
 } from '@cardinal/namespaces'
 import type { Wallet } from '@saberhq/solana-contrib'
-import type { Connection, PublicKey } from '@solana/web3.js'
+import type { Connection } from '@solana/web3.js'
 import { sendAndConfirmRawTransaction, Transaction } from '@solana/web3.js'
 import { useMutation, useQueryClient } from 'react-query'
 
@@ -16,6 +16,7 @@ import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { handleError } from '../utils/errors'
 import { nameFromToken } from '../utils/nameUtils'
 import { tracer, withTrace } from '../utils/trace'
+import { executeTransaction } from '../utils/transactions'
 import { handleMigrate } from './handleMigrate'
 
 export const useHandleSetNamespaceDefault = (
@@ -39,12 +40,14 @@ export const useHandleSetNamespaceDefault = (
       >
     }): Promise<{ txid: string; namespaceName: string } | undefined> => {
       if (!tokenData) return undefined
-      let newMintId: PublicKey | undefined
       let transactions: Transaction[] = []
       const entryMint = tryPublicKey(tokenData.metaplexData?.parsed.mint)
       if (!entryMint) return undefined
       const [entryName, namespaceName] = nameFromToken(tokenData)
       const trace = tracer({ name: 'useGlobalReverseEntry' })
+      let txid = ''
+
+      /////////// migrate ///////////
       if (tokenData.certificate) {
         console.log('Type certificate, migrating ...')
         const response = await withTrace(
@@ -52,69 +55,76 @@ export const useHandleSetNamespaceDefault = (
           trace,
           { op: 'handleMigrate' }
         )
-        newMintId = response?.mintId
+        console.log(response)
         transactions = response?.transactions || []
-        console.log('Added migration instruction')
-      }
-
-      const transaction = new Transaction()
-      await withTrace(
-        () =>
-          withSetNamespaceReverseEntry(
-            transaction,
-            connection,
-            wallet,
-            namespaceName,
-            entryName,
-            newMintId || entryMint
-          ),
-        trace,
-        { op: 'withSetNamespaceReverseEntry' }
-      )
-
-      if (
-        globalReverseEntry.data &&
-        globalReverseEntry.data.parsed.namespaceName === namespaceName
-      ) {
+        await wallet.signAllTransactions(transactions)
+        for (let i = 0; i < transactions.length; i++) {
+          try {
+            txid = await withTrace(
+              () =>
+                sendAndConfirmRawTransaction(
+                  connection,
+                  transactions[i]!.serialize(),
+                  {
+                    skipPreflight: true,
+                  }
+                ),
+              trace,
+              { op: `sendTransaction ${i}/${transactions.length}` }
+            )
+          } catch (e) {
+            const errorMessage = handleError(e, `${e}`)
+            throw new Error(errorMessage)
+          }
+        }
+      } else {
+        /////////// set namespace default ///////////
+        const transaction = new Transaction()
         await withTrace(
           () =>
-            withSetGlobalReverseEntry(transaction, connection, wallet, {
-              namespaceName: namespaceName,
-              entryName: entryName,
-              mintId: newMintId || entryMint,
-            }),
+            withSetNamespaceReverseEntry(
+              transaction,
+              connection,
+              wallet,
+              namespaceName,
+              entryName,
+              entryMint
+            ),
           trace,
-          { op: 'withSetGlobalReverseEntry' }
+          { op: 'withSetNamespaceReverseEntry' }
         )
-      }
-      transaction.feePayer = wallet.publicKey
-      transaction.recentBlockhash = (
-        await connection.getRecentBlockhash('max')
-      ).blockhash
-      transactions.push(transaction)
-
-      const txid = ''
-      await wallet.signAllTransactions(transactions)
-      for (let i = 0; i < transactions.length; i++) {
-        const tx = transactions[i]!
-        let txid = ''
-        try {
-          const id = await withTrace(
+        if (
+          globalReverseEntry.data &&
+          globalReverseEntry.data.parsed.namespaceName === namespaceName
+        ) {
+          await withTrace(
             () =>
-              sendAndConfirmRawTransaction(connection, tx.serialize(), {
-                skipPreflight: true,
+              withSetGlobalReverseEntry(transaction, connection, wallet, {
+                namespaceName: namespaceName,
+                entryName: entryName,
+                mintId: entryMint,
               }),
             trace,
-            { op: `sendTransaction ${i}/${transactions.length}` }
+            { op: 'withSetGlobalReverseEntry' }
           )
-          if (i === transactions.length - 1) {
-            txid = id
-          }
-        } catch (e) {
-          const errorMessage = handleError(e, `${e}`)
-          throw new Error(errorMessage)
         }
+        transaction.feePayer = wallet.publicKey
+        transaction.recentBlockhash = (
+          await connection.getRecentBlockhash('max')
+        ).blockhash
+        txid = await withTrace(
+          () =>
+            executeTransaction(connection, wallet, transaction, {
+              confirmOptions: {
+                commitment: 'confirmed',
+              },
+              notificationConfig: { message: 'Set to default successfully' },
+            }),
+          trace,
+          { op: 'sendTransaction' }
+        )
       }
+      console.log('Successfully set default')
       trace?.finish()
       return { txid, namespaceName }
     },
