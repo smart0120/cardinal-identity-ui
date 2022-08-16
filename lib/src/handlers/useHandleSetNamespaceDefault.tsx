@@ -37,7 +37,7 @@ export const useHandleSetNamespaceDefault = (
         UserTokenData,
         'certificate' | 'tokenManager' | 'metaplexData' | 'identity'
       >
-    }): Promise<[string, string] | undefined> => {
+    }): Promise<{ txid: string; namespaceName: string } | undefined> => {
       if (!tokenData) return undefined
       let newMintId: PublicKey | undefined
       let transactions: Transaction[] = []
@@ -116,7 +116,7 @@ export const useHandleSetNamespaceDefault = (
         }
       }
       trace?.finish()
-      return [txid, namespaceName]
+      return { txid, namespaceName }
     },
     {
       onSuccess: (result) => {
@@ -127,11 +127,12 @@ export const useHandleSetNamespaceDefault = (
               message={
                 <div className="flex w-full flex-col text-center">
                   <div>
-                    Succesfully set handle as default {result[1]} identity.
+                    Succesfully set handle as default {result.namespaceName}{' '}
+                    identity.
                   </div>
                   <div>
                     Changes will be reflected{' '}
-                    <TransactionLink txid={result[0]} />
+                    <TransactionLink txid={result.txid} />
                   </div>
                 </div>
               }

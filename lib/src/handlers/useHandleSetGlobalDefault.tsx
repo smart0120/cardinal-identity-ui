@@ -5,6 +5,7 @@ import { Transaction } from '@solana/web3.js'
 import { useMutation, useQueryClient } from 'react-query'
 
 import { Alert } from '../common/Alert'
+import { TransactionLink } from '../common/TransactionLink'
 import { useWalletIdentity } from '../providers/WalletIdentityProvider'
 import { handleError } from '../utils/errors'
 import { tracer, withTrace } from '../utils/trace'
@@ -27,7 +28,7 @@ export const useHandleSetGlobalDefault = (
       entryName,
       namespaceName,
       mint,
-    }: HandleSetParam): Promise<string> => {
+    }: HandleSetParam): Promise<{ txid: string; namespaceName: string }> => {
       const transaction = new Transaction()
       const trace = tracer({ name: 'useHandleSetGlobalDefault' })
       await withTrace(
@@ -56,10 +57,28 @@ export const useHandleSetGlobalDefault = (
         { op: 'sendTransaction' }
       )
       trace?.finish()
-      return txid
+      return { txid, namespaceName }
     },
     {
-      onSuccess: () => queryClient.invalidateQueries(),
+      onSuccess: ({ txid, namespaceName }) => {
+        setMessage(
+          <Alert
+            type="success"
+            message={
+              <div className="flex w-full flex-col text-center">
+                <div>
+                  Succesfully set handle as default {namespaceName} identity.
+                </div>
+                <div>
+                  Changes will be reflected <TransactionLink txid={txid} />
+                </div>
+              </div>
+            }
+          />
+        )
+        queryClient.invalidateQueries()
+      },
+
       onError: async (e) => {
         setMessage(
           <Alert
