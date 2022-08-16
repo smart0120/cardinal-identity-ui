@@ -21,9 +21,9 @@
   "dependencies": {
     "@cardinal/certificates": "^2.0.1",
     "@cardinal/common": "^2.0.9",
-    "@cardinal/namespaces": "^4.1.46",
-    "@cardinal/token-manager": "^1.5.11",
     "@cardinal/eslint-config-react": "^1.0.10",
+    "@cardinal/namespaces": "^4.1.50",
+    "@cardinal/token-manager": "^1.5.11",
     "@emotion/core": "^11.0.0",
     "@emotion/css": "^11.7.1",
     "@emotion/react": "^11.9.0",
@@ -70,6 +70,7 @@
   "devDependencies": {
     "@babel/core": "^7.17.9",
     "@emotion/babel-plugin": "^11.7.2",
+    "@emotion/babel-preset-css-prop": "^11.10.0",
     "@storybook/addon-actions": "^6.4.22",
     "@storybook/addon-controls": "^6.4.22",
     "@storybook/addon-docs": "^6.4.22",

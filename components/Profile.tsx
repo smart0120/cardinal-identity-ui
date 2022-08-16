@@ -129,15 +129,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           </div>
         )}
         <div className="flex flex-col justify-center text-center">
-          {!addressName.isFetched ? (
-            <div className="h-6  w-28 animate-pulse rounded-md bg-gray-200" />
-          ) : (
-            <DisplayAddress
-              size={16}
-              connection={connection}
-              address={address}
-            />
-          )}
+          <DisplayAddress size={16} connection={connection} address={address} />
           <AddressLink address={address} />
         </div>
         {identity && (

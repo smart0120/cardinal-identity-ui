@@ -12,6 +12,7 @@ export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   hideIcon?: boolean
   disableLink?: boolean
   style?: React.CSSProperties
+  lineHeight?: number
   loader?: React.ReactElement
 }
 
@@ -23,6 +24,7 @@ export const DisplayAddress: React.FC<Props> = ({
   style,
   loader,
   hideIcon,
+  lineHeight = 1.25,
   disableLink,
   ...props
 }: Props) => {
@@ -30,13 +32,13 @@ export const DisplayAddress: React.FC<Props> = ({
   const identity = addressName.data
     ? getIdentity(addressName.data[1])
     : undefined
-  return addressName.isLoading ? (
+  return !addressName.isFetched ? (
     loader ?? (
       <div
         className="animate-pulse rounded-md"
         style={{
           backgroundColor: dark ? '#555' : '#DDD',
-          height: size * 1.5,
+          height: size * lineHeight,
           width: size * 7,
         }}
       />
@@ -47,6 +49,7 @@ export const DisplayAddress: React.FC<Props> = ({
       style={{
         color: dark ? 'white' : 'black',
         fontSize: size,
+        lineHeight: lineHeight,
         ...style,
       }}
       {...props}
