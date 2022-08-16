@@ -43,12 +43,7 @@ const TwitterHome = () => {
     >
       <Header />
       <div style={{ marginTop: '10vh' }}>
-        <div
-          style={{
-            width: '320px',
-            margin: '0px auto',
-          }}
-        >
+        <div className="mx-auto w-80">
           <PlaceholderProfile />
         </div>
       </div>

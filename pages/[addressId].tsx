@@ -53,7 +53,7 @@ const Home = () => {
             <Profile address={address} />
           </div>
         ) : (
-          <div className="mx-auto w-80 p-5">
+          <div className="mx-auto w-80">
             <PlaceholderProfile />
           </div>
         )}

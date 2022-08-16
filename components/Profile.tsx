@@ -184,7 +184,7 @@ export const PlaceholderProfile: React.FC = () => {
         boxShadow: '0 4px 34px rgb(0 0 0 / 8%)',
       }}
     >
-      <div style={{ marginBottom: '40px' }}>
+      <div className="mb-8">
         <Alert message={'Connect wallet to continue'} type="warning" />
       </div>
       <div className="flex flex-col items-center justify-center">
@@ -201,7 +201,7 @@ export const PlaceholderProfile: React.FC = () => {
           className="h-6 w-32 animate-pulse rounded-md bg-gray-200"
         />
         <div
-          style={{ marginBottom: '50px' }}
+          style={{ marginBottom: '33px' }}
           className="h-6 w-28 animate-pulse rounded-md bg-gray-200"
         />
       </div>
