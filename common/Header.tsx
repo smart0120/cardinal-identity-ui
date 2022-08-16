@@ -25,10 +25,10 @@ export const Header = () => {
         <div className="my-auto flex flex-col">
           <LogoTitled className="inline-block h-6" />
         </div>
-        <div className="absolute top-[70px] left-[210px] text-[10px] italic text-white">
+        <div className="absolute top-[60px] left-[200px] text-[10px] italic text-white">
           <span
             className="mr-2 rounded-md px-[7px] py-1"
-            style={{ background: '#FFFFFF30', transform: 'translateY(90%)' }}
+            style={{ background: '#FFFFFF30' }}
           >
             identity
           </span>

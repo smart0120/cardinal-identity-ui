@@ -35,7 +35,7 @@ export const useNamespaceReverseEntries = (
         )
       )
       return reverseEntryDatas.filter(
-        (r): r is AccountData<ReverseEntryData> => r !== null
+        (r): r is AccountData<ReverseEntryData> => !!r?.parsed
       )
     },
     { refetchOnMount: false, refetchOnWindowFocus: false }
