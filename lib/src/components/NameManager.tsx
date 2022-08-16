@@ -106,24 +106,18 @@ export const NameEntryRow = ({
             onClick={async () =>
               handleUnlink.mutate(
                 {
-                  globalReverseNameEntryData:
-                    globalReverseEntry.data &&
-                    globalReverseEntry.data.parsed?.entryName ===
-                      nameFromMint(
-                        userTokenData.metaplexData?.parsed.data.name || '',
-                        userTokenData.metaplexData?.parsed.data.uri || ''
-                      )[1]
-                      ? globalReverseEntry.data
-                      : undefined,
-                  namespaceReverseEntry:
-                    namespaceReverseEntry.data &&
-                    namespaceReverseEntry.data.parsed.entryName ===
-                      nameFromMint(
-                        userTokenData.metaplexData?.parsed.data.name || '',
-                        userTokenData.metaplexData?.parsed.data.uri || ''
-                      )[1]
-                      ? namespaceReverseEntry.data
-                      : undefined,
+                  globalReverseNameEntryData: isReverseEntry(
+                    userTokenData,
+                    globalReverseEntry.data
+                  )
+                    ? globalReverseEntry.data
+                    : undefined,
+                  namespaceReverseEntry: isReverseEntry(
+                    userTokenData,
+                    namespaceReverseEntry.data
+                  )
+                    ? namespaceReverseEntry.data
+                    : undefined,
                 },
                 {
                   onSuccess: () => userNamesForNamespace.remove(),
