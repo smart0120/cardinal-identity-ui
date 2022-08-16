@@ -10,7 +10,7 @@ const Verification = () => {
   const router = useRouter()
   const { identities } = useWalletIdentity()
   const identity = identities.length === 1 ? identities[0] : undefined
-  const [tokenCode, setTokenCode] = useState('')
+  const [_tokenCode, setTokenCode] = useState('')
   const [error, setError] = useState<string | undefined>(undefined)
   const [linkCopied, setLinkCopied] = useState(false)
 
@@ -59,8 +59,8 @@ const Verification = () => {
                   className="text-md mt-5 flex flex-row justify-center rounded-lg p-5 text-center font-medium"
                   style={{ background: identity?.colors.buttonColor }}
                 >
-                  Now copy this page's URL and paste it in the previous page to
-                  claim your handle as a non-transferable NFT
+                  Now copy this page&apos;s URL and paste it in the previous
+                  page to claim your handle as a non-transferable NFT
                 </div>
                 <Tooltip placement="top" title="Copy to clipboard">
                   <div className="mt-5 flex flex-row justify-center">
