@@ -1213,22 +1213,6 @@
     tiny-invariant "^1.2.0"
     tslib "^2.3.1"
 
-"@cardinal/common@^2.0.9":
-  version "2.0.9"
-  resolved "https://registry.yarnpkg.com/@cardinal/common/-/common-2.0.9.tgz#1631aab70921182c96bc6da4a3143969a882419c"
-  integrity sha512-4wQ+zsHM5jnCVGW/fevbDm9E97iA50pyFpT31L/5Fs1vVApJHCPEL0XJOUF+EXWryB50qqVbq760nEZ7tOhFxQ==
-  dependencies:
-    "@metaplex-foundation/mpl-token-metadata" "^1.2.5"
-    "@project-serum/anchor" "^0.24.2"
-    "@saberhq/anchor-contrib" "^1.12.48"
-    "@saberhq/solana-contrib" "^1.12.48"
-    "@saberhq/token-utils" "^1.12.48"
-    "@solana/buffer-layout" "^4.0.0"
-    "@solana/spl-token" "^0.1.8"
-    "@ubeswap/token-math" "^4.4.4"
-    tiny-invariant "^1.2.0"
-    tslib "^2.3.1"
-
 "@cardinal/eslint-config-react@^1.0.10":
   version "1.0.10"
   resolved "https://registry.yarnpkg.com/@cardinal/eslint-config-react/-/eslint-config-react-1.0.10.tgz#60c955886995d42dd11577d735a4fb0e9d1e1526"
@@ -2214,17 +2198,6 @@
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.1.4.tgz#0c8b74c50f29ee44f423f7416829c0bf8bb5eb27"
   integrity sha512-LwzQKA4vzIct1zNZzBmRKI9QuNpLgTQMEjsQLf3BXuGYb3QPTP4Yjf6mkdX+X1mYttZ808QpOwAzZjv28kq7DA==
 
-"@saberhq/anchor-contrib@^1.12.48":
-  version "1.14.0"
-  resolved "https://registry.yarnpkg.com/@saberhq/anchor-contrib/-/anchor-contrib-1.14.0.tgz#87a1fc8628bdc321c2c518a684a717ca35a59ba5"
-  integrity sha512-gxfnA6I2iWkqItaEhM7ocFkSCWXn0qUFui2/uoaHRW6kOZgYpqqIrhsMaPmJ/azW+bCQ5bv0n2odaaEg5QtFjQ==
-  dependencies:
-    "@saberhq/solana-contrib" "^1.14.0"
-    eventemitter3 "^4.0.7"
-    lodash.camelcase "^4.3.0"
-    lodash.mapvalues "^4.6.0"
-    tslib "^2.4.0"
-
 "@saberhq/anchor-contrib@^1.14.1":
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/@saberhq/anchor-contrib/-/anchor-contrib-1.14.1.tgz#a2a82858ca10417428a8a7221ebcda1b870a2b7f"
@@ -2265,7 +2238,7 @@
   dependencies:
     tslib "^2.4.0"
 
-"@saberhq/solana-contrib@^1.12.23", "@saberhq/solana-contrib@^1.12.48", "@saberhq/solana-contrib@^1.14.0":
+"@saberhq/solana-contrib@^1.12.23", "@saberhq/solana-contrib@^1.14.0":
   version "1.14.0"
   resolved "https://registry.yarnpkg.com/@saberhq/solana-contrib/-/solana-contrib-1.14.0.tgz#865f297d7fbffc5a54f4ef8f3d6b689f9be21d8e"
   integrity sha512-sjHSf/HCgfNACSdn94SLdKP8gv/tkysChMTITMDafNbZpH+xiOTW6BYT8bjQNRj6HbIsvQ+9fg5kllYz4/OPBA==
@@ -2293,7 +2266,7 @@
     tiny-invariant "^1.2.0"
     tslib "^2.4.0"
 
-"@saberhq/token-utils@^1.12.36", "@saberhq/token-utils@^1.12.48":
+"@saberhq/token-utils@^1.12.36":
   version "1.14.0"
   resolved "https://registry.yarnpkg.com/@saberhq/token-utils/-/token-utils-1.14.0.tgz#c97b13462e6e7b349599794fea866d1edf949c5d"
   integrity sha512-tTX2VDsrDp1kn24YVtCgdyo6n5jtCcLbRbA+dDHh5tGqw/PLaY4jnxw1MWoohs7TmFTz2MrpXoUUSDLo123BKw==

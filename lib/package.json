@@ -1,6 +1,6 @@
 {
   "name": "@cardinal/namespaces-components",
-  "version": "4.1.16",
+  "version": "4.1.17",
   "description": "Solana namespaces react components library",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@cardinal/certificates": "^2.0.1",
-    "@cardinal/common": "^2.0.9",
+    "@cardinal/common": "^2.0.10",
     "@cardinal/eslint-config-react": "^1.0.10",
     "@cardinal/namespaces": "^4.1.53",
     "@cardinal/token-manager": "^1.5.12",
