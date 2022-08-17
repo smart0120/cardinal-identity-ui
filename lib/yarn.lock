@@ -1163,7 +1163,23 @@
     ts-mocha "^9.0.2"
     typescript "^4.5.5"
 
-"@cardinal/common@^2.0.1", "@cardinal/common@^2.0.9":
+"@cardinal/common@^2.0.10":
+  version "2.0.10"
+  resolved "https://registry.yarnpkg.com/@cardinal/common/-/common-2.0.10.tgz#a1a9e9d07d80f1077f795eb50b5616be7d42b833"
+  integrity sha512-mgXk3LDEtG2W2I1aW9py2TRZ76K0rs+dz5hfoB+bfCBvQfgx+hd2peIwL3H/Krh9YLz+kmBJRSqKoQfdCCwxgg==
+  dependencies:
+    "@metaplex-foundation/mpl-token-metadata" "^1.2.5"
+    "@project-serum/anchor" "^0.24.2"
+    "@saberhq/anchor-contrib" "^1.14.1"
+    "@saberhq/solana-contrib" "^1.14.1"
+    "@saberhq/token-utils" "^1.14.1"
+    "@solana/buffer-layout" "^4.0.0"
+    "@solana/spl-token" "^0.1.8"
+    "@ubeswap/token-math" "^4.4.4"
+    tiny-invariant "^1.2.0"
+    tslib "^2.3.1"
+
+"@cardinal/common@^2.0.9":
   version "2.0.9"
   resolved "https://registry.yarnpkg.com/@cardinal/common/-/common-2.0.9.tgz#1631aab70921182c96bc6da4a3143969a882419c"
   integrity sha512-4wQ+zsHM5jnCVGW/fevbDm9E97iA50pyFpT31L/5Fs1vVApJHCPEL0XJOUF+EXWryB50qqVbq760nEZ7tOhFxQ==
@@ -1189,15 +1205,16 @@
     eslint-plugin-react "^7.29.3"
     eslint-plugin-react-hooks "^4.3.0"
 
-"@cardinal/namespaces@^4.1.51":
-  version "4.1.51"
-  resolved "https://registry.yarnpkg.com/@cardinal/namespaces/-/namespaces-4.1.51.tgz#40b0062cf867e1481b6ef7108c82f8d2bc18cc05"
-  integrity sha512-CqVReOmAi6P6EoIHJz08IC92yZVCVsQVwCCzfyrFNgCSY/CRL1IS5Bf4NI+zBfffRw5kbeub5EtPjDgG6Xv9cQ==
+"@cardinal/namespaces@^4.1.53":
+  version "4.1.53"
+  resolved "https://registry.yarnpkg.com/@cardinal/namespaces/-/namespaces-4.1.53.tgz#30afa1e1de24b8d16c799cbb38bdaa413a741a24"
+  integrity sha512-6Rylvjsu30hYQDJsBtksrlrhxRKP0K+7gt/hW8xcDJqaQpnyaOG+d2JK2YlFA0BYhb5iuUQlQFuZzB0w9GkraA==
   dependencies:
     "@cardinal/certificates" "^2.0.1"
-    "@cardinal/common" "^2.0.1"
+    "@cardinal/common" "^2.0.10"
     "@cardinal/token-manager" "1.5.12"
     "@metaplex-foundation/mpl-token-metadata" "^1.2.5"
+    "@project-serum/anchor" "^0.24.2"
 
 "@cardinal/token-manager@1.5.12", "@cardinal/token-manager@^1.5.12":
   version "1.5.12"
@@ -2143,7 +2160,7 @@
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.1.4.tgz#0c8b74c50f29ee44f423f7416829c0bf8bb5eb27"
   integrity sha512-LwzQKA4vzIct1zNZzBmRKI9QuNpLgTQMEjsQLf3BXuGYb3QPTP4Yjf6mkdX+X1mYttZ808QpOwAzZjv28kq7DA==
 
-"@saberhq/anchor-contrib@^1.12.48":
+"@saberhq/anchor-contrib@^1.12.48", "@saberhq/anchor-contrib@^1.14.1":
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/@saberhq/anchor-contrib/-/anchor-contrib-1.14.1.tgz#a2a82858ca10417428a8a7221ebcda1b870a2b7f"
   integrity sha512-eaNkif2grTLOEUrgDeaezfVF836wM0He+AGVNn1igCOfRJQWkWexx1WxyAuPU2yjbzBrZnJN+q2c6wY1LbWTQA==
@@ -2190,7 +2207,7 @@
     tiny-invariant "^1.2.0"
     tslib "^2.4.0"
 
-"@saberhq/token-utils@^1.12.48":
+"@saberhq/token-utils@^1.12.48", "@saberhq/token-utils@^1.14.1":
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/@saberhq/token-utils/-/token-utils-1.14.1.tgz#392b3288896c5c4401be4c9614c476adf30120c0"
   integrity sha512-sPlU2y+UMijiPxCC7Hz2YU24nGA+FDbqzaFyht45ZxHV4TZ1u07MBoFHQyzvGGnT/ZDRmYAh+Xu4Y187ZDQmyA==
