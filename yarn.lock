@@ -1185,7 +1185,7 @@
     eip1193-provider "^1.0.1"
     js-sha3 "^0.8.0"
 
-"@cardinal/certificates@=2.0.1", "@cardinal/certificates@^2.0.1":
+"@cardinal/certificates@^2.0.1":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@cardinal/certificates/-/certificates-2.0.1.tgz#6b76366ad11e64abfc3e0a7478560dd9c55d1c2c"
   integrity sha512-q6Ke5cq/vj3oNwj0sh94FldXGSuUcTtu0L+c+yrEMqD8hgZJHemN/kGDeA7aU4PNJJLRtWoU80d7d0CxO9z/jg==
@@ -1223,17 +1223,31 @@
     eslint-plugin-react "^7.29.3"
     eslint-plugin-react-hooks "^4.3.0"
 
-"@cardinal/namespaces@^4.1.50":
-  version "4.1.50"
-  resolved "https://registry.yarnpkg.com/@cardinal/namespaces/-/namespaces-4.1.50.tgz#0bce42b0014116f664efe8350fd8376cba8bf3ea"
-  integrity sha512-rHtY6tvG9NakvY2jRCKk7cmTqM6zsBXxWWk6sdUU7N2mQE74gibSsoJq7ZxU1FmVlWOFJmfr2mXEt+568OyZgA==
+"@cardinal/namespaces@^4.1.51":
+  version "4.1.51"
+  resolved "https://registry.yarnpkg.com/@cardinal/namespaces/-/namespaces-4.1.51.tgz#40b0062cf867e1481b6ef7108c82f8d2bc18cc05"
+  integrity sha512-CqVReOmAi6P6EoIHJz08IC92yZVCVsQVwCCzfyrFNgCSY/CRL1IS5Bf4NI+zBfffRw5kbeub5EtPjDgG6Xv9cQ==
   dependencies:
     "@cardinal/certificates" "^2.0.1"
     "@cardinal/common" "^2.0.1"
-    "@cardinal/token-manager" "1.5.11"
+    "@cardinal/token-manager" "1.5.12"
     "@metaplex-foundation/mpl-token-metadata" "^1.2.5"
 
-"@cardinal/token-manager@1.5.11", "@cardinal/token-manager@^1.5.11":
+"@cardinal/token-manager@1.5.12":
+  version "1.5.12"
+  resolved "https://registry.yarnpkg.com/@cardinal/token-manager/-/token-manager-1.5.12.tgz#48d218a98e17bc0d855622709a4a6debd6d1e867"
+  integrity sha512-KM91oWVlh5/6uiRRGvvhp8h2GwPylTVUlN97rQhLts+gzvww1jb8tYOkEFbenEmiHvaf9anIBeJU5eNM1CD8bQ==
+  dependencies:
+    "@metaplex-foundation/mpl-token-metadata" "^1.2.5"
+    "@solana/buffer-layout" "^4.0.0"
+    "@solana/spl-token" "^0.1.8"
+    borsh "^0.7.0"
+    bs58 "^4.0.1"
+    superstruct "^0.15.4"
+    tiny-invariant "^1.2.0"
+    tslib "^2.3.1"
+
+"@cardinal/token-manager@^1.5.11":
   version "1.5.11"
   resolved "https://registry.yarnpkg.com/@cardinal/token-manager/-/token-manager-1.5.11.tgz#1193b1e6e8e042502fb736697faa61c30ab09fba"
   integrity sha512-7dtTBKukWqx+9TyLF5qcIK+o4QS8gxXwUbbk3M4TfCY55JKfBQsYSRAWKQjEPnvDps6VZrdmzVcNwszUmIDaig==
