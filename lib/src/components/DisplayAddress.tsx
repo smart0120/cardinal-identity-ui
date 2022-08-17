@@ -4,7 +4,7 @@ import { getIdentity } from '../common/Identities'
 import { useAddressName } from '../hooks/useAddressName'
 import { formatIdentityLink, formatShortAddress } from '../utils/format'
 
-export interface Props extends React.HTMLAttributes<HTMLDivElement> {
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
   connection: Connection
   address: PublicKey | undefined
   dark?: boolean

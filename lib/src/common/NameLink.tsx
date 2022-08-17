@@ -1,6 +1,6 @@
 import { getIdentity } from './Identities'
 
-export interface Props extends React.HTMLAttributes<HTMLDivElement> {
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
   handle?: string
   namespace?: string
   children: React.ReactNode

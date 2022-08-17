@@ -1,3 +1,6 @@
+export * from './common/Identities'
+export * from './common/LogoTitled'
+export * from './common/NameLink'
 export * from './components/AccountConnect'
 export * from './components/AccountPopover'
 export * from './components/AddressImage'
