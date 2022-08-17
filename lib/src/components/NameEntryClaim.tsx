@@ -80,7 +80,7 @@ export const NameEntryClaim = ({
 
   return (
     <>
-      <div className="text-dark-6 mb-6 text-center text-2xl">
+      <div className="mb-6 text-center text-2xl text-dark-6">
         {appInfo?.name ? `${appInfo.name} uses` : 'Use'} Cardinal to link your{' '}
         <strong>{identity.displayName}</strong> identity to your{' '}
         <strong>Solana</strong> address.
@@ -158,7 +158,7 @@ export const NameEntryClaim = ({
             <>
               <div>
                 You will receive a non-tradeable NFT to prove you own your
-                Twitter handle.
+                {identity.displayName} handle.
               </div>
               {proof && proof?.length !== 0 && (
                 <div

@@ -1,9 +1,9 @@
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, Connection } from '@solana/web3.js'
 import React from 'react'
-import { FaPowerOff, FaTwitter } from 'react-icons/fa'
+import { FaPowerOff, FaUser } from 'react-icons/fa'
 
-import { ProfileSmall, useAddressName, useWalletIdentity } from '../'
+import { ProfileSmall, useWalletIdentity } from '../'
 
 export const AccountPopover = ({
   connection,
@@ -21,8 +21,6 @@ export const AccountPopover = ({
   style?: React.CSSProperties
 }) => {
   const { show } = useWalletIdentity()
-
-  const addressName = useAddressName(connection, wallet?.publicKey ?? undefined)
   if (!wallet.publicKey) return <></>
   return (
     <div className="w-screen max-w-[300px] ">
@@ -58,19 +56,8 @@ export const AccountPopover = ({
                 })
               }
             >
-              <FaTwitter />
-              <span>
-                {addressName.isLoading ? (
-                  <div
-                    className="h-5 w-24 animate-pulse rounded-md"
-                    style={{ backgroundColor: dark ? '#555' : '#DDD' }}
-                  />
-                ) : addressName.data ? (
-                  'Edit Twitter'
-                ) : (
-                  'Link Twitter'
-                )}
-              </span>
+              <FaUser />
+              <span>Edit Profile</span>
             </MenuItem>
           )}
           <MenuItem onClick={handleDisconnect} dark={dark}>
