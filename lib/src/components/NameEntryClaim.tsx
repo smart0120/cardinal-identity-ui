@@ -157,7 +157,7 @@ export const NameEntryClaim = ({
           description={
             <>
               <div>
-                You will receive a non-tradeable NFT to prove you own your
+                You will receive a non-tradeable NFT to prove you own your{' '}
                 {identity.displayName} handle.
               </div>
               {proof && proof?.length !== 0 && (
