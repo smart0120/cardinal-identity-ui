@@ -48,19 +48,15 @@ const Home = () => {
       style={{ background: identity?.colors.primary }}
     >
       <Head>
-        <title>Cardinal | Identity</title>
         <meta name="twitter:card" content="summary_large_image" />
         <meta property="twitter:domain" content="twitter.cardinal.so" />
-        <meta name="twitter:url" content="https://twitter.cardinal.so/" />
-        <meta name="twitter:creator" content="@cardinal_labs" />
-        <meta name="twitter:site" content="@cardinal_labs" />
         <meta
           name="twitter:title"
-          content="Claim your Twitter handle on Solana!"
+          content={`Claim your ${identity?.displayName} handle on Solana!`}
         />
         <meta
           name="twitter:description"
-          content="Secure your identity on Solana by claiming your Twitter handle as an NFT, powered by Cardinal."
+          content={`Secure your identity on Solana by claiming your ${identity?.displayName} handle as an NFT, powered by Cardinal.`}
         />
         <meta
           name="twitter:image"
