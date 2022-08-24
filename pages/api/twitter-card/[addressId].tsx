@@ -1,17 +1,65 @@
-import { shortPubKey } from '@cardinal/common'
+import { firstParam, shortPubKey, tryPublicKey } from '@cardinal/common'
+import {
+  findNamespaceId,
+  getGlobalReverseNameEntry,
+  getNameEntry,
+  getReverseEntry,
+} from '@cardinal/namespaces'
 import * as canvas from '@napi-rs/canvas'
+import { Connection } from '@solana/web3.js'
 import { getImageUrl, IDENTITIES, isKnownIdentity } from 'lib/src'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { ENVIRONMENTS } from 'providers/EnvironmentProvider'
 
 const twitterCard = async (req: NextApiRequest, res: NextApiResponse) => {
   const WIDTH = 1200
   const HEIGHT = 630
   const imageCanvas = canvas.createCanvas(WIDTH, HEIGHT)
 
-  const addressId = req.query.addressId as string | undefined
-  const handle = (req.query.handle as string | undefined)?.replace('@', '')
-  const identityName = req.query.i as string | undefined
   const dev = (req.query.dev as string) === 'true'
+  let handle = (req.query.handle as string | undefined)?.replace('@', '')
+  let addressId = req.query.addressId as string | undefined
+  const identityName = req.query.i as string | undefined
+
+  let identity =
+    IDENTITIES[isKnownIdentity(identityName) ? identityName : 'twitter']
+
+  if (addressId && !handle) {
+    const clusterParam = req.query.cluster as string
+    const foundEnvironment =
+      ENVIRONMENTS.find(
+        (e) => e.label === (firstParam(clusterParam) || 'mainnet')
+      ) ?? ENVIRONMENTS[0]!
+    const connection = new Connection(foundEnvironment?.primary)
+
+    const tryAddress = tryPublicKey(addressId)
+    if (tryAddress) {
+      let reverseEntry
+      if (identityName) {
+        const [namespaceId] = await findNamespaceId(identity.name)
+        reverseEntry = await getReverseEntry(
+          connection,
+          tryAddress,
+          namespaceId,
+          true
+        )
+      } else {
+        reverseEntry = await getGlobalReverseNameEntry(connection, tryAddress)
+      }
+      handle = reverseEntry.parsed.entryName
+      if (isKnownIdentity(reverseEntry.parsed.namespaceName)) {
+        identity = IDENTITIES[reverseEntry.parsed.namespaceName]
+      }
+    } else {
+      const nameEntry = await getNameEntry(
+        connection,
+        identity?.name,
+        addressId
+      )
+      handle = addressId
+      addressId = nameEntry.parsed.data?.toString()
+    }
+  }
 
   // draw base image
   const baseImgUri = 'https://identity.cardinal.so/assets/twitter-card.png'
@@ -75,8 +123,6 @@ const twitterCard = async (req: NextApiRequest, res: NextApiResponse) => {
     )
   }
 
-  const identity =
-    IDENTITIES[isKnownIdentity(identityName) ? identityName : 'twitter']
   if (identity) {
     const profileImageUri = await getImageUrl(
       identity.name,
