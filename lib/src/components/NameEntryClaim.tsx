@@ -120,6 +120,7 @@ export const NameEntryClaim = ({
                 wallet={wallet}
                 identity={identity}
                 disabled={false}
+                handle={handle}
                 callback={() => setVerificationInitiated(true)}
               />
             </>
