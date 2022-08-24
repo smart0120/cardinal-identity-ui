@@ -25,39 +25,43 @@ const twitterCard = async (req: NextApiRequest, res: NextApiResponse) => {
     IDENTITIES[isKnownIdentity(identityName) ? identityName : 'twitter']
 
   if (addressId && !handle) {
-    const clusterParam = req.query.cluster as string
-    const foundEnvironment =
-      ENVIRONMENTS.find(
-        (e) => e.label === (firstParam(clusterParam) || 'mainnet')
-      ) ?? ENVIRONMENTS[0]!
-    const connection = new Connection(foundEnvironment?.primary)
+    try {
+      const clusterParam = req.query.cluster as string
+      const foundEnvironment =
+        ENVIRONMENTS.find(
+          (e) => e.label === (firstParam(clusterParam) || 'mainnet')
+        ) ?? ENVIRONMENTS[0]!
+      const connection = new Connection(foundEnvironment?.primary)
 
-    const tryAddress = tryPublicKey(addressId)
-    if (tryAddress) {
-      let reverseEntry
-      if (identityName) {
-        const [namespaceId] = await findNamespaceId(identity.name)
-        reverseEntry = await getReverseEntry(
-          connection,
-          tryAddress,
-          namespaceId,
-          true
-        )
+      const tryAddress = tryPublicKey(addressId)
+      if (tryAddress) {
+        let reverseEntry
+        if (identityName) {
+          const [namespaceId] = await findNamespaceId(identity.name)
+          reverseEntry = await getReverseEntry(
+            connection,
+            tryAddress,
+            namespaceId,
+            true
+          )
+        } else {
+          reverseEntry = await getGlobalReverseNameEntry(connection, tryAddress)
+        }
+        handle = reverseEntry.parsed.entryName
+        if (isKnownIdentity(reverseEntry.parsed.namespaceName)) {
+          identity = IDENTITIES[reverseEntry.parsed.namespaceName]
+        }
       } else {
-        reverseEntry = await getGlobalReverseNameEntry(connection, tryAddress)
+        const nameEntry = await getNameEntry(
+          connection,
+          identity?.name,
+          addressId
+        )
+        handle = addressId
+        addressId = nameEntry.parsed.data?.toString()
       }
-      handle = reverseEntry.parsed.entryName
-      if (isKnownIdentity(reverseEntry.parsed.namespaceName)) {
-        identity = IDENTITIES[reverseEntry.parsed.namespaceName]
-      }
-    } else {
-      const nameEntry = await getNameEntry(
-        connection,
-        identity?.name,
-        addressId
-      )
-      handle = addressId
-      addressId = nameEntry.parsed.data?.toString()
+    } catch (e) {
+      console.log(e)
     }
   }
 
@@ -124,11 +128,16 @@ const twitterCard = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   if (identity) {
-    const profileImageUri = await getImageUrl(
-      identity.name,
-      handle ?? addressId ?? '',
-      dev
-    )
+    let profileImageUri
+    try {
+      profileImageUri = await getImageUrl(
+        identity.name,
+        handle ?? addressId ?? '',
+        dev
+      )
+    } catch (e) {
+      console.log(`Failed to get profile image ${e}`)
+    }
     if (profileImageUri) {
       const profileImage = await canvas.loadImage(profileImageUri)
       const profileCtx = imageCanvas.getContext('2d')
