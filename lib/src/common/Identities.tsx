@@ -216,7 +216,7 @@ export const IDENTITIES: {
     ),
     nameLink: (n) => `https://github.com/${n}`,
     verificationUrl: () =>
-      `https://github.com/login/oauth/authorize?client_id=46fd12e1745bd062a3b4&redirect_uri=http://localhost:3000/verification?identity=github&read:user&state=15773059ghq9183habn&allow_signup=false`,
+      `https://github.com/login/oauth/authorize?client_id=46fd12e1745bd062a3b4&redirect_uri=https://github.cardinal.so/verification?identity=github&read:user&state=15773059ghq9183habn&allow_signup=false`,
     verifierUrl: (address, proof, accessToken, cluster, dev) => {
       const code = new URL(proof).searchParams.get('code')
       console.log('code', code)
