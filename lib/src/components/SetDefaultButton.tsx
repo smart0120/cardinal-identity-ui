@@ -3,6 +3,7 @@ import type { Wallet } from '@saberhq/solana-contrib'
 import type { Connection } from '@solana/web3.js'
 import { BiGlobe } from 'react-icons/bi'
 
+import { Alert } from '../common/Alert'
 import { ButtonLight } from '../common/Button'
 import type { Identity } from '../common/Identities'
 import { LoadingSpinner } from '../common/LoadingSpinner'
@@ -37,7 +38,12 @@ export const SetDefaultButton = ({ connection, wallet, identity }: Props) => {
           )
           if (!foundReverseEntry) {
             setMessage(
-              'You must set a default handle for the identity before setting it global'
+              <Alert
+                type="error"
+                message={
+                  'You must set a default handle for the identity before setting it global'
+                }
+              />
             )
             return
           } else {
