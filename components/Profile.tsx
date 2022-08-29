@@ -54,7 +54,10 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           <Alert message={'Loading'} type="warning" />
         ) : addressName.data ? (
           <Alert
-            message={`Succesfully linked ${addressName.data[1]}`}
+            message={`Succesfully linked ${
+              identities.find((id) => id.name === addressName.data![1])
+                ?.displayName
+            }`}
             type="success"
           />
         ) : (
