@@ -135,6 +135,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
         )}
         <div className="flex flex-col justify-center text-center">
           <DisplayAddress
+            className="mx-auto"
             size={16}
             connection={connection}
             dark={

@@ -19,6 +19,7 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
 export const DisplayAddress: React.FC<Props> = ({
   connection,
   address,
+  className,
   dark = false,
   size = 14,
   style,
@@ -45,7 +46,7 @@ export const DisplayAddress: React.FC<Props> = ({
     )
   ) : (
     <div
-      className="flex items-center gap-1"
+      className={`${className} flex items-center gap-1`}
       style={{
         color: dark ? 'white' : 'black',
         fontSize: size,
