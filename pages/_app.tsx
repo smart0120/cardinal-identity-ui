@@ -23,17 +23,17 @@ const App = ({
   cluster,
 }: AppProps & { cluster: string; identityName: IdentityName }) => (
   <EnvironmentProvider defaultCluster={cluster}>
-    <WalletProvider wallets={getWalletAdapters()}>
-      <WalletModalProvider>
-        <WalletIdentityProvider
-          identities={identityName ? [IDENTITIES[identityName]] : undefined}
-        >
+    <WalletProvider wallets={getWalletAdapters()} autoConnect>
+      <WalletIdentityProvider
+        identities={identityName ? [IDENTITIES[identityName]] : undefined}
+      >
+        <WalletModalProvider>
           <>
             <ToastContainer />
             <Component {...pageProps} />
           </>
-        </WalletIdentityProvider>
-      </WalletModalProvider>
+        </WalletModalProvider>
+      </WalletIdentityProvider>
     </WalletProvider>
   </EnvironmentProvider>
 )
