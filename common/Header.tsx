@@ -10,7 +10,6 @@ import { ButtonSmall } from './ButtonSmall'
 import { LogoTitled } from './LogoTitled'
 import { asWallet } from './Wallets'
 
-
 type Props = {
   tabs?: {
     disabled?: boolean

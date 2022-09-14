@@ -2,7 +2,6 @@ import { css } from '@emotion/react'
 import { LoadingSpinner } from 'lib/src/common/LoadingSpinner'
 import { useState } from 'react'
 
-
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   children: JSX.Element | string
   className?: string
