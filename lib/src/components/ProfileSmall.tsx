@@ -54,7 +54,7 @@ export const ProfileSmall = ({
             dark={dark}
           />
         </div>
-        <div className="text-sm text-gray-500">{shortPubKey(address)}</div>
+        <div className={`text-sm ${dark ? 'text-white text-opacity-60' : 'text-black text-opacity-60'}`}>{shortPubKey(address)}</div>
       </div>
     </div>
   )
