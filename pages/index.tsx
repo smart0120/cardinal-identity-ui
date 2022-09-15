@@ -1,5 +1,6 @@
 import styled from '@emotion/styled'
 import { useWallet } from '@solana/wallet-adapter-react'
+import { FooterSlim } from 'common/FooterSlim'
 import { Header } from 'common/Header'
 import { PlaceholderProfile } from 'components/Profile'
 import { useWalletIdentity } from 'lib/src'
@@ -39,7 +40,7 @@ const TwitterHome = () => {
 
   return (
     <div
-      className={`fixed h-full w-full bg-dark-4`}
+      className={`fixed flex h-full w-full flex-col bg-dark-4`}
       style={{ background: identity?.colors.primary }}
     >
       <Head>
@@ -59,11 +60,12 @@ const TwitterHome = () => {
         />
       </Head>
       <Header />
-      <div style={{ marginTop: '10vh' }}>
+      <div className="flex grow items-center justify-center">
         <div className="mx-auto w-80">
           <PlaceholderProfile />
         </div>
       </div>
+      <FooterSlim />
     </div>
   )
 }

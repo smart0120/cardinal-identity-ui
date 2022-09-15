@@ -2,6 +2,7 @@ import { firstParam } from '@cardinal/common'
 import { getNameEntry } from '@cardinal/namespaces'
 import { useWallet } from '@solana/wallet-adapter-react'
 import type { PublicKey } from '@solana/web3.js'
+import { FooterSlim } from 'common/FooterSlim'
 import { Header } from 'common/Header'
 import { PlaceholderProfile, Profile } from 'components/Profile'
 import { tryPublicKey, useWalletIdentity } from 'lib/src'
@@ -44,7 +45,7 @@ const Home = () => {
 
   return (
     <div
-      className={`fixed h-full w-full bg-dark-4`}
+      className={`fixed flex h-full w-full flex-col bg-dark-4`}
       style={{ background: identity?.colors.primary }}
     >
       <Head>
@@ -68,7 +69,7 @@ const Home = () => {
         />
       </Head>
       <Header />
-      <div style={{ marginTop: '10vh' }}>
+      <div className="flex grow items-center justify-center">
         {address ? (
           <div className="mx-auto w-80">
             <Profile address={address} />
@@ -79,6 +80,7 @@ const Home = () => {
           </div>
         )}
       </div>
+      <FooterSlim />
     </div>
   )
 }
