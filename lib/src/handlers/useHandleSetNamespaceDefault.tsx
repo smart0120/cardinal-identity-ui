@@ -64,10 +64,7 @@ export const useHandleSetNamespaceDefault = (
               () =>
                 sendAndConfirmRawTransaction(
                   connection,
-                  transactions[i]!.serialize(),
-                  {
-                    skipPreflight: true,
-                  }
+                  transactions[i]!.serialize()
                 ),
               trace,
               { op: `sendTransaction ${i}/${transactions.length}` }

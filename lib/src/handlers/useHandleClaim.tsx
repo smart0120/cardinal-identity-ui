@@ -70,10 +70,7 @@ export const useHandleClaim = (
       await wallet.signAllTransactions(transactions)
       for (const tx of transactions) {
         txId = await withTrace(
-          () =>
-            sendAndConfirmRawTransaction(connection, tx.serialize(), {
-              skipPreflight: true,
-            }),
+          () => sendAndConfirmRawTransaction(connection, tx.serialize(), {}),
           trace,
           { op: 'sendTransaction' }
         )

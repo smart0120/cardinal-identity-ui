@@ -60,9 +60,7 @@ export const useHandleUnlink = (
       await wallet.signTransaction(transaction)
       const txid = await withTrace(
         () =>
-          sendAndConfirmRawTransaction(connection, transaction.serialize(), {
-            skipPreflight: true,
-          }),
+          sendAndConfirmRawTransaction(connection, transaction.serialize(), {}),
         trace,
         { op: 'sendTransaction' }
       )
