@@ -1,5 +1,4 @@
 import type { Wallet } from '@saberhq/solana-contrib'
-
 import type {
   ConfirmOptions,
   Connection,
@@ -8,8 +7,9 @@ import type {
   Transaction,
 } from '@solana/web3.js'
 import { sendAndConfirmRawTransaction } from '@solana/web3.js'
-import { handleError } from './errors'
+
 import { notify } from '../common/Notification'
+import { handleError } from './errors'
 
 export const executeTransaction = async (
   connection: Connection,

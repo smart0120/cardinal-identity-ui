@@ -21,6 +21,7 @@ export interface HandleSetParam {
 
 export type VerifyResponse = {
   error?: string
+  message?: string
   handle?: string
   accessToken?: string
 }
@@ -50,7 +51,7 @@ export const useHandleVerify = (
         tracer({ name: 'useHandleVerify' })
       )
       const json = (await response.json()) as VerifyResponse
-      if (response.status !== 200) throw new Error(json.error)
+      if (response.status !== 200) throw new Error(json.error ?? json.message)
       console.log('Verification response: ', JSON.stringify(json))
 
       setHandle(json.handle)
