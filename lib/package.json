@@ -1,6 +1,6 @@
 {
   "name": "@cardinal/namespaces-components",
-  "version": "4.1.20",
+  "version": "4.1.21",
   "description": "Solana namespaces react components library",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -43,7 +43,6 @@
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
     "@headlessui/react": "^1.6.1",
-    "@mui/material": "^5.10.0",
     "@popperjs/core": "^2.11.5",
     "@project-serum/anchor": "^0.24.2",
     "@saberhq/solana-contrib": "^1.12.26",
