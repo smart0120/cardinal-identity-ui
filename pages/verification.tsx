@@ -1,7 +1,7 @@
-import Tooltip from '@mui/material/Tooltip'
 import { Header } from 'common/Header'
 import { useWalletIdentity } from 'lib/src'
 import { ButtonLight } from 'lib/src/common/Button'
+import { Tooltip } from 'lib/src/common/Tooltip'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { IoCheckmarkCircleOutline } from 'react-icons/io5'
