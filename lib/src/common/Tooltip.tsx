@@ -5,7 +5,7 @@ import React from 'react'
 export const Tooltip: React.FC<TooltipProps> = ({ children, ...rest }) => {
   return (
     <MuiTooltip {...rest}>
-      <>{children}</>
+      <div>{children}</div>
     </MuiTooltip>
   )
 }

@@ -75,7 +75,7 @@ export const NameEntryRow = ({
       <div className="flex items-center gap-2">
         {!isReverseEntry(userTokenData, namespaceReverseEntry.data) && (
           <Tooltip
-            title={`Set handle as you default ${namespaceName} identity`}
+            title={`Set handle as your default ${namespaceName} identity`}
           >
             <ButtonLight
               onClick={() =>
