@@ -8,6 +8,11 @@
     "dist/",
     "src/"
   ],
+  "keywords": [
+    "solana",
+    "identity",
+    "cardinal"
+  ],
   "homepage": "https://github.com/cardinal-labs/cardinal-identity-ui#readme",
   "bugs": {
     "url": "https://github.com/cardinal-labs/cardinal-identity-ui/issues"
