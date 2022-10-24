@@ -2,87 +2,46 @@ import { useWallet } from '@solana/wallet-adapter-react'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import { GlyphWallet } from 'assets/GlyphWallet'
 import { AccountConnect } from 'lib/src'
-import { useRouter } from 'next/router'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
-import { useEffect, useState } from 'react'
 
 import { ButtonSmall } from './ButtonSmall'
 import { LogoTitled } from './LogoTitled'
 import { asWallet } from './Wallets'
 
-type Props = {
-  tabs?: {
-    disabled?: boolean
-    name: string
-    anchor: string
-    tooltip?: string
-  }[]
-  hideDashboard?: boolean
-}
-
-export const Header: React.FC<Props> = ({ tabs, hideDashboard }: Props) => {
-  const router = useRouter()
+export const Header = () => {
   const wallet = useWallet()
   const walletModal = useWalletModal()
-  const { connection, environment } = useEnvironmentCtx()
+  const { secondaryConnection, environment } = useEnvironmentCtx()
 
-  const [tab, setTab] = useState<string>('browse')
-
-  useEffect(() => {
-    const anchor = router.asPath.split('#')[1]
-    if (anchor !== tab) setTab(anchor || 'browse')
-  }, [router.asPath, tab])
-
+  console.log(wallet.connected, wallet.publicKey)
   return (
     <div className="w-full px-4 py-4">
       <div className="flex min-h-[72px] flex-wrap items-center justify-center gap-4 rounded-xl bg-white bg-opacity-5 py-4 px-8 md:justify-between">
         <div className="flex items-center gap-5">
-          <div
-            className="flex cursor-pointer items-center transition-opacity hover:opacity-60"
-            onClick={() => {
-              router.push(`/${location.search}`)
-            }}
-          >
+          <div className="flex cursor-pointer items-center transition-opacity hover:opacity-60">
             <LogoTitled className="inline-block h-6" />
-            <div className="absolute top-[54px] left-[200px] text-[10px] italic text-white">
-              <span
-                className="mr-2 ml-3 rounded-md px-[7px] py-1"
-                style={{ background: '#FFFFFF30' }}
-              >
-                identity
-              </span>
-              {environment.label !== 'mainnet-beta' && (
-                <span
-                  className="rounded-md px-[7px] py-1"
-                  style={{
-                    background: '#FFFFFF30',
-                    transform: 'translateY(20%)',
-                  }}
-                >
-                  {environment.label}
-                </span>
-              )}
-            </div>
           </div>
+          {environment.label !== 'mainnet-beta' && (
+            <div className="text-primary">{environment.label}</div>
+          )}
         </div>
-
         <div className="flex-5 flex items-center justify-end gap-6">
           {wallet.connected && wallet.publicKey ? (
             <AccountConnect
               dark={true}
-              connection={connection}
+              connection={secondaryConnection}
               environment={environment.label}
               handleDisconnect={() => wallet.disconnect()}
               wallet={asWallet(wallet)}
             />
           ) : (
             <ButtonSmall
-              className="text-xs"
+              className="text-xs text-white"
               onClick={() => walletModal.setVisible(true)}
             >
               <>
                 <GlyphWallet />
-                <div className="text-white">Connect wallet</div>
+                <>Connect wallet</>
               </>
             </ButtonSmall>
           )}

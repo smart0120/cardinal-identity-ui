@@ -1,6 +1,6 @@
 import type { Wallet } from '@saberhq/solana-contrib'
 import type { Cluster, Connection } from '@solana/web3.js'
-import React from 'react'
+import React, { useState } from 'react'
 import { BiChevronDown } from 'react-icons/bi'
 
 import { ProfileSmall } from '../'
@@ -22,11 +22,14 @@ export const AccountConnect = ({
   dark?: boolean
   style?: React.CSSProperties
 }) => {
+  const [open, setOpen] = useState<boolean>(false)
+
   if (!wallet.publicKey) return <></>
   return (
     <Popover
       offset={[-30, 20]}
       placement="bottom-end"
+      open={open}
       content={
         <AccountPopover
           dark={dark}
@@ -38,7 +41,10 @@ export const AccountConnect = ({
         />
       }
     >
-      <div className="flex cursor-pointer gap-2 text-gray-500 transition duration-200 hover:text-gray-300">
+      <div
+        onClick={() => setOpen(true)}
+        className="flex cursor-pointer gap-2 text-gray-500 transition duration-200 hover:text-gray-300"
+      >
         <ProfileSmall
           dark={dark}
           connection={connection}

@@ -1,8 +1,7 @@
+import { css } from '@emotion/react'
 import styled from '@emotion/styled'
-import { Popover as HeadlessPopover } from '@headlessui/react'
 import type { Placement } from '@popperjs/core'
-import React, { Fragment, useState } from 'react'
-import { usePopper } from 'react-popper'
+import React, { useEffect, useRef, useState } from 'react'
 
 const Arrow = styled.div`
   ::before {
@@ -52,54 +51,47 @@ const Arrow = styled.div`
 
 export interface PopoverProps {
   content: React.ReactNode
+  open: boolean
   guide?: boolean
   children: React.ReactNode
   placement?: Placement
   offset?: [number, number]
 }
 
-export const Popover: React.FC<PopoverProps> = ({
-  content,
-  children,
-  placement = 'right',
-  offset = [-25, 5],
-}) => {
-  const [referenceElement, setReferenceElement] =
-    useState<HTMLDivElement | null>(null)
-  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(
-    null
-  )
-  const [arrowElement, setArrowElement] = useState<HTMLDivElement | null>(null)
-  const { styles, attributes } = usePopper(referenceElement, popperElement, {
-    placement,
-    modifiers: [
-      { name: 'offset', options: { offset } },
-      { name: 'arrow', options: { element: arrowElement } },
-    ],
-  })
+export const Popover: React.FC<PopoverProps> = ({ content, children }) => {
+  const ref = useRef<HTMLDivElement | null>(null)
+  const [isOpen, setIsOpen] = useState<boolean>(false)
+
+  const handleClickOutside = (event: { target: any }) => {
+    if (ref.current && !ref.current.contains(event.target)) {
+      setIsOpen(false)
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutside, true)
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true)
+    }
+  }, [])
 
   return (
-    <HeadlessPopover>
-      {/* @ts-ignore */}
-      <HeadlessPopover.Button as={Fragment} ref={setReferenceElement}>
-        {children}
-      </HeadlessPopover.Button>
-      <HeadlessPopover.Panel
-        ref={setPopperElement}
-        style={{ ...styles.popper, zIndex: 49 }}
-        {...attributes.popper}
+    <div className="relative" ref={ref}>
+      <div onClick={() => setIsOpen(!isOpen)}>{children}</div>
+      <div
+        className={`absolute right-0 top-14 z-50 justify-center overflow-scroll bg-light-0 bg-opacity-[0.05] transition-all duration-200 ${
+          isOpen ? 'pointer-events-auto' : 'pointer-events-none'
+        }`}
+        // eslint-disable-next-line react/no-unknown-property
+        css={css`
+          ${isOpen
+            ? 'opacity: 100; backdrop-filter: blur(15px);'
+            : 'opacity: 0; backdrop-filter: blur(0px);'}
+        `}
       >
         {content}
-        <Arrow
-          className={`arrow-${
-            attributes.popper?.['data-popper-placement'] ?? ''
-          }`}
-          ref={setArrowElement}
-          style={{ ...styles.arrow }}
-          {...attributes.arrow}
-        />
-      </HeadlessPopover.Panel>
-    </HeadlessPopover>
+      </div>
+    </div>
   )
 }
 
