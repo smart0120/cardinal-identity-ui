@@ -1,4 +1,3 @@
-import { contrastColorMode } from '@cardinal/common'
 import styled from '@emotion/styled'
 import type { Cluster } from '@solana/web3.js'
 import { lighten } from 'polished'
@@ -101,13 +100,13 @@ export function ToastContainer() {
               style={{
                 borderColor: '#7560FF',
                 backgroundColor: lighten(0.07, '#0B0B0B'),
-                color: contrastColorMode('#0B0B0B')[0],
+                color: '#0B0B0B',
                 wordBreak: 'break-word',
               }}
             >
               {resolveValue(t.message, t)}
               <button
-                style={{ color: contrastColorMode('#0B0B0B')[0] }}
+                style={{ color: '#0B0B0B' }}
                 className={``}
                 onClick={() => toast.dismiss(t.id)}
               >

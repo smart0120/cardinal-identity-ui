@@ -1,4 +1,3 @@
-import { contrastColorMode } from '@cardinal/common'
 import { css } from '@emotion/react'
 import type { Wallet } from '@saberhq/solana-contrib'
 import { useWallet } from '@solana/wallet-adapter-react'
@@ -100,6 +99,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
               src={addressImage.data[0]}
             />
             <div
+              // eslint-disable-next-line react/no-unknown-property
               css={css`
                 &:hover {
                   transform: scale(1.05);
@@ -138,13 +138,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
             className="mx-auto"
             size={16}
             connection={connection}
-            dark={
-              identity?.colors.buttonColor
-                ? contrastColorMode(identity?.colors.buttonColor)[1]
-                  ? true
-                  : false
-                : undefined
-            }
+            dark={false}
             address={address}
           />
           <AddressLink address={address} />

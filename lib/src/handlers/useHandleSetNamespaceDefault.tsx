@@ -55,7 +55,6 @@ export const useHandleSetNamespaceDefault = (
           trace,
           { op: 'handleMigrate' }
         )
-        console.log(response)
         transactions = response?.transactions || []
         await wallet.signAllTransactions(transactions)
         for (let i = 0; i < transactions.length; i++) {

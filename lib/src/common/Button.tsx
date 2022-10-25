@@ -1,6 +1,5 @@
-import { contrastColorMode } from '@cardinal/common'
+import { contrastify } from '@cardinal/common'
 import { css } from '@emotion/react'
-import { darken, lighten } from 'polished'
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   disabled?: boolean
@@ -20,17 +19,14 @@ export const ButtonLight: React.FC<Props> = ({
         disabled ? 'cursor-default opacity-50' : 'cursor-pointer'
       }`}
       {...props}
+      // eslint-disable-next-line react/no-unknown-property
       css={
         background &&
         css`
           background: ${background} !important;
-          color: ${contrastColorMode(background)[1]
-            ? lighten(0.5, background)
-            : darken(0.5, background)} !important;
+          color: ${contrastify(0.5, background)[1]}
           &:hover {
-            background: ${contrastColorMode(background)[1]
-              ? lighten(0.05, background)
-              : darken(0.05, background)} !important;
+            background: ${contrastify(0.5, background)[1]} !important;
           }
         `
       }

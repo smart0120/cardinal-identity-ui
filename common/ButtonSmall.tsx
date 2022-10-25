@@ -28,6 +28,7 @@ export const ButtonSmall: React.FC<Props> = ({
           ? 'cursor-default opacity-50'
           : 'cursor-pointer hover:bg-opacity-5'
       }`}
+      // eslint-disable-next-line react/no-unknown-property
       css={css`
         white-space: break-spaces;
       `}

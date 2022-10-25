@@ -1,6 +1,5 @@
-import { contrastColorMode } from '@cardinal/common'
+import { contrastify } from '@cardinal/common'
 import { useWalletIdentity } from 'lib/src'
-import { darken, lighten } from 'polished'
 import { FaCheck, FaExclamation } from 'react-icons/fa'
 
 export const Alert = ({ message, type }: { message: string; type: string }) => {
@@ -12,9 +11,7 @@ export const Alert = ({ message, type }: { message: string; type: string }) => {
       style={{
         background: identity?.colors.buttonColor,
         color: identity?.colors.buttonColor
-          ? contrastColorMode(identity?.colors.buttonColor)[1]
-            ? lighten(0.5, identity?.colors.buttonColor)
-            : darken(0.5, identity?.colors.buttonColor)
+          ? contrastify(0.5, identity?.colors.buttonColor)[1]
           : undefined,
       }}
     >

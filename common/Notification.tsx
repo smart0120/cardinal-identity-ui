@@ -97,6 +97,7 @@ export function ToastContainer() {
               className={`relative flex w-full max-w-sm gap-4 rounded border border-border bg-dark-4 p-4 text-light-0 shadow ${
                 t.visible ? 'animate-enter' : 'animate-leave'
               }`}
+              // eslint-disable-next-line react/no-unknown-property
               css={css`
                 word-break: break-word;
               `}

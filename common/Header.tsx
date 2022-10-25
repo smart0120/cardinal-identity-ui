@@ -13,7 +13,6 @@ export const Header = () => {
   const walletModal = useWalletModal()
   const { secondaryConnection, environment } = useEnvironmentCtx()
 
-  console.log(wallet.connected, wallet.publicKey)
   return (
     <div className="w-full px-4 py-4">
       <div className="flex min-h-[72px] flex-wrap items-center justify-center gap-4 rounded-xl bg-white bg-opacity-5 py-4 px-8 md:justify-between">
