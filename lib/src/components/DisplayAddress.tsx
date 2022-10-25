@@ -26,7 +26,6 @@ export const DisplayAddress: React.FC<Props> = ({
   loader,
   hideIcon,
   lineHeight = 1.25,
-  disableLink,
   ...props
 }: Props) => {
   const addressName = useAddressName(connection, address)

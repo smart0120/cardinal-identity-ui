@@ -8,9 +8,9 @@ export const ProfileSmall = ({
   connection,
   address,
   dark,
-  onClick,
   placeholder,
   className,
+  disableProfileLink,
   style,
 }: {
   /** Solana RPC Connection to load this profile  */
@@ -27,6 +27,8 @@ export const ProfileSmall = ({
   className?: string
   /** Optional style prop to add to the profile div */
   style?: React.CSSProperties
+  // disables link to identity user profile
+  disableProfileLink?: boolean
   /** Optional dev environemnt */
   dev?: boolean
 }) => {
@@ -34,7 +36,7 @@ export const ProfileSmall = ({
     <div
       className={`${className} flex cursor-pointer gap-2 text-sm`}
       style={style}
-      onClick={onClick}
+      // onClick={onClick}
     >
       <AddressImage
         connection={connection}
@@ -48,13 +50,19 @@ export const ProfileSmall = ({
         <div className={`text-${dark ? 'white' : 'black'}`}>
           <DisplayAddress
             size={16}
-            style={{ pointerEvents: 'none' }}
+            style={disableProfileLink ? { pointerEvents: 'none' } : {}}
             connection={connection}
             address={address || undefined}
             dark={dark}
           />
         </div>
-        <div className={`text-sm ${dark ? 'text-white text-opacity-60' : 'text-black text-opacity-60'}`}>{shortPubKey(address)}</div>
+        <div
+          className={`text-sm ${
+            dark ? 'text-white text-opacity-60' : 'text-black text-opacity-60'
+          }`}
+        >
+          {shortPubKey(address)}
+        </div>
       </div>
     </div>
   )

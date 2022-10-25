@@ -1,53 +1,6 @@
 import { css } from '@emotion/react'
-import styled from '@emotion/styled'
 import type { Placement } from '@popperjs/core'
 import React, { useEffect, useRef, useState } from 'react'
-
-const Arrow = styled.div`
-  ::before {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    z-index: -1;
-    content: '';
-    transform: rotate(45deg);
-  }
-  &.arrow-top {
-    bottom: -5px;
-    ::before {
-      border-top: none;
-      border-left: none;
-    }
-  }
-  &.arrow-bottom {
-    top: -5px;
-    ::before {
-      border-bottom: none;
-      border-right: none;
-    }
-  }
-  &.arrow-bottom-end {
-    top: -5px;
-    ::before {
-      border-bottom: none;
-      border-right: none;
-    }
-  }
-  &.arrow-left {
-    right: -5px;
-    ::before {
-      border-bottom: none;
-      border-left: none;
-    }
-  }
-  &.arrow-right {
-    left: -5px;
-    ::before {
-      border-right: none;
-      border-top: none;
-    }
-  }
-`
 
 export interface PopoverProps {
   content: React.ReactNode

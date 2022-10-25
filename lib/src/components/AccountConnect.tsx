@@ -48,6 +48,7 @@ export const AccountConnect = ({
         <ProfileSmall
           dark={dark}
           connection={connection}
+          disableProfileLink={true}
           address={wallet.publicKey}
         />
         <BiChevronDown className="h-10 text-[25px] hover:scale-105" />
