@@ -1,6 +1,6 @@
 {
   "name": "@cardinal/namespaces-components",
-  "version": "4.1.23",
+  "version": "4.1.24",
   "description": "Solana namespaces react components library",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -49,6 +49,7 @@
     "@sentry/types": "^7.10.0",
     "@solana/spl-token": "^0.1.8",
     "@solana/web3.js": "1.32.0",
+    "@solana/buffer-layout": "^4.0.0",
     "polished": "^4.1.3",
     "react-hot-toast": "^2.3.0",
     "react-icons": "^4.3.1",
