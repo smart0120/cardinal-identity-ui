@@ -32,7 +32,7 @@ export const Popover: React.FC<PopoverProps> = ({ content, children }) => {
     <div className="relative" ref={ref}>
       <div onClick={() => setIsOpen(!isOpen)}>{children}</div>
       <div
-        className={`absolute right-0 top-14 z-50 justify-center overflow-scroll bg-light-0 bg-opacity-[0.05] transition-all duration-200 ${
+        className={`absolute right-0 top-14 z-50 justify-center bg-light-0 bg-opacity-[0.05] transition-all duration-200 ${
           isOpen ? 'pointer-events-auto' : 'pointer-events-none'
         }`}
         // eslint-disable-next-line react/no-unknown-property
