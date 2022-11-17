@@ -39,7 +39,7 @@ module.exports = {
     '@typescript-eslint/consistent-type-imports': 'error',
     '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/no-empty-function': 'off',
-    "react/no-unescaped-entities": 'warn',
+    'react/no-unescaped-entities': 'warn',
     '@typescript-eslint/no-unused-vars': [
       'warn',
       {

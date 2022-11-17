@@ -85,7 +85,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
         <div className="border-2 border-[#000] rounded-lg p-4 flex flex-col items-center gap-4 w-[300px]">
           {!addressImage.isFetched ? (
             <div
-              className="animate-pulse bg-gray-200"
+              className="bg-gray-200"
               style={{ height: '250px', width: '250px', borderRadius: '50%' }}
             />
           ) : addressImage.data ? (
@@ -205,7 +205,7 @@ export const PlaceholderProfile: React.FC = () => {
           <h1 className="text-2xl font-bold">132</h1>
         </div>
         <div className="border-2 border-[#000]  rounded-lg px-4 py-2 flex justify-between items-center w-[300px]">
-          <div className="animate-pulse border-2 border-[#000] rounded-full bg-gray-200 w-[56px] h-[56px]" />
+          <div className="border-2 border-[#000] rounded-full bg-gray-200 w-[56px] h-[56px]" />
           <Alert message={'Connect wallet to continue'} type="warning" />
         </div>
       </div>

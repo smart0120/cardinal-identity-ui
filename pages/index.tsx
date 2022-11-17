@@ -38,10 +38,7 @@ const TwitterHome = () => {
   }, [wallet.connected, wallet.publicKey, router])
 
   return (
-    <div
-      className={`fixed flex h-full w-full flex-col bg-white`}
-      style={{ background: identity?.colors.primary }}
-    >
+    <div className={`fixed flex h-full w-full flex-col bg-white`}>
       <Head>
         {/* <meta name="twitter:card" content="summary_large_image" />
         <meta property="twitter:domain" content="twitter.cardinal.so" />
