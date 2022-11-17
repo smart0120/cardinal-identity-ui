@@ -35,10 +35,11 @@ module.exports = {
     'import/first': 'warn',
     'import/newline-after-import': 'warn',
     'import/no-duplicates': 'warn',
-    'unused-imports/no-unused-imports': 'error',
+    // 'unused-imports/no-unused-imports': 'error',
     '@typescript-eslint/consistent-type-imports': 'error',
     '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/no-empty-function': 'off',
+    "react/no-unescaped-entities": 'warn',
     '@typescript-eslint/no-unused-vars': [
       'warn',
       {
