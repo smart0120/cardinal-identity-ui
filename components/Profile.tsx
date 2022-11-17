@@ -59,8 +59,8 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
           />
         )}
       </div>
-      <div className="flex justify-between">
-        <div className="flex flex-col w-[200px] gap-4">
+      <div className="flex flex-col md:flex-row justify-between gap-4">
+        <div className="flex flex-col w-full md:w-[200px] gap-4">
           <div className="border-2 border-[#000] rounded-lg px-4 py-2">
             <h3 className="font-bold">Total Users PoP'ed</h3>
             <h1 className="text-2xl font-bold">132</h1>
@@ -82,7 +82,7 @@ export const Profile: React.FC<Props> = ({ address }: Props) => {
             <h1 className="text-2xl font-bold">NA</h1>
           </div>
         </div>
-        <div className="border-2 border-[#000] rounded-lg p-4 flex flex-col items-center gap-4 w-[300px]">
+        <div className="border-2 border-[#000] rounded-lg p-4 flex flex-col items-center gap-4 w-full md:w-[300px]">
           {!addressImage.isFetched ? (
             <div
               className="bg-gray-200"
@@ -199,12 +199,12 @@ export const PlaceholderProfile: React.FC = () => {
       <div className="mb-4">
         <Alert message={'Note: Minting on NUKEPad requires your wallet to be enrolled into Proof Of Purity(PoP)'} type="warning" />
       </div>
-      <div className="flex justify-between">
-        <div className="border-2 border-[#000] rounded-lg px-4 py-2 w-[200px]">
+      <div className="flex flex-col md:flex-row justify-between gap-4">
+        <div className="border-2 border-[#000] rounded-lg px-4 py-2 w-full md:w-[200px]">
           <h3 className="font-bold">Total Users PoP'ed</h3>
           <h1 className="text-2xl font-bold">132</h1>
         </div>
-        <div className="border-2 border-[#000]  rounded-lg px-4 py-2 flex justify-between items-center w-[300px]">
+        <div className="border-2 border-[#000]  rounded-lg px-4 py-2 flex justify-between items-center w-full md:w-[300px]">
           <div className="border-2 border-[#000] rounded-full bg-gray-200 w-[56px] h-[56px]" />
           <Alert message={'Connect wallet to continue'} type="warning" />
         </div>

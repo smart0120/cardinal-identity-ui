@@ -74,13 +74,13 @@ const Home = () => {
         /> */}
       </Head>
       <Header />
-      <div className="flex grow items-center justify-center">
+      <div className="p-4 overflow-auto flex h-full md:items-center">
         {wallet.connected && address ? (
-          <div className="mx-auto w-[510px]">
+          <div className="mx-auto w-full md:w-[510px]">
             <Profile address={address} />
           </div>
         ) : (
-          <div className="mx-auto w-[510px]">
+          <div className="mx-auto w-full md:w-[510px]">
             <PlaceholderProfile />
           </div>
         )}

@@ -56,8 +56,8 @@ const TwitterHome = () => {
         /> */}
       </Head>
       <Header />
-      <div className="flex grow items-center justify-center">
-        <div className="mx-auto w-[510px]">
+      <div className="p-4 overflow-auto flex h-full md:items-center">
+        <div className="mx-auto md:w-[510px] w-full">
           <PlaceholderProfile />
         </div>
       </div>
