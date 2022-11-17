@@ -2,14 +2,13 @@ import { firstParam } from '@cardinal/common'
 import { getNameEntry } from '@cardinal/namespaces'
 import { useWallet } from '@solana/wallet-adapter-react'
 import type { PublicKey } from '@solana/web3.js'
-import { FooterSlim } from 'common/FooterSlim'
 import { Header } from 'common/Header'
 import { PlaceholderProfile, Profile } from 'components/Profile'
 import { tryPublicKey, useWalletIdentity } from 'lib/src'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEnvironmentCtx } from 'providers/EnvironmentProvider'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 const Home = () => {
   const wallet = useWallet()
@@ -43,13 +42,21 @@ const Home = () => {
     }
   }, [wallet.connected, wallet.publicKey, addressId, router])
 
+  useEffect(() => {
+    console.log(wallet.connected, router.pathname)
+    // if (!wallet.connected) {
+    //   router.push('/', undefined, {
+    //     shallow: true,
+    //   })
+    // }
+  }, [wallet.connected, router])
+
   return (
     <div
-      className={`fixed flex h-full w-full flex-col bg-dark-4`}
-      style={{ background: identity?.colors.primary }}
+      className={`fixed flex h-full w-full flex-col bg-white`}
     >
       <Head>
-        <meta name="twitter:card" content="summary_large_image" />
+        {/* <meta name="twitter:card" content="summary_large_image" />
         <meta property="twitter:domain" content="twitter.cardinal.so" />
         <meta
           name="twitter:title"
@@ -61,26 +68,23 @@ const Home = () => {
         />
         <meta
           name="twitter:image"
-          content={`${
-            process.env.NEXT_PUBLIC_BASE_URL
-          }/api/twitter-card/${addressId}${
-            router.query.handle ? `?handle=${router.query.handle}` : ''
-          }`}
-        />
+          content={`${process.env.NEXT_PUBLIC_BASE_URL
+            }/api/twitter-card/${addressId}${router.query.handle ? `?handle=${router.query.handle}` : ''
+            }`}
+        /> */}
       </Head>
       <Header />
       <div className="flex grow items-center justify-center">
-        {address ? (
-          <div className="mx-auto w-80">
+        {wallet.connected && address ? (
+          <div className="mx-auto w-[510px]">
             <Profile address={address} />
           </div>
         ) : (
-          <div className="mx-auto w-80">
+          <div className="mx-auto w-[510px]">
             <PlaceholderProfile />
           </div>
         )}
       </div>
-      <FooterSlim />
     </div>
   )
 }

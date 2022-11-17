@@ -28,8 +28,8 @@ export default class MyDocument extends Document {
             data-emotion-css={this.props.ids?.join(' ')}
             dangerouslySetInnerHTML={{ __html: this.props.css }}
           />
-          <meta name="twitter:creator" content="@cardinal_labs" />
-          <meta name="twitter:site" content="@cardinal_labs" />
+          {/* <meta name="twitter:creator" content="@cardinal_labs" />
+          <meta name="twitter:site" content="@cardinal_labs" /> */}
         </Head>
         <body>
           <Main />

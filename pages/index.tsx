@@ -1,6 +1,5 @@
 import styled from '@emotion/styled'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { FooterSlim } from 'common/FooterSlim'
 import { Header } from 'common/Header'
 import { PlaceholderProfile } from 'components/Profile'
 import { useWalletIdentity } from 'lib/src'
@@ -40,11 +39,11 @@ const TwitterHome = () => {
 
   return (
     <div
-      className={`fixed flex h-full w-full flex-col bg-dark-4`}
+      className={`fixed flex h-full w-full flex-col bg-white`}
       style={{ background: identity?.colors.primary }}
     >
       <Head>
-        <meta name="twitter:card" content="summary_large_image" />
+        {/* <meta name="twitter:card" content="summary_large_image" />
         <meta property="twitter:domain" content="twitter.cardinal.so" />
         <meta
           name="twitter:title"
@@ -57,15 +56,14 @@ const TwitterHome = () => {
         <meta
           name="twitter:image"
           content="https://identity.cardinal.so/assets/twitter-card.png"
-        />
+        /> */}
       </Head>
       <Header />
       <div className="flex grow items-center justify-center">
-        <div className="mx-auto w-80">
+        <div className="mx-auto w-[510px]">
           <PlaceholderProfile />
         </div>
       </div>
-      <FooterSlim />
     </div>
   )
 }

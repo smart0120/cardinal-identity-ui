@@ -1,6 +1,6 @@
 export const GlyphWallet = () => (
   <svg
-    style={{ height: '12px' }}
+    style={{ height: '30px' }}
     width="22"
     height="20"
     viewBox="0 0 22 20"

@@ -46,7 +46,6 @@ export const AccountConnect = ({
         className="flex cursor-pointer gap-2 text-gray-500 transition duration-200 hover:text-gray-300"
       >
         <ProfileSmall
-          dark={dark}
           connection={connection}
           disableProfileLink={true}
           address={wallet.publicKey}

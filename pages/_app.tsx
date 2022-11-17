@@ -4,10 +4,10 @@ import 'tailwindcss/tailwind.css'
 import { WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import {
-  BackpackWalletAdapter,
-  BraveWalletAdapter,
-  CoinbaseWalletAdapter,
-  FractalWalletAdapter,
+  // BackpackWalletAdapter,
+  // BraveWalletAdapter,
+  // CoinbaseWalletAdapter,
+  // FractalWalletAdapter,
   GlowWalletAdapter,
   LedgerWalletAdapter,
   PhantomWalletAdapter,
@@ -29,27 +29,24 @@ require('@solana/wallet-adapter-react-ui/styles.css')
 const App = ({
   Component,
   pageProps,
-  identityName,
   cluster,
-}: AppProps & { cluster: string; identityName: IdentityName }) => (
+}: AppProps & { cluster: string; }) => (
   <EnvironmentProvider defaultCluster={cluster}>
     <WalletProvider
       wallets={[
         new PhantomWalletAdapter(),
         new SolflareWalletAdapter(),
-        new BackpackWalletAdapter(),
-        new CoinbaseWalletAdapter(),
-        new BraveWalletAdapter(),
-        new FractalWalletAdapter(),
+        // new BackpackWalletAdapter(),
+        // new CoinbaseWalletAdapter(),
+        // new BraveWalletAdapter(),
+        // new FractalWalletAdapter(),
         new GlowWalletAdapter(),
         new LedgerWalletAdapter(),
         new TorusWalletAdapter(),
       ]}
       autoConnect
     >
-      <WalletIdentityProvider
-        identities={identityName ? [IDENTITIES[identityName]] : undefined}
-      >
+      <WalletIdentityProvider>
         <WalletModalProvider>
           <>
             <ToastContainer />

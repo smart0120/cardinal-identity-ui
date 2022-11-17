@@ -26,21 +26,21 @@ export const VerificationButton = ({
   return (
     <div
       className="flex"
-      onClick={() => {
-        window.open(link, '_blank')
-        callback && callback()
-      }}
+      // onClick={() => {
+      //   window.open(link, '_blank')
+      //   callback && callback()
+      // }}
     >
       <ButtonLight
         className="mt-[5px] flex items-center justify-center gap-[5px] py-[5px] px-[14px]"
         background={identity?.colors.primary}
         disabled={disabled}
       >
-        {identity && identity.icon({ variant: 'light', height: 14, width: 14 })}
+        {identity && identity.icon({ variant: 'light', height: 20, width: 20 })}
         <span
-          style={{ color: identity.colors.primaryFontColor, fontSize: '12px' }}
+          style={{ color: identity.colors.primaryFontColor, fontSize: '18px' }}
         >
-          Verify
+          Tweet
         </span>
       </ButtonLight>
     </div>

@@ -125,8 +125,8 @@ export const BoltIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 
 export const Megaphone: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
-    width="18"
-    height="18"
+    width="40"
+    height="40"
     version="1.1"
     viewBox="0 0 1200 1200"
     xmlns="http://www.w3.org/2000/svg"
@@ -150,8 +150,8 @@ export const Megaphone: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 
 export const Link: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
-    width="18"
-    height="18"
+    width="40"
+    height="40"
     version="1.1"
     viewBox="0 0 1200 1200"
     xmlns="http://www.w3.org/2000/svg"
@@ -165,8 +165,8 @@ export const Link: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 
 export const Verified: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
-    width="16"
-    height="16"
+    width="40"
+    height="40"
     version="1.1"
     viewBox="0 0 1200 1200"
     xmlns="http://www.w3.org/2000/svg"

@@ -3,7 +3,6 @@ import * as Sentry from '@sentry/browser'
 import type { Cluster, Connection } from '@solana/web3.js'
 import React, { useContext, useState } from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { ReactQueryDevtools } from 'react-query/devtools'
 
 import { ClaimCard } from '..'
 import type { Identity, IdentityName } from '../common/Identities'
@@ -70,7 +69,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
   const [onClose, setOnClose] = useState<(() => void) | undefined>()
   const [showIdentityModal, setShowIdentityModal] = useState<boolean>(false)
   const [identities, setIdentities] = useState(defaultIdentities)
-  const [defaultVerifyIdentity, setDefaultVerifyIdentity] = useState<Identity>()
+  const [defaultVerifyIdentity, setDefaultVerifyIdentity] = useState<Identity>(IDENTITIES['twitter'])
   const [message, setMessage] = useState<React.ReactNode>()
 
   Sentry.init({
@@ -100,7 +99,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
           setShowIdentityModal(true)
           setMessage(undefined)
           identities && setIdentities(identities)
-          verifyIdentity && setDefaultVerifyIdentity(IDENTITIES[verifyIdentity])
+          setDefaultVerifyIdentity(IDENTITIES['twitter'])
           Sentry.configureScope((scope) => {
             scope.setUser({
               username: wallet.publicKey?.toString(),
@@ -123,7 +122,7 @@ export const WalletIdentityProvider: React.FC<Props> = ({
     >
       <QueryClientProvider client={QUERY_CLIENT}>
         <Modal
-          className="bg-white text-dark-6"
+          className="bg-white text-dark-6 border-2 border-black"
           isOpen={showIdentityModal}
           onDismiss={() => {
             setShowIdentityModal(false)
@@ -145,7 +144,6 @@ export const WalletIdentityProvider: React.FC<Props> = ({
           />
         </Modal>
         {children}
-        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </WalletIdentityContext.Provider>
   )

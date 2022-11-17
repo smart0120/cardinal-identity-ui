@@ -1,17 +1,17 @@
 import styled from '@emotion/styled'
 import { lighten } from 'polished'
 import { FaCheckCircle } from 'react-icons/fa'
+import { ButtonLight } from '../common/Button'
 
 import { LoadingSpinner } from '../common/LoadingSpinner'
 
-interface Props
-  extends React.DetailedHTMLProps<
-    React.ButtonHTMLAttributes<HTMLButtonElement>,
-    HTMLButtonElement
-  > {
+interface Props {
   loading?: boolean
   complete?: boolean
   footer?: React.ReactNode
+  onClick: () => void
+  children: JSX.Element | string
+  disabled?: boolean
 }
 
 export const ButtonWithFooter: React.FC<Props> = ({
@@ -23,12 +23,9 @@ export const ButtonWithFooter: React.FC<Props> = ({
   ...props
 }: Props) => {
   return (
-    <BottomArea>
-      <BigButton disabled={disabled} {...props}>
-        {loading ? <LoadingSpinner /> : complete ? <FaCheckCircle /> : children}
-      </BigButton>
-      <FooterText>{footer}</FooterText>
-    </BottomArea>
+    <ButtonLight disabled={disabled} {...props} className='bg-teal-500 hover:bg-teal-600'>
+      {loading ? <LoadingSpinner /> : complete ? <FaCheckCircle /> : children}
+    </ButtonLight>
   )
 }
 

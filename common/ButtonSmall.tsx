@@ -23,10 +23,10 @@ export const ButtonSmall: React.FC<Props> = ({
   return (
     <div
       {...props}
-      className={`flex items-center justify-center gap-1 rounded-xl border-[0px] border-border bg-light-0 bg-opacity-10 px-3 py-2 transition-all ${className} ${
+      className={`flex items-center justify-center gap-1 rounded-full border-[0px] border-border bg-black px-3 py-2 transition-all ${className} ${
         disabled
           ? 'cursor-default opacity-50'
-          : 'cursor-pointer hover:bg-opacity-5'
+          : 'cursor-pointer hover:bg-opacity-50'
       }`}
       // eslint-disable-next-line react/no-unknown-property
       css={css`

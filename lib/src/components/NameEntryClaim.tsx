@@ -80,10 +80,8 @@ export const NameEntryClaim = ({
 
   return (
     <>
-      <div className="mb-6 text-center text-2xl text-dark-6">
-        {appInfo?.name ? `${appInfo.name} uses` : 'Use'} Cardinal to link your{' '}
-        <strong>{identity.displayName}</strong> identity to your{' '}
-        <strong>Solana</strong> address.
+      <div className="mb-6 text-center text-lg text-dark-6">
+        Enroll into Proof Of Purity <b><span className='text-pink-300'>P</span><span className='text-indigo-500'>o</span><span className='text-yellow-500'>P</span></b> to get <span className='text-yellow-300'>whitelisted</span> for future mints and <b className='text-teal-500'>earn $SOL</b> by maintaining your <b className='text-rose-400'>mint streak</b>
       </div>
       {globalReverseEntry.data &&
         globalReverseEntry.data.parsed.namespaceName === identity.name && (
@@ -102,36 +100,28 @@ export const NameEntryClaim = ({
             showIcon
           />
         )}
-      <ButtonLight
-        className="absolute right-8 z-10"
-        onClick={() => setVerifyIdentity(undefined)}
-      >
-        Manage linked accounts
-      </ButtonLight>
       <DetailsWrapper>
         <StepDetail
           disabled={!wallet?.publicKey || !connection}
           icon={<Megaphone />}
           title={identity?.description.header || 'Verify'}
           description={
-            <>
-              <div>{identity?.description.text}</div>
-              <VerificationButton
-                wallet={wallet}
-                identity={identity}
-                disabled={false}
-                handle={handle}
-                callback={() => setVerificationInitiated(true)}
-              />
-            </>
+            <div>{identity?.description.text}</div>
           }
-        />
+        >
+          <VerificationButton
+            wallet={wallet}
+            identity={identity}
+            disabled={false}
+            handle={handle}
+            callback={() => setVerificationInitiated(true)}
+          />
+        </StepDetail>
         <StepDetail
           disabled={!verificationInitiated}
           icon={<Link />}
-          title={`Paste the URL of the ${
-            identity.verification?.toLocaleLowerCase() || 'verification'
-          }`}
+          title={`Paste the URL of the ${identity.verification?.toLocaleLowerCase() || 'verification'
+            }`}
           description={
             <div>
               <LabeledInput
@@ -142,7 +132,16 @@ export const NameEntryClaim = ({
               />
             </div>
           }
-        />
+        >
+          <ButtonLight
+            className="mt-[5px] flex items-center justify-center gap-[5px] py-[5px] px-[14px] bg-teal-500 hover:bg-teal-600"
+            disabled={!verificationInitiated}
+          >
+            <span className='text-[18px]'>
+              Submit
+            </span>
+          </ButtonLight>
+        </StepDetail>
         <StepDetail
           disabled={
             !proof ||
@@ -158,8 +157,7 @@ export const NameEntryClaim = ({
           description={
             <>
               <div>
-                You will receive a non-tradeable NFT to prove you own your{' '}
-                {identity.displayName} handle.
+                You will receive an Identity NFT
               </div>
               {proof && proof?.length !== 0 && (
                 <div
@@ -241,7 +239,7 @@ export const NameEntryClaim = ({
                           />
                           {nameEntryData?.data?.owner?.toString() ===
                             wallet?.publicKey?.toString() &&
-                          !handleClaimTransaction.isLoading ? (
+                            !handleClaimTransaction.isLoading ? (
                             <>
                               <div>
                                 You already own this handle! If you want to set
@@ -271,38 +269,39 @@ export const NameEntryClaim = ({
               )}
             </>
           }
-        />
-      </DetailsWrapper>
-      <ButtonWithFooter
-        loading={handleClaimTransaction.isLoading}
-        complete={handleClaimTransaction.isSuccess}
-        disabled={
-          !handleVerify.isSuccess ||
-          proof?.length === 0 ||
-          nameEntryData.isFetching ||
-          nameEntryData?.data?.owner?.toString() ===
-            wallet?.publicKey?.toString()
-        }
-        onClick={async () => {
-          handleClaimTransaction.mutate(
-            {
-              proof,
-              accessToken,
-            },
-            {
-              onSuccess: () => {
-                onComplete && onComplete(handle || '')
-              },
+        >
+          <ButtonWithFooter
+            loading={handleClaimTransaction.isLoading}
+            complete={handleClaimTransaction.isSuccess}
+            disabled={
+              !handleVerify.isSuccess ||
+              proof?.length === 0 ||
+              nameEntryData.isFetching ||
+              nameEntryData?.data?.owner?.toString() ===
+              wallet?.publicKey?.toString()
             }
-          )
-        }}
-      >
-        Claim {handle && `@${handle}`}
-      </ButtonWithFooter>
+            onClick={async () => {
+              handleClaimTransaction.mutate(
+                {
+                  proof,
+                  accessToken,
+                },
+                {
+                  onSuccess: () => {
+                    onComplete && onComplete(handle || '')
+                  },
+                }
+              )
+            }}
+          >
+            Get Popped
+          </ButtonWithFooter>
+        </StepDetail>
+      </DetailsWrapper>
     </>
   )
 }
 const DetailsWrapper = styled.div`
   display: grid;
-  grid-row-gap: 28px;
+  grid-row-gap: 16px;
 `

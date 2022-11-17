@@ -7,13 +7,7 @@ export const Alert = ({ message, type }: { message: string; type: string }) => {
   const identity = identities.length === 1 ? identities[0] : undefined
   return (
     <div
-      className="flex items-center justify-center rounded-lg bg-light-1 py-2 text-center text-xs text-light-4"
-      style={{
-        background: identity?.colors.buttonColor,
-        color: identity?.colors.buttonColor
-          ? contrastify(0.5, identity?.colors.buttonColor)[1]
-          : undefined,
-      }}
+      className="flex items-center justify-center rounded-lg bg-light-1 p-2 text-center text-xs text-light-4 border-2 border-[#000]"
     >
       {type === 'success' && <FaCheck />}
       {type === 'warning' && <FaExclamation />}
