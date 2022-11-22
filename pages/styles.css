@@ -15,3 +15,18 @@ body {
 a {
   text-decoration: none;
 }
+
+.navbar-text {
+  width: 0;
+  opacity: 0;
+  transition: all 0.3s;
+  overflow: hidden;
+  padding: 0;
+  height: 24px;
+}
+
+.right-sidebar:hover .navbar-text {
+  opacity: 1;
+  width: 120px;
+  padding-left: 12px;
+}

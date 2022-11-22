@@ -1,6 +1,7 @@
 import styled from '@emotion/styled'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { Header } from 'common/Header'
+import Layout from 'common/Layout'
 import { PlaceholderProfile } from 'components/Profile'
 import { useWalletIdentity } from 'lib/src'
 import Head from 'next/head'
@@ -38,30 +39,9 @@ const TwitterHome = () => {
   }, [wallet.connected, wallet.publicKey, router])
 
   return (
-    <div className={`fixed flex h-full w-full flex-col bg-white`}>
-      <Head>
-        {/* <meta name="twitter:card" content="summary_large_image" />
-        <meta property="twitter:domain" content="twitter.cardinal.so" />
-        <meta
-          name="twitter:title"
-          content={`Claim your ${identity?.displayName} handle on Solana!`}
-        />
-        <meta
-          name="twitter:description"
-          content={`Secure your identity on Solana by claiming your ${identity?.displayName} handle as an NFT, powered by Cardinal.`}
-        />
-        <meta
-          name="twitter:image"
-          content="https://identity.cardinal.so/assets/twitter-card.png"
-        /> */}
-      </Head>
-      <Header />
-      <div className="p-4 overflow-auto flex h-full md:items-center">
-        <div className="mx-auto md:w-[510px] w-full">
-          <PlaceholderProfile />
-        </div>
-      </div>
-    </div>
+    <Layout>
+      <PlaceholderProfile />
+    </Layout>
   )
 }
 
